@@ -66,36 +66,9 @@
                         <i class="ri-keyboard-fill"></i>@lang('translation.management')
                     </a>
                 </li>
-
                 <!-- <li class="nav-item">
                     <a href="votes" class="nav-link">@lang('translation.ratings')</a>
-                </li> --
-                <li class="nav-item">
-                    <a class="nav-link menu-link" href="#sidebarForms" data-bs-toggle="collapse" role="button"
-                        aria-expanded="false" aria-controls="sidebarForms">
-                        <i class="ri-file-list-3-line"></i> <span>@lang('translation.forms')</span>
-                    </a>
-                    <div class="collapse menu-dropdown" id="sidebarForms">
-                        <ul class="nav nav-sm flex-column">
-                            
-                            <li class="nav-item">
-                                <a href="forms-elements" class="nav-link">@lang('translation.basic-elements')</a>
-                            </li>
-                            <li class="nav-item">
-                                <a href="forms-checkboxs-radios" class="nav-link">@lang('translation.checkboxs-radios')</a>
-                            </li>
-                            <li class="nav-item">
-                                <a href="forms-pickers" class="nav-link">@lang('translation.pickers')</a>
-                            </li>
-                            <li class="nav-item">
-                                <a href="forms-advanced" class="nav-link">@lang('translation.advanced')</a>
-                            </li>
-                            <li class="nav-item">
-                                <a href="forms-select2" class="nav-link">@lang('translation.select2') </a>
-                            </li>
-                        </ul>
-                    </div>
-                </li>
+                </li> -->
 
             </ul>
         </div>

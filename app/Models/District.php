@@ -9,7 +9,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class District extends Model
 {
-    protected $fillable = ['name', 'municipality_id'];
+    protected $fillable = ['name', 'number', 'municipality_id', 'latitude', 'longitude', 'active'];
 
     public function municipality(): BelongsTo
     {

@@ -143,8 +143,25 @@
                         </span>
                     </button>
                     <div class="dropdown-menu dropdown-menu-end">
-                        <!-- <div class="dropdown-divider"></div> -->
-                        <a class="dropdown-item " href="javascript:void();" onclick="event.preventDefault(); document.getElementById('logout-form').submit();"><i class="bx bx-power-off font-size-16 align-middle me-1"></i> <span key="t-logout">@lang('translation.logout')</span></a>
+                        <h6 class="dropdown-header">Bienvenid@ {{ Auth::user()->name }}!</h6>
+                        <a class="dropdown-item" href="{{ route('profile') }}">
+                            <i class="mdi mdi-account-circle text-muted fs-16 align-middle me-1"></i> 
+                            <span class="align-middle">Perfil</span>
+                        </a>
+                        <a class="dropdown-item" href="pages-faqs">
+                            <i class="mdi mdi-lifebuoy text-muted fs-16 align-middle me-1"></i> 
+                            <span class="align-middle">Ayuda</span>
+                        </a>
+                        <div class="dropdown-divider"></div>
+                        <a class="dropdown-item" href="{{ route('profile.settings') }}">
+                            <i class="mdi mdi-cog-outline text-muted fs-16 align-middle me-1"></i> 
+                            <span class="align-middle">Configuraciones</span>
+                        </a>
+                        
+                        <a class="dropdown-item" href="javascript:void();" onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
+                            <i class="bx bx-power-off font-size-16 align-middle me-1"></i> 
+                            <span key="t-logout">@lang('translation.logout')</span>
+                        </a>
                         <form id="logout-form" action="{{ route('logout') }}" method="POST" style="display: none;">
                             @csrf
                         </form>

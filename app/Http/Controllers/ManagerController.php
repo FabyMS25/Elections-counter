@@ -6,6 +6,7 @@ use App\Models\VotingTable;
 use App\Models\Institution;
 use App\Models\Department;
 use App\Models\Municipality;
+use App\Models\Locality;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\ValidationException;
@@ -15,25 +16,22 @@ class ManagerController extends Controller
     public function index()
     {
         try {
-            $managers = Manager::with(['user', 'votingTable.institution'])->get();
-            $institutions = Institution::with('municipality.department')->get();
-            $departments = Department::with('municipalities')->get();
+            $managers = Manager::with(['user', 'votingTable.institution'])->get();            
+            $institutions = Institution::all();            
         } catch (\Exception $e) {
             \Log::error('Error loading managers: ' . $e->getMessage());
             $managers = collect();
             $institutions = collect();
-            $departments = collect();
             session()->flash('error', 'Error loading managers data.');
-        }
-        
-        return view('tables-managers', compact('managers', 'institutions', 'departments'));
+        }        
+        return view('tables-managers', compact('managers', 'institutions'));
     }
 
     public function getVotingTables($institutionId)
     {
         try {
             $votingTables = VotingTable::where('institution_id', $institutionId)
-                ->where('status', 'active')
+                ->where('status', 'activo')
                 ->get();
             
             return response()->json($votingTables);

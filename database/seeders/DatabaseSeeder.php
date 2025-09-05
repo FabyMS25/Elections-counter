@@ -16,7 +16,10 @@ class DatabaseSeeder extends Seeder
         // \App\Models\User::factory(10)->create();
         $this->call([
             DepartmentSeeder::class,
-            DepartamentDivisionsSeeder::class,
+            ProvincesMunicipalitiesSeeder::class,
+            LocalitiesSeeder::class,
+            ElectionTypeSeeder::class,
+            
             // QuillacolloInstitutionsSeeder::class,
         ]);
     }

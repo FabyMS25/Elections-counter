@@ -11,14 +11,17 @@ class Institution extends Model
     use HasFactory;
 
     protected $fillable = [
-        'name',
-        'code',
-        'address',
-        'province_id',
-        'municipality_id',
-        'district_id',
-        'zone_id',
-        'active',
+        'name', 'code', 'address', 'locality_id', 'district_id', 'zone_id',
+        'registered_citizens', 'total_computed_records', 'total_annulled_records',
+        'total_enabled_records', 'active'
+    ];
+
+    protected $casts = [
+        'active' => 'boolean',
+        'registered_citizens' => 'integer',
+        'total_computed_records' => 'integer',
+        'total_annulled_records' => 'integer',
+        'total_enabled_records' => 'integer',
     ];
 
     protected static function boot()
@@ -45,24 +48,31 @@ class Institution extends Model
         return $this->hasMany(VotingTable::class);
     }
 
-
-    public function province(): BelongsTo
+    public function locality(): BelongsTo
     {
-        return $this->belongsTo(Province::class);
+        return $this->belongsTo(Locality::class);
     }
-
-    public function municipality(): BelongsTo
-    {
-        return $this->belongsTo(Municipality::class);
-    }
-
     public function district(): BelongsTo
     {
         return $this->belongsTo(District::class);
     }
-
     public function zone(): BelongsTo
     {
         return $this->belongsTo(Zone::class);
+    }
+
+    public function scopeActive($query)
+    {
+        return $query->where('active', true);
+    }
+
+    public function updateTotals()
+    {
+        $this->update([
+            'total_computed_records' => $this->votingTables()->sum('computed_records'),
+            'total_annulled_records' => $this->votingTables()->sum('annulled_records'),
+            'total_enabled_records' => $this->votingTables()->sum('enabled_records'),
+            'registered_citizens' => $this->votingTables()->sum('registered_citizens'),
+        ]);
     }
 }

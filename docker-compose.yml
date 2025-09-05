@@ -1,42 +1,46 @@
 version: '3.8'
+
 services:
   app:
     build:
       context: .
       dockerfile: Dockerfile
-    ports:
-      - "8000:80"
+    container_name: laravel_app
     volumes:
-      - .:/var/www/html
-    environment:
-      - DB_CONNECTION=pgsql
-      - DB_HOST=db
-      - DB_PORT=5432
-      - DB_DATABASE=election_counter
-      - DB_USERNAME=laravel_user
-      - DB_PASSWORD=secret
+      - .:/var/www
+    networks:
+      - laravel
     depends_on:
       - db
+
+  webserver:
+    image: nginx:alpine
+    container_name: laravel_nginx
+    ports:
+      - "80:80"
+    volumes:
+      - .:/var/www
+      - ./docker/nginx/conf.d:/etc/nginx/conf.d
     networks:
-      - election-net
+      - laravel
+    depends_on:
+      - app
 
   db:
     image: postgres:15
-    container_name: election-db
+    container_name: laravel_postgres
+    restart: always
     environment:
-      - POSTGRES_DB=election_counter
-      - POSTGRES_USER=laravel_user
-      - POSTGRES_PASSWORD=secret
-    ports:
-      - "5432:5432"
+      POSTGRES_DB: laravel_db
+      POSTGRES_USER: laravel_user
+      POSTGRES_PASSWORD: laravel_pass
     volumes:
-      - postgres_data:/var/lib/postgresql/data
+      - db_data:/var/lib/postgresql/data
     networks:
-      - election-net
+      - laravel
 
 networks:
-  election-net:
-    driver: bridge
+  laravel:
 
 volumes:
-  postgres_data:
+  db_data:

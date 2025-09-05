@@ -66,36 +66,9 @@
                         <i class="ri-keyboard-fill"></i><?php echo app('translator')->get('translation.management'); ?>
                     </a>
                 </li>
-
                 <!-- <li class="nav-item">
                     <a href="votes" class="nav-link"><?php echo app('translator')->get('translation.ratings'); ?></a>
-                </li> --
-                <li class="nav-item">
-                    <a class="nav-link menu-link" href="#sidebarForms" data-bs-toggle="collapse" role="button"
-                        aria-expanded="false" aria-controls="sidebarForms">
-                        <i class="ri-file-list-3-line"></i> <span><?php echo app('translator')->get('translation.forms'); ?></span>
-                    </a>
-                    <div class="collapse menu-dropdown" id="sidebarForms">
-                        <ul class="nav nav-sm flex-column">
-                            
-                            <li class="nav-item">
-                                <a href="forms-elements" class="nav-link"><?php echo app('translator')->get('translation.basic-elements'); ?></a>
-                            </li>
-                            <li class="nav-item">
-                                <a href="forms-checkboxs-radios" class="nav-link"><?php echo app('translator')->get('translation.checkboxs-radios'); ?></a>
-                            </li>
-                            <li class="nav-item">
-                                <a href="forms-pickers" class="nav-link"><?php echo app('translator')->get('translation.pickers'); ?></a>
-                            </li>
-                            <li class="nav-item">
-                                <a href="forms-advanced" class="nav-link"><?php echo app('translator')->get('translation.advanced'); ?></a>
-                            </li>
-                            <li class="nav-item">
-                                <a href="forms-select2" class="nav-link"><?php echo app('translator')->get('translation.select2'); ?> </a>
-                            </li>
-                        </ul>
-                    </div>
-                </li>
+                </li> -->
 
             </ul>
         </div>

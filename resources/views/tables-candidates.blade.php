@@ -4,7 +4,6 @@
 @endsection
 @section('css')
     <link href="{{ URL::asset('build/libs/sweetalert2/sweetalert2.min.css') }}" rel="stylesheet" type="text/css" />
-    <!-- <link href="{{ URL::asset('build/libs/choices.js/choices.js.min.css') }}" rel="stylesheet" type="text/css" /> -->
     <style>
         .image-preview-container {
             margin-top: 10px;
@@ -15,6 +14,13 @@
             max-height: 100px;
             border-radius: 5px;
             margin: 5px;
+        }
+        .color-preview {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            display: inline-block;
+            border: 1px solid #dee2e6;
         }
     </style>
 @endsection
@@ -91,9 +97,10 @@
                                         <th class="sort" data-sort="photo">Foto</th>
                                         <th class="sort" data-sort="name">Nombre</th>
                                         <th class="sort" data-sort="party">Partido</th>
-                                        <th data-sort="color">Color</th>
-                                        <th class="sort" data-sort="position">Cargo</th>
-                                        <th class="actions-column" >Acciones</th>
+                                        <th class="sort" data-sort="color">Color</th>
+                                        <th class="sort" data-sort="election_type">Tipo de Elección</th>
+                                        <th class="sort" data-sort="type">Tipo</th>
+                                        <th class="actions-column">Acciones</th>
                                     </tr>
                                 </thead>
                                 <tbody class="list form-check-all">
@@ -105,36 +112,45 @@
                                                 </div>
                                             </th>
                                             <td class="photo">
-                                                <img src="{{ $candidate->photo_url }}" alt="{{ $candidate->name }}"  class="avatar-xs rounded-circle">
+                                                @if($candidate->photo)
+                                                    <img src="{{ $candidate->photo_url }}" alt="{{ $candidate->name }}" class="avatar-xs rounded-circle">
+                                                @else
+                                                    <div class="avatar-xs bg-light rounded-circle"></div>
+                                                @endif
                                             </td>
                                             <td class="name">{{ $candidate->name }}</td>
                                             <td class="party">
                                                 <div class="d-flex gap-2 align-items-center">
-                                                    <div class="flex-shrink-0">
                                                     @if($candidate->party_logo)
-                                                        <img src="{{ $candidate->party_logo_url }}" alt="{{ $candidate->party }}"  class="avatar-xs rounded-circle">
+                                                        <img src="{{ $candidate->party_logo_url }}" alt="{{ $candidate->party }}" class="avatar-xs rounded-circle">
                                                     @endif
-                                                    </div>
-                                                    <div class="flex-grow-1">
+                                                    <div>
                                                         {{ $candidate->party }}
+                                                        @if($candidate->party_full_name)
+                                                            <br><small class="text-muted">{{ $candidate->party_full_name }}</small>
+                                                        @endif
                                                     </div>
                                                 </div>
                                             </td>
                                             <td class="color">
-                                                <div class="d-flex gap-2 align-items-center">
-                                                    <div class="flex-shrink-0">
-                                                    @if($candidate->party_logo)
-                                                        <img src="{{ $candidate->party_logo_url }}" alt="{{ $candidate->party }}"  class="avatar-xs rounded-circle">
-                                                    @endif
-                                                    </div>
-                                                    <div class="flex-grow-1">
-                                                        {{ $candidate->party }}
-                                                    </div>
-                                                </div>
+                                                @if($candidate->color)
+                                                    <div class="color-preview" style="background-color: {{ $candidate->color }}"></div>
+                                                @endif
                                             </td>
-                                            <td class="position">
+                                            <td class="election_type">
                                                 <span class="badge bg-primary-subtle text-primary">
-                                                    {{ $candidate->position }}
+                                                    {{ $candidate->electionType->name ?? 'N/A' }}
+                                                </span>
+                                            </td>
+                                            <td class="type">
+                                                <span class="badge 
+                                                    @if($candidate->type === 'candidato') bg-success
+                                                    @elseif($candidate->type === 'blank_votes') bg-warning
+                                                    @elseif($candidate->type === 'null_votes') bg-danger
+                                                    @else bg-secondary @endif">
+                                                    {{ $candidate->type === 'candidato' ? 'Candidato' : 
+                                                       ($candidate->type === 'blank_votes' ? 'Votos en Blanco' : 
+                                                       ($candidate->type === 'null_votes' ? 'Votos Nulos' : $candidate->type)) }}
                                                 </span>
                                             </td>
                                             <td>
@@ -145,7 +161,10 @@
                                                             data-id="{{ $candidate->id }}"
                                                             data-name="{{ $candidate->name }}"
                                                             data-party="{{ $candidate->party }}"
-                                                            data-position="{{ $candidate->position }}"
+                                                            data-party_full_name="{{ $candidate->party_full_name }}"
+                                                            data-color="{{ $candidate->color }}"
+                                                            data-election_type_id="{{ $candidate->election_type_id }}"
+                                                            data-type="{{ $candidate->type }}"
                                                             data-photo="{{ $candidate->photo }}"
                                                             data-party_logo="{{ $candidate->party_logo }}"
                                                             data-photo-url="{{ $candidate->photo_url }}"
@@ -244,29 +263,60 @@
                         <div class="row">
                             <div class="col-md-6">
                                 <div class="mb-3">
-                                    <label for="position-field" class="form-label">Cargo <span class="text-danger">*</span></label>
-                                    <select class="form-control @error('position') is-invalid @enderror" name="position" id="position-field" required>
-                                        <option value="">Seleccione un cargo</option>
-                                        @foreach($positions as $position)
-                                            <option value="{{ $position }}" {{ old('position') == $position ? 'selected' : '' }}>{{ $position }}</option>
-                                        @endforeach
-                                    </select>
-                                    @error('position')
+                                    <label for="party_full_name-field" class="form-label">Nombre Completo del Partido</label>
+                                    <input type="text" id="party_full_name-field" name="party_full_name" class="form-control @error('party_full_name') is-invalid @enderror" 
+                                        placeholder="Ingrese el nombre completo del partido" value="{{ old('party_full_name') }}" />
+                                    @error('party_full_name')
                                         <div class="invalid-feedback">{{ $message }}</div>
-                                    @else
-                                        <div class="invalid-feedback">Por favor seleccione un cargo.</div>
                                     @enderror
                                 </div>
                             </div>
                             <div class="col-md-6">
                                 <div class="mb-3">
-                                    <label for="position-field" class="form-label">Color <span class="text-danger">*</span></label>
+                                    <label for="color-field" class="form-label">Color <span class="text-danger">*</span></label>
                                     <input type="color" class="form-control form-control-color w-100 @error('color') is-invalid @enderror" 
-                                        id="color-field" name="color" value="#1b8af8ff">                                    
+                                        id="color-field" name="color" value="{{ old('color', '#1b8af8') }}" required>
                                     @error('color')
                                         <div class="invalid-feedback">{{ $message }}</div>
                                     @else
-                                        <div class="invalid-feedback">Por favor ingrese un color.</div>
+                                        <div class="invalid-feedback">Por favor seleccione un color.</div>
+                                    @enderror
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="election_type_id-field" class="form-label">Tipo de Elección <span class="text-danger">*</span></label>
+                                    <select class="form-control @error('election_type_id') is-invalid @enderror" name="election_type_id" id="election_type_id-field" required>
+                                        <option value="">Seleccione un tipo de elección</option>
+                                        @foreach($electionTypes as $electionType)
+                                            <option value="{{ $electionType->id }}" {{ old('election_type_id') == $electionType->id ? 'selected' : '' }}>
+                                                {{ $electionType->name }} ({{ $electionType->type }})
+                                            </option>
+                                        @endforeach
+                                    </select>
+                                    @error('election_type_id')
+                                        <div class="invalid-feedback">{{ $message }}</div>
+                                    @else
+                                        <div class="invalid-feedback">Por favor seleccione un tipo de elección.</div>
+                                    @enderror
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="type-field" class="form-label">Tipo <span class="text-danger">*</span></label>
+                                    <select class="form-control @error('type') is-invalid @enderror" name="type" id="type-field" required>
+                                        <option value="">Seleccione un tipo</option>
+                                        <option value="candidato" {{ old('type') == 'candidato' ? 'selected' : '' }}>Candidato</option>
+                                        <option value="blank_votes" {{ old('type') == 'blank_votes' ? 'selected' : '' }}>Votos en Blanco</option>
+                                        <option value="null_votes" {{ old('type') == 'null_votes' ? 'selected' : '' }}>Votos Nulos</option>
+                                    </select>
+                                    @error('type')
+                                        <div class="invalid-feedback">{{ $message }}</div>
+                                    @else
+                                        <div class="invalid-feedback">Por favor seleccione un tipo.</div>
                                     @enderror
                                 </div>
                             </div>
@@ -348,124 +398,104 @@
     <script src="{{ URL::asset('build/libs/list.js/list.min.js') }}"></script>
     <script src="{{ URL::asset('build/libs/list.pagination.js/list.pagination.min.js') }}"></script>
     <script src="{{ URL::asset('build/libs/sweetalert2/sweetalert2.min.js') }}"></script>
-    <!-- <script src="{{ URL::asset('build/libs/choices.js/choices.js.min.js') }}"></script> -->
+
     <script>
-        document.addEventListener('DOMContentLoaded', function () {
-            // Init Choices.js
-            const positionSelect = new Choices('#position-field', {
+        document.addEventListener('DOMContentLoaded', function() {
+            const electionTypeSelect = new Choices('#election_type_id-field', {
                 searchEnabled: true,
-                itemSelectText: '',
                 shouldSort: false,
+                placeholder: true
+            });
+            const typeSelect = new Choices('#type-field', {
+                searchEnabled: false,
+                shouldSort: false,
+                placeholder: true
             });
 
-            // Utility: image preview
-            function handleImagePreview(inputId, previewId) {
-                const input = document.getElementById(inputId);
-                const preview = document.getElementById(previewId);
-                input.addEventListener('change', e => {
-                    const file = e.target.files[0];
-                    if (file) {
-                        const reader = new FileReader();
-                        reader.onload = ev => {
-                            preview.src = ev.target.result;
-                            preview.style.display = 'block';
-                        };
-                        reader.readAsDataURL(file);
+            document.getElementById('photo-field').addEventListener('change', function(e) {
+                const preview = document.getElementById('photo-preview');
+                if (this.files && this.files[0]) {
+                    const reader = new FileReader();
+                    reader.onload = function(e) {
+                        preview.src = e.target.result;
+                        preview.style.display = 'block';
                     }
-                });
-            }
-            handleImagePreview('photo-field', 'photo-preview');
-            handleImagePreview('party_logo-field', 'party-logo-preview');
-
-            // List.js
-            const candidateList = new List('candidateList', {
-                valueNames: ['name', 'party', 'position']
-            }).on('updated', () => {
-                attachEditDeleteEvents();
+                    reader.readAsDataURL(this.files[0]);
+                }
             });
-
-            // Select/Deselect all checkboxes
-            document.getElementById('checkAll').addEventListener('change', function () {
-                document.querySelectorAll('input[name="chk_child"]').forEach(cb => cb.checked = this.checked);
-            });
-
-            // Reset form for new candidate
-            document.getElementById('create-btn').addEventListener('click', () => {
-                document.getElementById('exampleModalLabel').textContent = 'Agregar Nuevo Candidato';
-                const form = document.getElementById('candidateForm');
-                form.action = "{{ route('candidates.store') }}";
-                document.getElementById('method_field').value = '';
-                form.reset();
-                document.getElementById('candidate_id').value = '';
-                document.getElementById('save-btn').textContent = 'Guardar';
-                positionSelect.setChoiceByValue('');
-                ['photo-preview', 'party-logo-preview'].forEach(id => document.getElementById(id).style.display = 'none');
-                document.getElementById('color-field').value = '#1b8af8'; // reset color default
-                clearValidationErrors();
-            });
-
-            // Edit & Delete
-            function attachEditDeleteEvents() {
-                // Edit buttons
-                document.querySelectorAll('.edit-item-btn').forEach(btn => {
-                    btn.onclick = () => {
-                        document.getElementById('exampleModalLabel').textContent = 'Editar Candidato';
-                        const form = document.getElementById('candidateForm');
-                        form.action = btn.dataset.updateUrl;
-                        document.getElementById('method_field').value = 'PUT';
-                        document.getElementById('candidate_id').value = btn.dataset.id;
-                        document.getElementById('name-field').value = btn.dataset.name;
-                        document.getElementById('party-field').value = btn.dataset.party;
-                        positionSelect.setChoiceByValue(btn.dataset.position);
-                        document.getElementById('color-field').value = btn.dataset.color || '#1b8af8';
-                        
-                        const photoPreview = document.getElementById('photo-preview');
-                        const logoPreview = document.getElementById('party-logo-preview');
-                        photoPreview.style.display = btn.dataset.photoUrl ? 'block' : 'none';
-                        logoPreview.style.display = btn.dataset.partyLogoUrl ? 'block' : 'none';
-                        if (btn.dataset.photoUrl) photoPreview.src = btn.dataset.photoUrl;
-                        if (btn.dataset.partyLogoUrl) logoPreview.src = btn.dataset.partyLogoUrl;
-
-                        document.getElementById('save-btn').textContent = 'Actualizar';
-                        clearValidationErrors();
-                    };
-                });
-
-                // Delete buttons
-                document.querySelectorAll('.remove-item-btn').forEach(btn => {
-                    btn.onclick = () => document.getElementById('deleteForm').action = btn.dataset.deleteUrl;
-                });
-            }
-            attachEditDeleteEvents();
-
-            // Form validation
-            const form = document.getElementById('candidateForm');
-            form.addEventListener('submit', function (event) {
-                let isValid = true;
-                ['name', 'party', 'position', 'color'].forEach(field => {
-                    const el = document.getElementById(field + '-field');
-                    if (!el.value.trim()) {
-                        el.classList.add('is-invalid');
-                        isValid = false;
-                    } else {
-                        el.classList.remove('is-invalid');
+            document.getElementById('party_logo-field').addEventListener('change', function(e) {
+                const preview = document.getElementById('party-logo-preview');
+                if (this.files && this.files[0]) {
+                    const reader = new FileReader();
+                    reader.onload = function(e) {
+                        preview.src = e.target.result;
+                        preview.style.display = 'block';
                     }
-                });
-                if (!isValid) {
-                    event.preventDefault();
-                    event.stopPropagation();
+                    reader.readAsDataURL(this.files[0]);
                 }
             });
 
-            document.getElementById('showModal').addEventListener('hidden.bs.modal', clearValidationErrors);
+            document.querySelectorAll('.edit-item-btn').forEach(button => {
+                button.addEventListener('click', function() {
+                    const modal = document.getElementById('showModal');
+                    const form = document.getElementById('candidateForm');
+                    const modalTitle = modal.querySelector('.modal-title');
+                    const methodField = document.getElementById('method_field');
+                    const candidateId = document.getElementById('candidate_id');
+                    
+                    modalTitle.textContent = 'Editar Candidato';
+                    form.action = this.dataset.updateUrl;
+                    methodField.value = 'PUT';
+                    candidateId.value = this.dataset.id;
+                    document.getElementById('name-field').value = this.dataset.name;
+                    document.getElementById('party-field').value = this.dataset.party;
+                    document.getElementById('party_full_name-field').value = this.dataset.party_full_name || '';
+                    document.getElementById('color-field').value = this.dataset.color;
+                    document.getElementById('election_type_id-field').value = this.dataset.election_type_id;
+                    document.getElementById('type-field').value = this.dataset.type;
+                    
+                    const photoPreview = document.getElementById('photo-preview');
+                    const partyLogoPreview = document.getElementById('party-logo-preview');
+                    
+                    if (this.dataset.photoUrl) {
+                        photoPreview.src = this.dataset.photoUrl;
+                        photoPreview.style.display = 'block';
+                    } else {
+                        photoPreview.style.display = 'none';
+                    }
+                    
+                    if (this.dataset.partyLogoUrl) {
+                        partyLogoPreview.src = this.dataset.partyLogoUrl;
+                        partyLogoPreview.style.display = 'block';
+                    } else {
+                        partyLogoPreview.style.display = 'none';
+                    }
+                });
+            });
 
-            function clearValidationErrors() {
-                document.querySelectorAll('.is-invalid').forEach(el => el.classList.remove('is-invalid'));
-            }
+            document.getElementById('create-btn').addEventListener('click', function() {
+                const modal = document.getElementById('showModal');
+                const form = document.getElementById('candidateForm');
+                const modalTitle = modal.querySelector('.modal-title');
+                const methodField = document.getElementById('method_field');
+                const candidateId = document.getElementById('candidate_id');
+                
+                modalTitle.textContent = 'Agregar Nuevo Candidato';
+                form.action = "{{ route('candidates.store') }}";
+                methodField.value = '';
+                candidateId.value = '';
+                form.reset();
+                document.getElementById('photo-preview').style.display = 'none';
+                document.getElementById('party-logo-preview').style.display = 'none';
+            });
+
+            document.querySelectorAll('.remove-item-btn').forEach(button => {
+                button.addEventListener('click', function() {
+                    const deleteForm = document.getElementById('deleteForm');
+                    deleteForm.action = this.dataset.deleteUrl;
+                });
+            });
+
         });
-
-        function deleteMultiple() {
-            alert('Función de eliminar múltiple - por implementar');
-        }
     </script>
 @endsection

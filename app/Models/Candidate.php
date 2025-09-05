@@ -1,5 +1,4 @@
 <?php
-
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -12,15 +11,23 @@ class Candidate extends Model
     protected $fillable = [
         'name',
         'party',
-        'position',
+        'party_full_name',
         'party_logo',
         'photo',
-        'color'
+        'color',
+        'election_type_id',
+        'type',
+        'active'
     ];
 
     public function votes()
     {
         return $this->hasMany(Vote::class);
+    }
+
+    public function electionType()
+    {
+        return $this->belongsTo(ElectionType::class);
     }
 
     public function getPhotoUrlAttribute()

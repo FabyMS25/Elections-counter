@@ -11,13 +11,15 @@ class Vote extends Model
 
     protected $fillable = [
         'quantity',
+        'percentage',
         'voting_table_id',
         'candidate_id',
+        'election_type_id',
         'user_id',
         'verified_at'
     ];
-
     protected $casts = [
+        'quantity' => 'integer',
         'verified_at' => 'datetime',
     ];
 
@@ -27,6 +29,10 @@ class Vote extends Model
 
     public function votingTable(){
         return $this->belongsTo(VotingTable::class);
+    }
+        
+    public function electionType(){
+        return $this->belongsTo(ElectionType::class);
     }
 
     public function user(){
@@ -40,7 +46,7 @@ class Vote extends Model
         
         $tally = '';
         for ($i = 0; $i < $groups; $i++) {
-            $tally .= '卌 '; // Chinese character for 5
+            $tally .= '卌 ';
         }
         
         if ($remaining > 0) {

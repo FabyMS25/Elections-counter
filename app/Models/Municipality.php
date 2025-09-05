@@ -11,20 +11,24 @@ class Municipality extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['name', 'province_id'];
+    protected $fillable = ['name', 'province_id','latitude','longitude'];
 
     public function province()
     {
         return $this->belongsTo(Province::class);
     }
-
+    
+    public function localities()
+    {
+        return $this->hasMany(Locality::class);
+    }
     public function districts()
     {
         return $this->hasMany(District::class);
     }
 
-    public function institutions()
-    {
-        return $this->hasMany(Institution::class);
-    }
+    // public function institutions()
+    // {
+    //     return $this->hasMany(Institution::class);
+    // }
 }

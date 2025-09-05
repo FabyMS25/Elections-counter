@@ -134,7 +134,7 @@ return [
     "basic-tables"=>"Tablas Básicas",
     "grid-js"=>"Cuadrícula J",
     "list-departments"=>"Departamentos",
-    "list-institutions"=>"Instituciónes",
+    "list-institutions"=>"Recintos",
     "list-managers"=>"Encargados",
     "list-candidates"=>"Candidatos",
     "list-voting-tables"=>"Mesas",

@@ -11,7 +11,7 @@ class Province extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['name', 'department_id'];
+    protected $fillable = ['name', 'department_id','latitude','longitude'];
 
     public function department()
     {
@@ -23,9 +23,9 @@ class Province extends Model
         return $this->hasMany(Municipality::class);
     }
 
-    public function institutions(): HasMany
-    {
-        return $this->hasMany(Institution::class);
-    }
+    // public function institutions(): HasMany
+    // {
+    //     return $this->hasMany(Institution::class);
+    // }
 
 }

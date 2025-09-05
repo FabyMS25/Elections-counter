@@ -5,18 +5,17 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
-class Zone extends Model
+class Locality  extends Model
 {
-    use HasFactory;
+    protected $fillable = ['name', 'municipality_id', 'latitude', 'longitude'];
 
-    protected $fillable = ['name', 'district_id', 'latitude', 'longitude', 'active'];
-
-    public function district(): BelongsTo
+    public function municipality(): BelongsTo
     {
-        return $this->belongsTo(District::class);
+        return $this->belongsTo(Municipality::class);
     }
-
+    
     public function institutions()
     {
         return $this->hasMany(Institution::class);

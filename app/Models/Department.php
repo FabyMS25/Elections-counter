@@ -10,10 +10,10 @@ class Department extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['name', 'capital'];
+    protected $fillable = ['name', 'code'];
 
-    public function municipalities(): HasMany
+    public function provinces(): HasMany
     {
-        return $this->hasMany(Municipality::class);
+        return $this->hasMany(Province::class);
     }
 }

@@ -1,22 +1,26 @@
-FROM php:8.3-apache
+# Dockerfile
+FROM php:8.2-fpm
 
-# Instalar extensiones necesarias
+# Install dependencies
 RUN apt-get update && apt-get install -y \
-    libpq-dev \
-    libzip-dev \
-    zip \
-    && docker-php-ext-install pdo pdo_pgsql zip \
-    && a2enmod rewrite
+    git curl libpq-dev unzip zip \
+    && docker-php-ext-install pdo pdo_pgsql
 
-# Instalar Composer
-COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
+# Install Composer
+COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
 
-# Copiar aplicación
-COPY . /var/www/html/
+# Set working directory
+WORKDIR /var/www
 
-# Instalar dependencias
-RUN composer install --no-dev --optimize-autoloader
+# Copy Laravel project
+COPY . .
 
-# Establecer permisos
-RUN chown -R www-data:www-data /var/www/html/storage \
-    && chmod -R 775 /var/www/html/storage
+# Install dependencies
+RUN composer install --no-interaction --prefer-dist --optimize-autoloader
+
+# Set permissions
+RUN chown -R www-data:www-data /var/www/storage /var/www/bootstrap/cache
+
+EXPOSE 9000
+
+CMD ["php-fpm"]

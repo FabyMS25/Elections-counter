@@ -4,12 +4,6 @@
 @endsection
 @section('css')
     <link href="{{ URL::asset('build/libs/sweetalert2/sweetalert2.min.css') }}" rel="stylesheet" type="text/css" />
-    <link href="{{ URL::asset('build/libs/choices.js/choices.js.min.css') }}" rel="stylesheet" type="text/css" />
-    <style>
-        .choices__list--dropdown .choices__item--selectable {
-            padding-right: 10px;
-        }
-    </style>
 @endsection
 @section('content')
     @component('components.breadcrumb')
@@ -125,6 +119,9 @@
                                             </td>
                                             <td class="institution">
                                                 {{ $manager->votingTable->institution->name ?? 'N/A' }}
+                                                @if($manager->votingTable->institution->locality ?? false)
+                                                    <br><small class="text-muted">{{ $manager->votingTable->institution->locality->name }}</small>
+                                                @endif
                                             </td>
                                             <td>
                                                 <div class="d-flex gap-2">
@@ -271,7 +268,16 @@
                                 <option value="">Seleccione una institución</option>
                                 @foreach($institutions as $institution)
                                     <option value="{{ $institution->id }}" {{ old('institution_id') == $institution->id ? 'selected' : '' }}>
-                                        {{ $institution->name }} - {{ $institution->municipality->name }}, {{ $institution->municipality->department->name }}
+                                        {{ $institution->name }} 
+                                        @if($institution->locality)
+                                            - {{ $institution->locality->name }}
+                                        @endif
+                                        @if($institution->district)
+                                            , {{ $institution->district->name }}
+                                        @endif
+                                        @if($institution->zone)
+                                            , Zona {{ $institution->zone->name }}
+                                        @endif
                                     </option>
                                 @endforeach
                             </select>
@@ -341,30 +347,25 @@
     <script src="{{ URL::asset('build/libs/list.js/list.min.js') }}"></script>
     <script src="{{ URL::asset('build/libs/list.pagination.js/list.pagination.min.js') }}"></script>
     <script src="{{ URL::asset('build/libs/sweetalert2/sweetalert2.min.js') }}"></script>
-    <script src="{{ URL::asset('build/libs/choices.js/choices.js.min.js') }}"></script>
     
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            // Initialize choices.js for better select UX
             const institutionSelect = new Choices('#institution-field', {
                 searchEnabled: true,
                 itemSelectText: '',
                 shouldSort: false,
             });
-
             const votingTableSelect = new Choices('#voting_table-field', {
                 searchEnabled: true,
                 itemSelectText: '',
                 shouldSort: false,
             });
-
             const roleSelect = new Choices('#role-field', {
                 searchEnabled: false,
                 itemSelectText: '',
                 shouldSort: false,
             });
 
-            // Load voting tables when institution changes
             document.getElementById('institution-field').addEventListener('change', function() {
                 const institutionId = this.value;
                 const votingTableField = document.getElementById('voting_table-field');
@@ -382,7 +383,6 @@
                                 votingTableField.appendChild(option);
                             });
                             
-                            // Reinitialize Choices.js
                             votingTableSelect.destroy();
                             votingTableSelect.init();
                         })
@@ -397,14 +397,12 @@
                 }
             });
 
-            // Initialize list.js
             var options = {valueNames: ['name', 'id_card', 'role', 'email', 'voting_table', 'institution']};
             var managerList = new List('managerList', options).on('updated', function(list) {
                 attachEditEventListeners();
                 attachDeleteEventListeners();
             });
 
-            // Initialize checkAll functionality
             document.getElementById('checkAll').addEventListener('change', function() {
                 var checkboxes = document.querySelectorAll('input[name="chk_child"]');
                 for (var i = 0; i < checkboxes.length; i++) {
@@ -420,9 +418,7 @@
                 document.getElementById('manager_id').value = '';
                 document.getElementById('password-field').required = true;
                 document.getElementById('password_confirmation-field').required = true;
-                document.getElementById('save-btn').textContent = 'Guardar';
-                
-                // Reset selects
+                document.getElementById('save-btn').textContent = 'Guardar';                
                 institutionSelect.setChoiceByValue('');
                 votingTableSelect.setChoiceByValue('');
                 roleSelect.setChoiceByValue('presidente');
@@ -452,11 +448,9 @@
                         document.getElementById('password-field').required = false;
                         document.getElementById('password_confirmation-field').required = false;
                         
-                        // Set selects
                         institutionSelect.setChoiceByValue(institution_id);
                         roleSelect.setChoiceByValue(role);
                         
-                        // Load voting tables for the institution
                         if (institution_id) {
                             fetch(`/managers/voting-tables/${institution_id}`)
                                 .then(response => response.json())
@@ -474,7 +468,6 @@
                                         votingTableField.appendChild(option);
                                     });
                                     
-                                    // Reinitialize Choices.js
                                     votingTableSelect.destroy();
                                     votingTableSelect.init();
                                     votingTableSelect.setChoiceByValue(voting_table_id);
@@ -496,7 +489,6 @@
                 });
             }
 
-            // Attach initial event listeners
             attachEditEventListeners();
             attachDeleteEventListeners();
 
@@ -504,7 +496,6 @@
             form.addEventListener('submit', function(event) {
                 let isValid = true;
                 
-                // Basic validation
                 const requiredFields = [
                     'name', 'email', 'role', 'institution_id', 'voting_table_id'
                 ];
@@ -519,7 +510,6 @@
                     }
                 });
                 
-                // For create form, validate password
                 if (!document.getElementById('manager_id').value) {
                     const password = document.getElementById('password-field');
                     const passwordConfirmation = document.getElementById('password_confirmation-field');

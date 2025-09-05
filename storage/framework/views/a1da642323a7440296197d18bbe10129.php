@@ -25,8 +25,8 @@
                                     <div class="bolivian-symbol">BO</div>
                                 </a>
                             </div>
-                            <h1 class="app-name">Sistema Electoral</h1>
-                            <p class="mt-3 fs-15 fw-medium">Plataforma Oficial de Conteo de Votos</p>
+                            <h1 class="app-name">SISTEMA DE CÓMPUTO</h1>
+                            <p class="mt-3 fs-15 fw-medium">SISTEMA DE CONSOLIDACIÓN DE CÓMPUTO EN PROCESO</p>
                         </div>
                     </div>
                 </div>

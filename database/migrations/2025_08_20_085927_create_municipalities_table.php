@@ -8,20 +8,18 @@ return new class extends Migration
 {
     public function up(): void
     {
-        Schema::create('candidates', function (Blueprint $table) {
+        Schema::create('municipalities', function (Blueprint $table) {
             $table->id();
+            $table->foreignId('province_id')->constrained('provinces')->onDelete('cascade');
             $table->string('name');
-            $table->string('party');
-            $table->string('position')->nullable();
-            $table->string('party_logo')->nullable();
-            $table->string('photo')->nullable();
-            $table->string('color')->nullable();
+            $table->decimal('latitude', 10, 7)->nullable();
+            $table->decimal('longitude', 10, 7)->nullable();
             $table->timestamps();
         });
     }
 
     public function down(): void
     {
-        Schema::dropIfExists('candidates');
+        Schema::dropIfExists('municipalities');
     }
 };

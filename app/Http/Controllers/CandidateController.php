@@ -1,8 +1,8 @@
 <?php
-
 namespace App\Http\Controllers;
 
 use App\Models\Candidate;
+use App\Models\ElectionType;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\ValidationException;
@@ -12,16 +12,16 @@ class CandidateController extends Controller
     public function index()
     {
         try {
-            $candidates = Candidate::all();
-            $positions = ['Presidente', 'Vicepresidente', 'Senador', 'Diputado', 'Alcalde', 'Concejal'];
+            $candidates = Candidate::where('active', true)->get();
+            $electionTypes = ElectionType::where('active', true)->get();
         } catch (\Exception $e) {
             \Log::error('Error loading candidates: ' . $e->getMessage());
             $candidates = collect();
-            $positions = [];
+            $electionTypes = collect();
             session()->flash('error', 'Error loading candidates data.');
         }
 
-        return view('tables-candidates', compact('candidates', 'positions'));
+        return view('tables-candidates', compact('candidates', 'electionTypes'));
     }
 
     public function store(Request $request)
@@ -30,19 +30,19 @@ class CandidateController extends Controller
             $request->validate([
                 'name' => 'required|string|max:255',
                 'party' => 'required|string|max:255',
-                'position' => 'required|string|max:255',
-                'color' => 'required|string|regex:/^#[0-9A-Fa-f]{6}$/',
+                'party_full_name' => 'nullable|string|max:255',
+                'color' => 'nullable|string|regex:/^#[0-9A-Fa-f]{6}$/',
+                'election_type_id' => 'required|exists:election_types,id',
+                'type' => 'required|in:candidato,blank_votes,null_votes',
                 'photo' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
                 'party_logo' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
-            ], [
-                'name.required' => 'El nombre es obligatorio.',
-                'party.required' => 'El partido político es obligatorio.',
-                'position.required' => 'El cargo es obligatorio.',
-                'color.required' => 'El color es obligatorio.',
-                'color.regex' => 'El color debe ser un código hexadecimal válido (#RRGGBB).',
+                'active' => 'boolean',
             ]);
 
-            $data = $request->only(['name', 'party', 'position', 'color']);
+            $data = $request->only([
+                'name', 'party', 'party_full_name',
+                'color', 'election_type_id', 'type', 'active'
+            ]);
 
             if ($request->hasFile('photo')) {
                 $data['photo'] = $request->file('photo')->store('candidates/photos', 'public');
@@ -73,19 +73,19 @@ class CandidateController extends Controller
             $request->validate([
                 'name' => 'required|string|max:255',
                 'party' => 'required|string|max:255',
-                'position' => 'required|string|max:255',
-                'color' => 'required|string|regex:/^#[0-9A-Fa-f]{6}$/',
+                'party_full_name' => 'nullable|string|max:255',
+                'color' => 'nullable|string|regex:/^#[0-9A-Fa-f]{6}$/',
+                'election_type_id' => 'required|exists:election_types,id',
+                'type' => 'required|in:candidato,blank_votes,null_votes',
                 'photo' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
                 'party_logo' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
-            ], [
-                'name.required' => 'El nombre es obligatorio.',
-                'party.required' => 'El partido político es obligatorio.',
-                'position.required' => 'El cargo es obligatorio.',
-                'color.required' => 'El color es obligatorio.',
-                'color.regex' => 'El color debe ser un código hexadecimal válido (#RRGGBB).',
+                'active' => 'boolean',
             ]);
 
-            $data = $request->only(['name', 'party', 'position', 'color']);
+            $data = $request->only([
+                'name', 'party', 'party_full_name',
+                'color', 'election_type_id', 'type', 'active'
+            ]);
 
             if ($request->hasFile('photo')) {
                 if ($candidate->photo) {
