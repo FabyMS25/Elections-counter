@@ -2,9 +2,6 @@
 @section('title')
     @lang('translation.profile')
 @endsection
-@section('css')
-    <link rel="stylesheet" href="{{ URL::asset('build/libs/swiper/swiper-bundle.min.css') }}">
-@endsection
 @section('content')
     <div class="profile-foreground position-relative mx-n4 mt-n4">
         <div class="profile-wid-bg">
@@ -92,7 +89,7 @@
                                     <div class="card-body">
                                         <h5 class="card-title mb-3">Acerca de</h5>
                                         <p>Bienvenido al sistema de administración electoral. Este perfil le permite gestionar su información personal y configurar las preferencias de su cuenta.</p>
-                                        
+
                                         <div class="row">
                                             <div class="col-lg-6 col-4">
                                                 <div class="d-flex mt-4">

@@ -1,300 +1,214 @@
 {{-- resources/views/voting-table-votes/partials/filters.blade.php --}}
-<div class="row mb-3">
-    <div class="col-12">
-        <div class="card shadow-sm border-0">
-            <div class="card-body py-3">
-                <form method="GET" action="{{ route('voting-table-votes.index') }}" id="filterForm">
-                    <div class="row g-2 align-items-end">
-                        <div class="col-md-3">
-                            <label class="form-label form-label-sm fw-semibold mb-1">
-                                <i class="ri-building-2-line me-1 text-muted"></i>Recinto
-                            </label>
-                            <select name="institution_id" class="form-select form-select-sm select2"
-                                    id="institutionFilter">
-                                <option value="">Todos los recintos</option>
-                                @foreach($institutions as $inst)
-                                    <option value="{{ $inst->id }}"
-                                        {{ request('institution_id') == $inst->id ? 'selected' : '' }}>
-                                        {{ $inst->name }} ({{ $inst->code }})
-                                    </option>
-                                @endforeach
-                            </select>
-                        </div>
-                        <div class="col-md-3">
-                            <label class="form-label form-label-sm fw-semibold mb-1">
-                                <i class="ri-vote-line me-1 text-muted"></i>Tipo de Elección
-                                @if(isset($dashboard) && $dashboard?->default_election_type_id === $electionTypeId)
-                                    <span class="badge bg-primary-subtle text-primary ms-1"
-                                          style="font-size:0.65rem;" title="Configurado en Dashboard">
-                                        <i class="ri-dashboard-line"></i> predeterminado
-                                    </span>
-                                @endif
-                            </label>
-                            <select name="election_type_id" class="form-select form-select-sm select2"
-                                    id="electionTypeFilter">
-                                @foreach($electionTypes as $type)
-                                    <option value="{{ $type->id }}"
-                                        {{ ($electionTypeId ?? '') == $type->id ? 'selected' : '' }}>
-                                        {{ $type->name }}
-                                        ({{ \Carbon\Carbon::parse($type->election_date)->format('d/m/Y') }})
-                                    </option>
-                                @endforeach
-                            </select>
-                        </div>
-                        <div class="col-md-2">
-                            <label class="form-label form-label-sm fw-semibold mb-1">
-                                <i class="ri-flag-line me-1 text-muted"></i>Estado
-                            </label>
-                            @php
-                                $statusOptions = [
-                                    'configurada'   => ['label' => 'Configurada',  'icon' => '⚙️'],
-                                    'en_espera'     => ['label' => 'En Espera',     'icon' => '⏳'],
-                                    'votacion'      => ['label' => 'En Votación',   'icon' => '🗳️'],
-                                    'en_escrutinio' => ['label' => 'En Escrutinio', 'icon' => '📊'],
-                                    'escrutada'     => ['label' => 'Escrutada',     'icon' => '✅'],
-                                    'observada'     => ['label' => 'Observada',     'icon' => '⚠️'],
-                                    'transmitida'   => ['label' => 'Transmitida',   'icon' => '📡'],
-                                    'anulada'       => ['label' => 'Anulada',       'icon' => '❌'],
-                                ];
-                            @endphp
-                            <select name="status" class="form-select form-select-sm" id="statusFilter">
-                                <option value="">Todos</option>
-                                @foreach($statusOptions as $val => $opt)
-                                    <option value="{{ $val }}"
-                                        {{ request('status') === $val ? 'selected' : '' }}>
-                                        {{ $opt['icon'] }} {{ $opt['label'] }}
-                                    </option>
-                                @endforeach
-                            </select>
-                        </div>
-                        <div class="col-md-2">
-                            <label class="form-label form-label-sm fw-semibold mb-1">
-                                <i class="ri-hashtag me-1 text-muted"></i>N° Mesa
-                            </label>
-                            <input type="number" name="table_number" class="form-control form-control-sm"
-                                   placeholder="Ej: 1, 2…" min="1"
-                                   value="{{ request('table_number') }}">
-                        </div>
-                        <div class="col-md-2 d-flex gap-2">
-                            <button type="submit" class="btn btn-primary btn-sm flex-grow-1">
-                                <i class="ri-search-line me-1"></i>Buscar
-                            </button>
-                            <a href="{{ route('voting-table-votes.index') }}"
-                               class="btn btn-outline-secondary btn-sm"
-                               title="Limpiar todos los filtros">
-                                <i class="ri-refresh-line"></i>
-                            </a>
-                        </div>
-                    </div>
+<div class="card">
+    <div class="card-body py-2 px-2">
+        <form method="GET" action="{{ route('voting-table-votes.index') }}" id="filterForm">
+            <div class="row g-2 align-items-end">
+
+                <div class="col-md-3">
+                    <label class="form-label small mb-1">
+                        <i class="ri-building-2-line me-1 text-muted"></i>Recinto
+                    </label>
+                    <select name="institution_id" class="form-select form-select-sm" id="institutionFilter">
+                        <option value="">Todos los recintos</option>
+                        @foreach($institutions as $inst)
+                            <option value="{{ $inst->id }}"
+                                {{ request('institution_id') == $inst->id ? 'selected' : '' }}>
+                                {{ $inst->name }} ({{ $inst->code }})
+                            </option>
+                        @endforeach
+                    </select>
+                </div>
+
+                <div class="col-md-3">
+                    <label class="form-label small mb-1">
+                        <i class="ri-vote-line me-1 text-muted"></i>Tipo de Elección
+                    </label>
+                    <select name="election_type_id" class="form-select form-select-sm" id="electionTypeFilter">
+                        @foreach($electionTypes as $type)
+                            <option value="{{ $type->id }}"
+                                {{ ($electionTypeId ?? '') == $type->id ? 'selected' : '' }}>
+                                {{ $type->name }}
+                                ({{ \Carbon\Carbon::parse($type->election_date)->format('d/m/Y') }})
+                            </option>
+                        @endforeach
+                    </select>
+                </div>
+
+                <div class="col-md-2">
+                    <label class="form-label small mb-1">
+                        <i class="ri-flag-line me-1 text-muted"></i>Estado
+                    </label>
                     @php
-                        $activeCount = collect([
-                            'institution_id', 'status', 'table_number', 'table_code',
-                            'from_name', 'to_name', 'table_type', 'min_votes',
-                            'max_votes', 'has_observations', 'participation',
-                        ])->filter(fn($k) => request($k))->count();
+                        $statusOptions = [
+                            'configurada'   => ['label'=>'Configurada',  'icon'=>'⚙️'],
+                            'en_espera'     => ['label'=>'En Espera',    'icon'=>'⏳'],
+                            'votacion'      => ['label'=>'En Votación',  'icon'=>'🗳️'],
+                            'en_escrutinio' => ['label'=>'Escrutinio',   'icon'=>'📊'],
+                            'escrutada'     => ['label'=>'Escrutada',    'icon'=>'✅'],
+                            'observada'     => ['label'=>'Observada',    'icon'=>'⚠️'],
+                            'transmitida'   => ['label'=>'Transmitida',  'icon'=>'📡'],
+                            'anulada'       => ['label'=>'Anulada',      'icon'=>'❌'],
+                        ];
                     @endphp
-                    @if($activeCount > 0)
-                    <div class="mt-2 d-flex flex-wrap gap-1 align-items-center">
-                        <small class="text-muted me-1">Activos:</small>
-                        @if(request('institution_id'))
-                            @php $inst = $institutions->find(request('institution_id')); @endphp
-                            <span class="badge bg-primary-subtle text-primary border border-primary-subtle filter-badge"
-                                  data-param="institution_id">
-                                🏫 {{ $inst?->name ?? 'Recinto' }} <i class="ri-close-line ms-1"></i>
-                            </span>
-                        @endif
-                        @if(request('status'))
-                            <span class="badge bg-secondary-subtle text-secondary border border-secondary-subtle filter-badge"
-                                  data-param="status">
-                                {{ $statusOptions[request('status')]['icon'] ?? '🏷️' }}
-                                {{ $statusOptions[request('status')]['label'] ?? request('status') }}
-                                <i class="ri-close-line ms-1"></i>
-                            </span>
-                        @endif
-                        @if(request('table_number'))
-                            <span class="badge bg-info-subtle text-info border border-info-subtle filter-badge"
-                                  data-param="table_number">
-                                # Mesa {{ request('table_number') }} <i class="ri-close-line ms-1"></i>
-                            </span>
-                        @endif
-                        @if(request('table_code'))
-                            <span class="badge bg-info-subtle text-info border border-info-subtle filter-badge"
-                                  data-param="table_code">
-                                📋 {{ request('table_code') }} <i class="ri-close-line ms-1"></i>
-                            </span>
-                        @endif
-                        @if(request('table_type'))
-                            <span class="badge bg-secondary-subtle text-secondary border filter-badge"
-                                  data-param="table_type">
-                                👥 {{ ucfirst(request('table_type')) }} <i class="ri-close-line ms-1"></i>
-                            </span>
-                        @endif
-                        @if(request('has_observations') !== null && request('has_observations') !== '')
-                            <span class="badge bg-warning-subtle text-warning border border-warning-subtle filter-badge"
-                                  data-param="has_observations">
-                                ⚠️ {{ request('has_observations') == '1' ? 'Con obs.' : 'Sin obs.' }}
-                                <i class="ri-close-line ms-1"></i>
-                            </span>
-                        @endif
-                        @if(request('min_votes') || request('max_votes'))
-                            <span class="badge bg-secondary-subtle text-secondary border filter-badge"
-                                  data-param="min_votes">
-                                🗳️ {{ request('min_votes') ?? '0' }}–{{ request('max_votes') ?? '∞' }} votos
-                                <i class="ri-close-line ms-1"></i>
-                            </span>
-                        @endif
-                    </div>
-                    @endif
-                    @php
-                        $advancedKeys   = ['table_code','from_name','to_name','table_type','min_votes','max_votes','has_observations','participation','sort_by'];
-                        $advancedActive = collect($advancedKeys)->filter(fn($k) => request($k))->count();
-                    @endphp
-                    <div class="mt-2">
-                        <a class="text-muted small text-decoration-none" data-bs-toggle="collapse"
-                           href="#advancedFilters" role="button"
-                           aria-expanded="{{ $advancedActive > 0 ? 'true' : 'false' }}">
-                            <i class="ri-equalizer-line me-1"></i>Filtros avanzados
-                            @if($advancedActive > 0)
-                                <span class="badge bg-primary rounded-pill ms-1" style="font-size:10px;">
-                                    {{ $advancedActive }}
-                                </span>
-                            @endif
+                    <select name="status" class="form-select form-select-sm" id="statusFilter">
+                        <option value="">Todos los estados</option>
+                        @foreach($statusOptions as $val => $opt)
+                            <option value="{{ $val }}"
+                                {{ request('status') === $val ? 'selected' : '' }}>
+                                {{ $opt['icon'] }} {{ $opt['label'] }}
+                            </option>
+                        @endforeach
+                    </select>
+                </div>
+
+                <div class="col-md-2">
+                    <label class="form-label small mb-1">
+                        <i class="ri-hashtag me-1 text-muted"></i>N° Mesa
+                    </label>
+                    <input type="number" name="table_number" class="form-control form-control-sm"
+                           placeholder="Ej: 1, 2…" min="1" value="{{ request('table_number') }}">
+                </div>
+
+                <div class="col-md-2 d-flex gap-2">
+                    <button type="submit" class="btn btn-primary btn-sm flex-grow-1">
+                        <i class="ri-filter-3-line me-1"></i>Filtrar
+                    </button>
+                    @if(request()->hasAny(['institution_id','status','table_number','table_code','table_type','from_name','to_name','min_votes','max_votes','has_observations']))
+                        <a href="{{ route('voting-table-votes.index', ['election_type_id' => request('election_type_id')]) }}"
+                           class="btn btn-outline-secondary btn-sm" title="Limpiar filtros">
+                            <i class="ri-close-line"></i>
                         </a>
-                    </div>
-                    <div class="collapse {{ $advancedActive > 0 ? 'show' : '' }}" id="advancedFilters">
-                        <div class="border rounded p-3 mt-2 bg-light">
-                            <div class="row g-2">
-                                <div class="col-md-2">
-                                    <label class="form-label form-label-sm fw-semibold mb-1">Código Mesa</label>
-                                    <input type="text" name="table_code" class="form-control form-control-sm"
-                                           placeholder="OEP o interno" value="{{ request('table_code') }}">
-                                </div>
-                                <div class="col-md-2">
-                                    <label class="form-label form-label-sm fw-semibold mb-1">Tipo de Mesa</label>
-                                    <select name="table_type" class="form-select form-select-sm">
-                                        <option value="">Todos</option>
-                                        <option value="mixta"     {{ request('table_type') == 'mixta'     ? 'selected' : '' }}>Mixta</option>
-                                        <option value="masculina" {{ request('table_type') == 'masculina' ? 'selected' : '' }}>Masculina</option>
-                                        <option value="femenina"  {{ request('table_type') == 'femenina'  ? 'selected' : '' }}>Femenina</option>
-                                    </select>
-                                </div>
-                                <div class="col-md-2">
-                                    <label class="form-label form-label-sm fw-semibold mb-1">Apellido desde</label>
-                                    <input type="text" name="from_name" class="form-control form-control-sm"
-                                           placeholder="Apellido inicial" value="{{ request('from_name') }}">
-                                </div>
-                                <div class="col-md-2">
-                                    <label class="form-label form-label-sm fw-semibold mb-1">Apellido hasta</label>
-                                    <input type="text" name="to_name" class="form-control form-control-sm"
-                                           placeholder="Apellido final" value="{{ request('to_name') }}">
-                                </div>
-                                <div class="col-md-2">
-                                    <label class="form-label form-label-sm fw-semibold mb-1">Observaciones</label>
-                                    <select name="has_observations" class="form-select form-select-sm">
-                                        <option value="">Todas</option>
-                                        <option value="1" {{ request('has_observations') == '1' ? 'selected' : '' }}>Con observaciones</option>
-                                        <option value="0" {{ request('has_observations') == '0' ? 'selected' : '' }}>Sin observaciones</option>
-                                    </select>
-                                </div>
-                                <div class="col-md-2">
-                                    <label class="form-label form-label-sm fw-semibold mb-1">Participación</label>
-                                    <select name="participation" class="form-select form-select-sm">
-                                        <option value="">Cualquiera</option>
-                                        <option value="alta"  {{ request('participation') == 'alta'  ? 'selected' : '' }}>Alta (&gt;75%)</option>
-                                        <option value="media" {{ request('participation') == 'media' ? 'selected' : '' }}>Media (50-75%)</option>
-                                        <option value="baja"  {{ request('participation') == 'baja'  ? 'selected' : '' }}>Baja (&lt;50%)</option>
-                                    </select>
-                                </div>
-                                <div class="col-md-2">
-                                    <label class="form-label form-label-sm fw-semibold mb-1">Votos mín.</label>
-                                    <input type="number" name="min_votes" class="form-control form-control-sm"
-                                           placeholder="0" min="0" value="{{ request('min_votes') }}">
-                                </div>
-                                <div class="col-md-2">
-                                    <label class="form-label form-label-sm fw-semibold mb-1">Votos máx.</label>
-                                    <input type="number" name="max_votes" class="form-control form-control-sm"
-                                           placeholder="∞" min="0" value="{{ request('max_votes') }}">
-                                </div>
+                    @endif
+                </div>
+            </div>
+            @php
+                $hasActive = request()->hasAny(['institution_id','status','table_number','table_code','table_type','has_observations','min_votes','max_votes']);
+            @endphp
+            @if($hasActive)
+            <div class="mt-2 d-flex align-items-center gap-2 flex-wrap">
+                <span class="text-muted" style="font-size:.78rem">Filtros activos:</span>
 
-                                <div class="col-md-2">
-                                    <label class="form-label form-label-sm fw-semibold mb-1">Ordenar por</label>
-                                    <select name="sort_by" class="form-select form-select-sm">
-                                        <option value="number"          {{ request('sort_by', 'number') == 'number'          ? 'selected' : '' }}>N° Mesa</option>
-                                        <option value="expected_voters" {{ request('sort_by') == 'expected_voters'           ? 'selected' : '' }}>Habilitados</option>
-                                        <option value="institution"     {{ request('sort_by') == 'institution'               ? 'selected' : '' }}>Recinto</option>
-                                        <option value="status"          {{ request('sort_by') == 'status'                    ? 'selected' : '' }}>Estado</option>
-                                    </select>
-                                </div>
+                @if(request('institution_id') && ($inst = $institutions->find(request('institution_id'))))
+                <span class="badge bg-primary d-inline-flex align-items-center gap-1" style="font-size:.75rem">
+                    <i class="ri-building-2-line"></i> {{ $inst->name }}
+                    <a href="{{ route('voting-table-votes.index', request()->except(['institution_id'])) }}"
+                       class="text-white ms-1"><i class="ri-close-line"></i></a>
+                </span>
+                @endif
 
-                                <div class="col-md-2">
-                                    <label class="form-label form-label-sm fw-semibold mb-1">Dirección</label>
-                                    <select name="sort_direction" class="form-select form-select-sm">
-                                        <option value="asc"  {{ request('sort_direction', 'asc') == 'asc'  ? 'selected' : '' }}>↑ Asc</option>
-                                        <option value="desc" {{ request('sort_direction') == 'desc'         ? 'selected' : '' }}>↓ Desc</option>
-                                    </select>
-                                </div>
+                @if(request('status') && isset($statusOptions[request('status')]))
+                <span class="badge bg-secondary d-inline-flex align-items-center gap-1" style="font-size:.75rem">
+                    {{ $statusOptions[request('status')]['icon'] }} {{ $statusOptions[request('status')]['label'] }}
+                    <a href="{{ route('voting-table-votes.index', request()->except(['status'])) }}"
+                       class="text-white ms-1"><i class="ri-close-line"></i></a>
+                </span>
+                @endif
 
-                                <div class="col-md-4 d-flex align-items-end justify-content-end gap-2">
-                                    <button type="submit" class="btn btn-primary btn-sm">
-                                        <i class="ri-search-line me-1"></i>Aplicar filtros
-                                    </button>
-                                    <a href="{{ route('voting-table-votes.index') }}"
-                                       class="btn btn-outline-secondary btn-sm">
-                                        <i class="ri-delete-bin-line me-1"></i>Limpiar
-                                    </a>
-                                </div>
+                @if(request('table_number'))
+                <span class="badge bg-info d-inline-flex align-items-center gap-1" style="font-size:.75rem">
+                    <i class="ri-hashtag"></i> Mesa {{ request('table_number') }}
+                    <a href="{{ route('voting-table-votes.index', request()->except(['table_number'])) }}"
+                       class="text-white ms-1"><i class="ri-close-line"></i></a>
+                </span>
+                @endif
 
-                            </div>
+                @if(request('table_code'))
+                <span class="badge bg-info d-inline-flex align-items-center gap-1" style="font-size:.75rem">
+                    <i class="ri-barcode-line"></i> {{ request('table_code') }}
+                    <a href="{{ route('voting-table-votes.index', request()->except(['table_code'])) }}"
+                       class="text-white ms-1"><i class="ri-close-line"></i></a>
+                </span>
+                @endif
+
+                @if(request('has_observations') !== null && request('has_observations') !== '')
+                <span class="badge bg-warning text-dark d-inline-flex align-items-center gap-1" style="font-size:.75rem">
+                    <i class="ri-alert-line"></i>
+                    {{ request('has_observations') == '1' ? 'Con observaciones' : 'Sin observaciones' }}
+                    <a href="{{ route('voting-table-votes.index', request()->except(['has_observations'])) }}"
+                       class="text-dark ms-1"><i class="ri-close-line"></i></a>
+                </span>
+                @endif
+            </div>
+            @endif
+            @php
+                $advancedKeys   = ['table_code','from_name','to_name','table_type','min_votes','max_votes','has_observations','sort_by'];
+                $advancedActive = collect($advancedKeys)->filter(fn($k) => request($k))->count();
+            @endphp
+            <div class="mt-2">
+                <a class="text-muted small text-decoration-none" data-bs-toggle="collapse"
+                   href="#advancedFilters" role="button"
+                   aria-expanded="{{ $advancedActive > 0 ? 'true' : 'false' }}">
+                    <i class="ri-equalizer-line me-1"></i>Filtros avanzados
+                    @if($advancedActive > 0)
+                        <span class="badge bg-primary rounded-pill ms-1" style="font-size:.65rem">{{ $advancedActive }}</span>
+                    @endif
+                </a>
+            </div>
+
+            <div class="collapse {{ $advancedActive > 0 ? 'show' : '' }}" id="advancedFilters">
+                <div class="border rounded p-3 mt-2 bg-light">
+                    <div class="row g-2">
+                        <div class="col-md-2">
+                            <label class="form-label small mb-1">Código Mesa</label>
+                            <input type="text" name="table_code" class="form-control form-control-sm"
+                                   placeholder="OEP o interno" value="{{ request('table_code') }}">
+                        </div>
+                        <div class="col-md-2">
+                            <label class="form-label small mb-1">Tipo de Mesa</label>
+                            <select name="table_type" class="form-select form-select-sm">
+                                <option value="">Todos</option>
+                                <option value="mixta"     {{ request('table_type') == 'mixta'     ? 'selected' : '' }}>Mixta</option>
+                                <option value="masculina" {{ request('table_type') == 'masculina' ? 'selected' : '' }}>Masculina</option>
+                                <option value="femenina"  {{ request('table_type') == 'femenina'  ? 'selected' : '' }}>Femenina</option>
+                            </select>
+                        </div>
+                        <div class="col-md-2">
+                            <label class="form-label small mb-1">Apellido desde</label>
+                            <input type="text" name="from_name" class="form-control form-control-sm"
+                                   placeholder="Apellido inicial" value="{{ request('from_name') }}">
+                        </div>
+                        <div class="col-md-2">
+                            <label class="form-label small mb-1">Apellido hasta</label>
+                            <input type="text" name="to_name" class="form-control form-control-sm"
+                                   placeholder="Apellido final" value="{{ request('to_name') }}">
+                        </div>
+                        <div class="col-md-2">
+                            <label class="form-label small mb-1">Observaciones</label>
+                            <select name="has_observations" class="form-select form-select-sm">
+                                <option value="">Todas</option>
+                                <option value="1" {{ request('has_observations') == '1' ? 'selected' : '' }}>Con obs.</option>
+                                <option value="0" {{ request('has_observations') == '0' ? 'selected' : '' }}>Sin obs.</option>
+                            </select>
+                        </div>
+                        <div class="col-md-1">
+                            <label class="form-label small mb-1">Votos mín.</label>
+                            <input type="number" name="min_votes" class="form-control form-control-sm"
+                                   placeholder="0" min="0" value="{{ request('min_votes') }}">
+                        </div>
+                        <div class="col-md-1">
+                            <label class="form-label small mb-1">Votos máx.</label>
+                            <input type="number" name="max_votes" class="form-control form-control-sm"
+                                   placeholder="∞" min="0" value="{{ request('max_votes') }}">
                         </div>
                     </div>
-
-                </form>
+                </div>
             </div>
-        </div>
+
+        </form>
     </div>
 </div>
 
-@push('styles')
-<link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet"/>
-<link href="https://cdn.jsdelivr.net/npm/select2-bootstrap-5-theme@1.3.0/dist/select2-bootstrap-5-theme.min.css" rel="stylesheet"/>
-<style>
-.filter-badge {
-    cursor: pointer;
-    user-select: none;
-    font-size: 0.75rem;
-    padding: 0.25rem 0.5rem;
-    border-radius: 20px;
-    transition: opacity 0.15s;
-}
-.filter-badge:hover { opacity: 0.75; }
-.select2-container--bootstrap-5 .select2-selection {
-    min-height: 31px;
-    font-size: 0.875rem;
-}
-</style>
-@endpush
-
 @push('scripts')
-<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
 <script>
 document.addEventListener('DOMContentLoaded', function () {
-    $('.select2').select2({
-        theme: 'bootstrap-5',
-        width: '100%',
-        allowClear: true,
-        placeholder: 'Seleccionar…',
-    });
-    $('#institutionFilter, #electionTypeFilter, #statusFilter').on('change', function () {
+    document.getElementById('electionTypeFilter')?.addEventListener('change', function () {
         document.getElementById('filterForm').submit();
     });
-    document.querySelectorAll('.filter-badge').forEach(badge => {
-        badge.addEventListener('click', function () {
-            const param = this.dataset.param;
-            const url   = new URL(window.location.href);
-            if (param === 'min_votes') url.searchParams.delete('max_votes');
-            url.searchParams.delete(param);
-            window.location.href = url.toString();
-        });
+    document.getElementById('institutionFilter')?.addEventListener('change', function () {
+        document.getElementById('filterForm').submit();
+    });
+    document.getElementById('statusFilter')?.addEventListener('change', function () {
+        document.getElementById('filterForm').submit();
     });
 });
 </script>

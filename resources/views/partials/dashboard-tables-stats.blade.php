@@ -1,5 +1,5 @@
 {{-- resources/views/partials/dashboard-tables-stats.blade.php --}}
-<div class="row g-3 mt-1">
+<div class="row g-2 mt-1">
     <div class="col-md-4">
         <div class="card border h-100 shadow-none text-center">
             <div class="card-body">
@@ -65,13 +65,10 @@
                 <small class="text-muted">Computadas</small>
             </div>
             <div class="col-4 border-start border-end">
-                <h5 class="mb-0" id="ds-stat-pending2">{{-- resources/views/partials/dashboard-tables-stats.blade.php --}}
-{{-- Compact single card: progress bar + three counters in one row --}}
+                <h5 class="mb-0" id="ds-stat-pending2">
 <div class="card mt-3 border-0 shadow-sm">
     <div class="card-body py-3 px-4">
-        <div class="row align-items-center g-3">
-
-            {{-- Label + % + bar --}}
+        <div class="row align-items-center g-2">
             <div class="col-lg-7">
                 <div class="d-flex align-items-center gap-3 mb-2">
                     <span class="text-uppercase fw-semibold text-muted" style="font-size:.68rem;letter-spacing:.05em;white-space:nowrap;">
@@ -88,8 +85,6 @@
                     </div>
                 </div>
             </div>
-
-            {{-- Three counters --}}
             <div class="col-lg-5">
                 <div class="row g-0 text-center">
                     <div class="col-4 border-end">

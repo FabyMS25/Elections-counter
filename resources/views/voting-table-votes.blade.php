@@ -3,7 +3,7 @@
     @lang('translation.management')
 @endsection
 @section('css')
-    <link href="{{ URL::asset('build/libs/swiper/swiper-bundle.min.css') }}" rel="stylesheet" type="text/css" />
+    {{-- <link href="{{ URL::asset('build/libs/swiper/swiper-bundle.min.css') }}" rel="stylesheet" type="text/css" /> --}}
     <style>
         .capacity-exceeded {
             background-color: #ffebee !important;
@@ -17,7 +17,7 @@
     @endcomponent
 
     <div id="alert-container" class="position-fixed top-0 end-0 p-3" style="z-index: 1050;"></div>
-    
+
     <!-- Election Type Selection (if multiple election types exist) -->
     @if($electionTypes->count() > 1)
     <div class="row mb-3">
@@ -57,24 +57,24 @@
                 $percentage = $stats['percentage'];
                 $trend = $stats['trend'];
                 $cardClass = 'info';
-                if ($trend === 'up') { 
+                if ($trend === 'up') {
                     $cardClass = 'success';
-                } elseif ($percentage > 20) { 
+                } elseif ($percentage > 20) {
                     $cardClass = 'primary';
-                } elseif ($percentage > 10) { 
+                } elseif ($percentage > 10) {
                     $cardClass = 'warning';
-                } else { 
-                    $cardClass = 'danger'; 
+                } else {
+                    $cardClass = 'danger';
                 }
-            @endphp        
+            @endphp
             <div class="col-xxl-3 col-md-6" data-candidate-id="{{ $candidate->id }}">
                 <div class="card card-animate">
                     <div class="card-body {{ $candidate->type === 'blank_votes' || $candidate->type === 'null_votes' ? 'bg-warning-subtle' : '' }}">
                         <div class="d-flex mb-3">
                             <div class="flex-grow-1">
                                 @if($candidate->photo)
-                                    <img src="{{ asset('storage/' . $candidate->photo) }}" 
-                                        alt="{{ $candidate->name }}" 
+                                    <img src="{{ asset('storage/' . $candidate->photo) }}"
+                                        alt="{{ $candidate->name }}"
                                         class="img-fluid rounded-circle border border-3 border-white shadow-sm"
                                         style="width:55px;height:55px;object-fit:cover;">
                                 @else
@@ -102,7 +102,7 @@
                                             <i class="ri-subtract-line"></i>
                                         </div>
                                     </div>
-                                @endif                       
+                                @endif
                             </div>
                             @endif
                             <div class="flex-shrink-0">
@@ -157,7 +157,7 @@
             </div>
         </form>
     </div>
-    
+
     <!-- Main Data Table -->
     <div class="card" id="tableList">
         <div class="card-header">
@@ -178,13 +178,13 @@
             </div>
             @if(session('success'))
                 <div class="alert alert-success">{{ session('success') }}</div>
-            @endif                    
+            @endif
             @if(session('error'))
                 <div class="alert alert-danger">{{ session('error') }}</div>
             @endif
         </div>
-        <div class="card-body">            
-            <div class="table table-responsive table-card">                    
+        <div class="card-body">
+            <div class="table table-responsive table-card">
                 <table class="table align-middle table-nowrap" id="votingTableList">
                     <thead class="table-light">
                         <tr>
@@ -203,8 +203,8 @@
                                 <div class="d-flex">
                                     @if($candidate->photo)
                                         <div class="avatar-xs flex-shrink-0 me-1">
-                                            <img src="{{ asset('storage/' . $candidate->photo) }}" 
-                                            alt="{{ $candidate->name }}" 
+                                            <img src="{{ asset('storage/' . $candidate->photo) }}"
+                                            alt="{{ $candidate->name }}"
                                             class="img-fluid rounded-circle">
                                         </div>
                                     @else
@@ -217,7 +217,7 @@
                                     <div style="{{ $candidate->type === 'candidato' ? 'width: 130px;' : 'width: 90px;' }}">
                                         <h6 class="fs-13 candidate-name mb-0">{{ $candidate->name }}</h6>
                                         @if($candidate->type === 'candidato' && $candidate->party)
-                                        <small class="text-muted fw-medium">({{ $candidate->party }})</small> 
+                                        <small class="text-muted fw-medium">({{ $candidate->party }})</small>
                                         @endif
                                     </div>
                                 </div>
@@ -255,7 +255,7 @@
                                 <td class="votingTable">
                                     {{ $table->code }} ({{ $table->number }})
                                     @if($table->from_name && $table->to_name)
-                                        <small class="from-name fs-10"><br>{{ $table->from_name }}</small> 
+                                        <small class="from-name fs-10"><br>{{ $table->from_name }}</small>
                                         <small class="to-name fs-10"><br>{{ $table->to_name }}</small>
                                     @endif
                                 </td>
@@ -280,22 +280,22 @@
                                 @foreach($candidates as $candidate)
                                 <td class="candidate-{{ $candidate->id }} text-center">
                                     <div class="d-flex align-items-center justify-content-center">
-                                        <button class="btn btn-sm btn-outline-secondary vote-btn subtract-vote" 
-                                                data-table-id="{{ $table->id }}" 
+                                        <button class="btn btn-sm btn-outline-secondary vote-btn subtract-vote"
+                                                data-table-id="{{ $table->id }}"
                                                 data-candidate-id="{{ $candidate->id }}"
                                                 {{ $table->status === 'cerrado' ? 'disabled' : '' }}>
                                             <i class="ri-subtract-line"></i>
                                         </button>
-                                        <input type="number" 
-                                               class="form-control form-control-sm vote-input mx-1 text-center" 
-                                               name="votes[{{ $table->id }}][{{ $candidate->id }}]" 
-                                               value="{{ $tableVotes[$candidate->id] ?? 0 }}" 
+                                        <input type="number"
+                                               class="form-control form-control-sm vote-input mx-1 text-center"
+                                               name="votes[{{ $table->id }}][{{ $candidate->id }}]"
+                                               value="{{ $tableVotes[$candidate->id] ?? 0 }}"
                                                min="0"
                                                data-table-id="{{ $table->id }}"
                                                data-candidate-id="{{ $candidate->id }}"
                                                {{ $table->status === 'cerrado' ? 'readonly' : '' }}>
-                                        <button class="btn btn-sm btn-outline-secondary vote-btn add-vote" 
-                                                data-table-id="{{ $table->id }}" 
+                                        <button class="btn btn-sm btn-outline-secondary vote-btn add-vote"
+                                                data-table-id="{{ $table->id }}"
                                                 data-candidate-id="{{ $candidate->id }}"
                                                 {{ $table->status === 'cerrado' ? 'disabled' : '' }}>
                                             <i class="ri-add-line"></i>
@@ -316,15 +316,15 @@
                                     </div>
                                 </td> -->
                                 <td class="text-center gap-1">
-                                    <button type="button" class="btn btn-success p-2 py-1 register-votes" 
+                                    <button type="button" class="btn btn-success p-2 py-1 register-votes"
                                         data-bs-toggle="tooltip" data-bs-placement="top" title="Registrar"
                                         data-table-id="{{ $table->id }}" {{ $table->status === 'cerrado' ? 'disabled' : '' }}>
-                                        <i class="ri-save-line"></i> 
+                                        <i class="ri-save-line"></i>
                                     </button>
-                                    <button type="button" class="btn btn-outline-primary p-2 py-1 register-close" 
+                                    <button type="button" class="btn btn-outline-primary p-2 py-1 register-close"
                                         data-bs-toggle="tooltip" data-bs-placement="top" title="Cerrar Mesa"
                                         data-table-id="{{ $table->id }}" {{ $table->status === 'cerrado' ? 'disabled' : '' }}>
-                                        <i class="ri-close-circle-fill"></i>                                        
+                                        <i class="ri-close-circle-fill"></i>
                                     </button>
                                     @if($table->status === 'cerrado')
                                         <div class="text-muted small mt-1">Cerrada</div>
@@ -339,15 +339,15 @@
                             @foreach($candidates as $candidate)
                             <td class="text-center fw-bold candidate-{{ $candidate->id }}">
                                 <div class="d-flex gap-2 align-items-center">
-                                    <span class="fs-14 fw-bold mb-1">{{ $candidateTotals[$candidate->id] ?? 0 }}</span>                                    
+                                    <span class="fs-14 fw-bold mb-1">{{ $candidateTotals[$candidate->id] ?? 0 }}</span>
                                     @php
                                         $stats = $candidateStats[$candidate->id] ?? ['trend' => 'neutral', 'percentage' => 0];
                                         $trend = $stats['trend'];
                                         $percentage = $stats['percentage'];
-                                    @endphp                                    
+                                    @endphp
                                     @if($totalCount > 0)
                                         <small class="text-muted mb-1">{{ number_format($percentage, 1) }}%</small>
-                                        @if($candidate->type === 'candidato')                                    
+                                        @if($candidate->type === 'candidato')
                                         @if($trend === 'up')
                                             <div class="avatar-xs">
                                                 <div class="avatar-title bg-success-subtle text-success rounded-circle fs-12">
@@ -433,12 +433,7 @@
     </div>
 @endsection
 @section('script')
-    <script src="{{ URL::asset('build/libs/prismjs/prism.js') }}"></script>
-    <script src="{{ URL::asset('build/libs/list.js/list.min.js') }}"></script>
-    <script src="{{ URL::asset('build/libs/list.pagination.js/list.pagination.min.js') }}"></script>
-    <script src="{{ URL::asset('build/libs/swiper/swiper-bundle.min.js') }}"></script>
     <script src="{{ URL::asset('build/js/app.js') }}"></script>
-
     <script>
         document.addEventListener("DOMContentLoaded", function () {
             var votingTableList = new List('tableList', {
@@ -454,7 +449,7 @@
             document.querySelector('.search').addEventListener('input', function(e) {
                 var searchValue = e.target.value;
                 votingTableList.search(searchValue);
-            });            
+            });
             document.getElementById('institution_id').addEventListener('change', function(e) {
                 var institutionId = e.target.value;
                 var selectedOption = document.querySelector('option[value="' + institutionId + '"]');
@@ -477,7 +472,7 @@
                     let tableId = this.dataset.tableId;
                     registerTableVotes(tableId, false);
                 });
-            });            
+            });
             document.querySelectorAll(".register-close").forEach(btn => {
                 btn.addEventListener("click", function () {
                     let tableId = this.dataset.tableId;
@@ -490,7 +485,7 @@
                 if (confirm('¿Está seguro de que desea registrar todos los votos de todas las mesas?')) {
                     registerAllVotes(false);
                 }
-            });            
+            });
             document.querySelector(".register-close-all").addEventListener("click", function () {
                 if (confirm('¿Está seguro de que desea registrar todos los votos y cerrar todas las mesas? No podrá registrar más votos después.')) {
                     registerAllVotes(true);
@@ -506,7 +501,7 @@
                         updateTotal(tableId);
                     }
                 });
-            });            
+            });
             document.querySelectorAll(".subtract-vote").forEach(btn => {
                 btn.addEventListener("click", function () {
                     let tableId = this.dataset.tableId;
@@ -517,23 +512,23 @@
                         updateTotal(tableId);
                     }
                 });
-            });            
+            });
             document.querySelectorAll(".vote-input").forEach(input => {
                 input.addEventListener('input', function() {
                     let tableId = this.dataset.tableId;
                     updateTotal(tableId);
                 });
-            });            
+            });
             function registerTableVotes(tableId, closeTable = false) {
                 let inputs = document.querySelectorAll(`input.vote-input[data-table-id="${tableId}"]`);
-                let votes = {};                
+                let votes = {};
                 inputs.forEach(input => {
                     votes[input.dataset.candidateId] = parseInt(input.value || 0);
-                });                
+                });
                 let button = document.querySelector(closeTable ? `.register-close[data-table-id="${tableId}"]` : `.register-votes[data-table-id="${tableId}"]`);
                 let originalText = button.innerHTML;
                 button.innerHTML = '<i class="ri-loader-2-line me-1 spin"></i> Procesando...';
-                button.disabled = true;                
+                button.disabled = true;
                 fetch("{{ route('voting-table-votes.register') }}", {
                     method: "POST",
                     headers: {
@@ -549,7 +544,7 @@
                 })
                 .then(res => res.json())
                 .then(data => {
-                    showAlert(data.success ? 'success' : 'danger', data.message);                    
+                    showAlert(data.success ? 'success' : 'danger', data.message);
                     if (data.success) {
                         setTimeout(() => {
                             location.reload();
@@ -565,22 +560,22 @@
                     button.innerHTML = originalText;
                     button.disabled = false;
                 });
-            }            
+            }
             function registerAllVotes(closeAll = false) {
                 let allTables = {};
                 document.querySelectorAll('tr[data-table-id]').forEach(row => {
                     let tableId = row.dataset.tableId;
                     let inputs = row.querySelectorAll('input.vote-input');
-                    let votes = {};                    
+                    let votes = {};
                     inputs.forEach(input => {
                         votes[input.dataset.candidateId] = parseInt(input.value || 0);
                     });
                     allTables[tableId] = votes;
-                });                
+                });
                 let button = document.querySelector(closeAll ? '.register-close-all' : '.register-all-votes');
                 let originalText = button.innerHTML;
                 button.innerHTML = '<i class="ri-loader-2-line me-1 spin"></i> Procesando...';
-                button.disabled = true;                
+                button.disabled = true;
                 fetch("{{ route('voting-table-votes.register-all') }}", {
                     method: "POST",
                     headers: {
@@ -595,7 +590,7 @@
                 })
                 .then(res => res.json())
                 .then(data => {
-                    showAlert(data.success ? 'success' : 'danger', data.message);                    
+                    showAlert(data.success ? 'success' : 'danger', data.message);
                     if (data.success) {
                         setTimeout(() => {
                             location.reload();
@@ -611,7 +606,7 @@
                     button.innerHTML = originalText;
                     button.disabled = false;
                 });
-            }            
+            }
             function showAlert(type, message) {
                 let alertContainer = document.getElementById("alert-container");
                 let div = document.createElement("div");
@@ -626,26 +621,26 @@
                         div.remove();
                     }
                 }, 5000);
-            }            
+            }
             document.querySelectorAll('.counter-value').forEach(counter => {
                 let target = parseInt(counter.getAttribute('data-target')) || 0;
                 counter.textContent = '0';
                 setTimeout(() => animateCounter(counter, target), 500);
-            });            
+            });
             function updateTotal(tableId) {
                 let inputs = document.querySelectorAll(`input.vote-input[data-table-id="${tableId}"]`);
                 let total = 0;
-                inputs.forEach(i => total += parseInt(i.value || 0));                
+                inputs.forEach(i => total += parseInt(i.value || 0));
                 let totalElement = document.querySelector(`.total-votes[data-table-id="${tableId}"]`);
                 if (totalElement) {
                     totalElement.textContent = total;
-                }                
+                }
                 let row = document.querySelector(`tr[data-table-id="${tableId}"]`);
                 if (row) {
                     let capacityElement = row.querySelector('.registeredCitizens');
                     let capacity = capacityElement ? parseInt(capacityElement.textContent) : null;
                     row.classList.remove('capacity-warning', 'capacity-exceeded');
-                    
+
                     if (capacity && !isNaN(capacity)) {
                         if (total > capacity) {
                             row.classList.add('capacity-exceeded');
@@ -653,17 +648,17 @@
                             row.classList.add('capacity-warning');
                         }
                     }
-                }                
+                }
                 updateFooterTotals();
                 updateCandidateCards();
             }
-            
+
             function updateFooterTotals() {
                 let candidateTotals = {};
-                let grandTotal = 0;                
+                let grandTotal = 0;
                 @foreach($candidates as $candidate)
                 candidateTotals[{{ $candidate->id }}] = 0;
-                @endforeach                
+                @endforeach
                 document.querySelectorAll('input.vote-input').forEach(input => {
                     let candidateId = input.dataset.candidateId;
                     let votes = parseInt(input.value || 0);
@@ -671,46 +666,46 @@
                         candidateTotals[candidateId] += votes;
                         grandTotal += votes;
                     }
-                });                
+                });
                 @foreach($candidates as $candidate)
                 let candidate{{ $candidate->id }}Total = candidateTotals[{{ $candidate->id }}];
                 let candidate{{ $candidate->id }}Element = document.querySelector('.candidate-{{ $candidate->id }} .fs-14');
                 if (candidate{{ $candidate->id }}Element) {
                     candidate{{ $candidate->id }}Element.textContent = candidate{{ $candidate->id }}Total;
-                }                
+                }
                 let candidate{{ $candidate->id }}Percentage = grandTotal > 0 ? (candidate{{ $candidate->id }}Total / grandTotal) * 100 : 0;
                 let candidate{{ $candidate->id }}PercentElement = document.querySelector('.candidate-{{ $candidate->id }} .text-muted');
                 if (candidate{{ $candidate->id }}PercentElement) {
                     candidate{{ $candidate->id }}PercentElement.textContent = candidate{{ $candidate->id }}Percentage.toFixed(1) + '%';
-                }                        
+                }
                 updateCandidateTrend({{ $candidate->id }}, candidate{{ $candidate->id }}Total, candidate{{ $candidate->id }}Percentage, grandTotal);
-                @endforeach                
+                @endforeach
                 let grandTotalElement = document.querySelector('tfoot .fw-bold .fs-14');
                 if (grandTotalElement && grandTotalElement.parentElement.parentElement.classList.contains('text-center')) {
                     grandTotalElement.textContent = grandTotal;
-                }        
-            }            
+                }
+            }
             function updateCandidateTrend(candidateId, votes, percentage, totalVotes) {
-                let allTotals = [];                
+                let allTotals = [];
                 @foreach($candidates as $candidate)
                 let candidate{{ $candidate->id }}Votes = 0;
                 document.querySelectorAll('input.vote-input[data-candidate-id="{{ $candidate->id }}"]').forEach(input => {
                     candidate{{ $candidate->id }}Votes += parseInt(input.value || 0);
                 });
                 allTotals.push({id: {{ $candidate->id }}, votes: candidate{{ $candidate->id }}Votes});
-                @endforeach                
+                @endforeach
                 let maxVotes = Math.max(...allTotals.map(c => c.votes));
-                let trend = 'down';                
+                let trend = 'down';
                 if (maxVotes > 0 && votes === maxVotes) {
                     trend = 'up';
                 } else if (totalVotes === 0) {
                     trend = 'neutral';
-                }                
+                }
                 let arrowContainer = document.querySelector(`.candidate-${candidateId} .avatar-xs`);
                 if (arrowContainer) {
                     let arrowElement = arrowContainer.querySelector('.avatar-title');
                     if (arrowElement) {
-                        arrowElement.className = 'avatar-title rounded-circle fs-12';            
+                        arrowElement.className = 'avatar-title rounded-circle fs-12';
                         if (trend === 'up') {
                             arrowElement.classList.add('bg-success-subtle', 'text-success');
                             arrowElement.innerHTML = '<i class="ri-arrow-right-up-fill"></i>';
@@ -726,10 +721,10 @@
             }
             function updateCandidateCards() {
                 let candidateTotals = {};
-                let grandTotal = 0;                
+                let grandTotal = 0;
                 @foreach($candidates as $candidate)
                 candidateTotals[{{ $candidate->id }}] = 0;
-                @endforeach                
+                @endforeach
                 document.querySelectorAll('input.vote-input').forEach(input => {
                     let candidateId = input.dataset.candidateId;
                     let votes = parseInt(input.value || 0);
@@ -737,9 +732,9 @@
                         candidateTotals[candidateId] += votes;
                         grandTotal += votes;
                     }
-                });                
+                });
                 let sortedCandidates = Object.entries(candidateTotals).sort((a, b) => b[1] - a[1]);
-                let maxVotes = sortedCandidates[0] ? sortedCandidates[0][1] : 0;                
+                let maxVotes = sortedCandidates[0] ? sortedCandidates[0][1] : 0;
                 @foreach($candidates as $candidate)
                 updateCandidateCard({{ $candidate->id }}, candidateTotals[{{ $candidate->id }}], grandTotal, maxVotes, sortedCandidates);
                 @endforeach
@@ -747,33 +742,33 @@
             function updateCandidateCard(candidateId, votes, totalVotes, maxVotes, sortedCandidates) {
                 let percentage = totalVotes > 0 ? (votes / totalVotes) * 100 : 0;
                 let rank = sortedCandidates.findIndex(([id, v]) => id == candidateId) + 1;
-                let trend = 'neutral';                
+                let trend = 'neutral';
                 if (maxVotes > 0 && votes === maxVotes) {
                     trend = 'up';
                 } else if (totalVotes > 0) {
                     trend = 'down';
-                }                
+                }
                 let voteElement = document.querySelector(`[data-candidate-id="${candidateId}"] .counter-value`);
                 if (voteElement) {
                     voteElement.textContent = votes;
                     voteElement.setAttribute('data-target', votes);
-                }                
+                }
                 let percentageElement = document.querySelector(`[data-candidate-id="${candidateId}"] .badge`);
                 if (percentageElement) {
                     percentageElement.textContent = `${percentage.toFixed(1)}% del total`;
                 }
             }
-            
+
             function animateCounter(element, target) {
                 let current = parseInt(element.textContent) || 0;
                 let increment = target > current ? 1 : -1;
                 let steps = Math.abs(target - current);
-                let stepTime = Math.max(50, 300 / steps);                
-                if (steps === 0) return;              
+                let stepTime = Math.max(50, 300 / steps);
+                if (steps === 0) return;
                 let timer = setInterval(() => {
                     current += increment;
-                    element.textContent = current;            
-                    
+                    element.textContent = current;
+
                     if (current === target) {
                         clearInterval(timer);
                     }

@@ -71,15 +71,10 @@ class QuillacolloInstitutionsSeeder extends Seeder
         DB::beginTransaction();
         try {
             foreach ($this->recintos as $data) {
-                // Calcular total de ciudadanos real basado en actas
                 $totalCitizens = ($data['mesas'] > 1)
                     ? (240 * ($data['mesas'] - 1)) + $data['last_mesa_voters']
                     : $data['last_mesa_voters'];
-
-                // 1. Crear Localidad
                 $locality = Locality::firstOrCreate(['name' => $data['locality'], 'municipality_id' => $municipality->id]);
-
-                // 2. Crear Institución
                 $inst = Institution::updateOrCreate(
                     ['code' => $data['code']],
                     [
@@ -91,19 +86,13 @@ class QuillacolloInstitutionsSeeder extends Seeder
                         'status' => 'activo'
                     ]
                 );
-
-                // 3. Generar Mesas con lógica OEP real
                 for ($i = 1; $i <= $data['mesas']; $i++) {
                     $currentVoters = ($i < $data['mesas']) ? 240 : $data['last_mesa_voters'];
-
-                    // Manejo de recintos de mesa única
                     if ($data['mesas'] === 1) {
                         $currentVoters = $data['last_mesa_voters'];
                     }
-
                     $suffix = $data['suffix'] ?? '';
                     $oepCode = ($data['oep_inicio'] + ($i - 1)) . "-1" . $suffix;
-
                     $mesa = VotingTable::updateOrCreate(
                         ['institution_id' => $inst->id, 'number' => $i],
                         [
@@ -113,7 +102,6 @@ class QuillacolloInstitutionsSeeder extends Seeder
                             'type' => 'mixta'
                         ]
                     );
-
                     VotingTableElection::updateOrCreate(
                         ['voting_table_id' => $mesa->id, 'election_type_id' => $election->id],
                         ['status' => 'configurada', 'election_date' => $election->election_date]

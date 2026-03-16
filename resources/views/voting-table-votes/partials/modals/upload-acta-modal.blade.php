@@ -1,182 +1,232 @@
-{{--
-    resources/views/voting-table-votes/partials/modals/upload-acta-modal.blade.php
---}}
+{{-- resources/views/voting-table-votes/partials/modals/upload-acta-modal.blade.php --}}
+@php
+    $parseIniSize = function(string $val): int {
+        $val  = trim($val);
+        $last = strtolower(substr($val, -1));
+        $num  = (int) $val;
+        return match($last) {
+            'g' => $num * 1024 * 1024 * 1024,
+            'm' => $num * 1024 * 1024,
+            'k' => $num * 1024,
+            default => $num,
+        };
+    };
+    $phpUpload = $parseIniSize(ini_get('upload_max_filesize') ?: '8M');
+    $phpPost   = $parseIniSize(ini_get('post_max_size')       ?: '8M');
+    $phpLimit  = min($phpUpload, $phpPost);
+    $appLimitBytes = min(10 * 1024 * 1024, $phpLimit);
+    $appLimitMb    = round($appLimitBytes / (1024 * 1024), 1);
+    $appLimitKb    = (int) floor($appLimitBytes / 1024);
+@endphp
+
 <div class="modal fade" id="uploadActaModal" tabindex="-1" aria-labelledby="uploadActaModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-lg">
+    <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">
 
             <div class="modal-header">
                 <h5 class="modal-title" id="uploadActaModalLabel">
-                    <i class="ri-upload-line me-1 text-info"></i>
-                    Subir Acta
+                    <i class="ri-upload-line me-2"></i>
+                    <span id="uploadActaTitle">Subir Acta Electoral</span>
                 </h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
             </div>
 
             <div class="modal-body">
-                <input type="hidden" id="actaTableId"          value="">
-                <input type="hidden" id="actaElectionTypeId"   value="">
+                <div id="uploadActaAlert" class="alert d-none" role="alert"></div>
 
-                <div class="row g-3">
-
-                    <div class="col-md-6">
-                        <label for="actaNumber" class="form-label fw-bold">
-                            Número de Acta <span class="text-danger">*</span>
+                <form id="uploadActaForm" enctype="multipart/form-data">
+                    @csrf
+                    <input type="hidden" name="voting_table_id"  id="uploadTableId">
+                    <input type="hidden" name="election_type_id" id="uploadElectionTypeId">
+                    <div class="mb-2">
+                        <label class="form-label fw-semibold">
+                            N° de Acta <span class="text-danger">*</span>
                         </label>
-                        <input type="text" id="actaNumber" class="form-control"
-                               placeholder="Ej: ACTA-001">
+                        <input type="text" name="acta_number" id="uploadActaNumber"
+                               class="form-control"
+                               placeholder="Ej: 001"
+                               maxlength="50" required>
                     </div>
-
-                    <div class="col-md-6">
-                        <label for="actaHasPhysical" class="form-label fw-bold">
-                            ¿Tiene acta física?
-                        </label>
-                        <select id="actaHasPhysical" class="form-select">
-                            <option value="1">Sí</option>
-                            <option value="0">No</option>
-                        </select>
-                    </div>
-
-                    <div class="col-12">
-                        <label for="actaPhoto" class="form-label fw-bold">
+                    <div class="mb-2">
+                        <label class="form-label fw-semibold">
                             Foto del Acta <span class="text-danger">*</span>
-                            <small class="text-muted fw-normal">Máx. 5 MB. JPG o PNG.</small>
                         </label>
-                        <input type="file" id="actaPhoto" class="form-control"
-                               accept="image/jpeg,image/png,image/jpg">
-                        <div id="actaPhotoPreview" class="mt-2 d-none">
-                            <img id="actaPhotoImg" src="" alt="Preview"
-                                 class="img-thumbnail" style="max-height:200px;">
+                        <input type="file"
+                               name="photo"
+                               id="uploadActaPhoto"
+                               class="form-control"
+                               accept="image/jpeg,image/png,image/jpg"
+                               required>
+                        <div class="form-text">
+                            JPEG o PNG — máximo <strong>{{ $appLimitMb }} MB</strong>
+                            @if($phpLimit < 10 * 1024 * 1024)
+                                <span class="text-warning">
+                                    (límite de PHP: {{ $appLimitMb }} MB —
+                                    para aumentarlo edite <code>upload_max_filesize</code> y
+                                    <code>post_max_size</code> en <code>php.ini</code>)
+                                </span>
+                            @endif
+                        </div>
+                        <div id="photoPreviewWrap" class="mt-2 d-none text-center">
+                            <img id="photoPreview"
+                                 src="" alt="Vista previa"
+                                 class="img-fluid rounded border"
+                                 style="max-height:200px;object-fit:contain;">
+                            <div id="photoPreviewInfo" class="small text-muted mt-1"></div>
                         </div>
                     </div>
-
-                    <div class="col-12">
-                        <label for="actaPdf" class="form-label fw-bold">
-                            PDF del Acta
-                            <small class="text-muted fw-normal">(opcional, máx. 10 MB)</small>
+                    <div class="mb-2">
+                        <label class="form-label fw-semibold">
+                            PDF del Acta <span class="text-muted">(opcional)</span>
                         </label>
-                        <input type="file" id="actaPdf" class="form-control" accept=".pdf">
+                        <input type="file" name="pdf" id="uploadActaPdf"
+                               class="form-control"
+                               accept="application/pdf">
+                        <div class="form-text">Máximo 20 MB</div>
                     </div>
-
-                </div>
+                    <div class="form-check mb-2">
+                        <input class="form-check-input" type="checkbox"
+                               name="has_physical" id="uploadHasPhysical" checked>
+                        <label class="form-check-label" for="uploadHasPhysical">
+                            Tengo el acta física en mano
+                        </label>
+                    </div>
+                </form>
             </div>
 
             <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">
                     <i class="ri-close-line me-1"></i>Cancelar
                 </button>
-                <button type="button" class="btn btn-info text-white" id="saveActaBtn">
+                <button type="button" class="btn btn-primary btn-sm" id="submitUploadActaBtn">
                     <i class="ri-upload-line me-1"></i>Subir Acta
                 </button>
             </div>
-
         </div>
     </div>
 </div>
 
 <script>
-// ─── Photo preview ────────────────────────────────────────────────────────────
-document.getElementById('actaPhoto')?.addEventListener('change', function() {
-    const file = this.files[0];
-    const preview = document.getElementById('actaPhotoPreview');
-    const img     = document.getElementById('actaPhotoImg');
-    if (file && preview && img) {
-        img.src = URL.createObjectURL(file);
-        preview.classList.remove('d-none');
-    }
-});
+(function () {
+    const PHP_LIMIT_BYTES = {{ $appLimitBytes }};
+    const PHP_LIMIT_MB    = {{ $appLimitMb }};
+    window.openActaModal = function (tableId, electionTypeId, tableCode) {
+        document.getElementById('uploadTableId').value        = tableId        ?? '';
+        document.getElementById('uploadElectionTypeId').value = electionTypeId ?? '';
+        const titleEl = document.getElementById('uploadActaTitle');
+        if (titleEl) titleEl.textContent = 'Subir Acta — ' + String(tableCode ?? tableId);
+        document.getElementById('uploadActaForm').reset();
+        hideAlert();
+        document.getElementById('photoPreviewWrap').classList.add('d-none');
 
-// ─── Open modal ───────────────────────────────────────────────────────────────
-window.openActaModal = function(tableId, electionTypeId) {
-    const resolvedEtId = (electionTypeId && electionTypeId !== 'null')
-        ? electionTypeId
-        : (window.electionTypeId ?? '');
+        new bootstrap.Modal(document.getElementById('uploadActaModal')).show();
+    };
+    document.getElementById('uploadActaPhoto')?.addEventListener('change', function () {
+        const file = this.files?.[0];
+        const wrap = document.getElementById('photoPreviewWrap');
+        const info = document.getElementById('photoPreviewInfo');
+        const prev = document.getElementById('photoPreview');
 
-    if (!resolvedEtId) {
-        Swal.fire({ icon: 'error', title: 'Error',
-                    text: 'No se pudo determinar el tipo de elección. Recargue la página.' });
-        return;
-    }
+        if (!file) { wrap.classList.add('d-none'); return; }
 
-    document.getElementById('actaTableId').value        = tableId;
-    document.getElementById('actaElectionTypeId').value = resolvedEtId;
-    document.getElementById('actaNumber').value         = '';
-    document.getElementById('actaPhoto').value          = '';
-    document.getElementById('actaPdf').value            = '';
-    document.getElementById('actaPhotoPreview').classList.add('d-none');
+        const sizeMb = file.size / (1024 * 1024);
 
-    new bootstrap.Modal(document.getElementById('uploadActaModal')).show();
-};
-
-// ─── Save acta ────────────────────────────────────────────────────────────────
-document.getElementById('saveActaBtn')?.addEventListener('click', function() {
-    const tableId      = document.getElementById('actaTableId').value;
-    const etId         = document.getElementById('actaElectionTypeId').value;
-    const actaNumber   = document.getElementById('actaNumber').value.trim();
-    const photoFile    = document.getElementById('actaPhoto').files[0];
-    const pdfFile      = document.getElementById('actaPdf').files[0];
-    const hasPhysical  = document.getElementById('actaHasPhysical').value;
-
-    if (!tableId || tableId === '0') {
-        return Swal.fire({ icon: 'error', title: 'Error', text: 'Mesa no identificada' });
-    }
-    if (!etId || etId === '0' || etId === 'null') {
-        return Swal.fire({ icon: 'error', title: 'Error', text: 'Tipo de elección no identificado' });
-    }
-    if (!actaNumber) {
-        return Swal.fire({ icon: 'error', title: 'Error', text: 'Ingrese el número de acta' });
-    }
-    if (!photoFile) {
-        return Swal.fire({ icon: 'error', title: 'Error', text: 'Seleccione la foto del acta' });
-    }
-    if (photoFile.size > 5 * 1024 * 1024) {
-        return Swal.fire({ icon: 'error', title: 'Error', text: 'La foto no puede superar 5 MB' });
-    }
-
-    const formData = new FormData();
-    formData.append('voting_table_id',  tableId);
-    formData.append('election_type_id', etId);
-    formData.append('acta_number',      actaNumber);
-    formData.append('photo',            photoFile);
-    formData.append('has_physical',     hasPhysical);
-    if (pdfFile) formData.append('pdf', pdfFile);
-
-    const btn      = this;
-    const origHtml = btn.innerHTML;
-    btn.innerHTML  = '<i class="ri-loader-4-line ri-spin me-1"></i>Subiendo...';
-    btn.disabled   = true;
-
-    fetch('/actas/upload', {
-        method: 'POST',
-        headers: {
-            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
-            'Accept': 'application/json',
-        },
-        body: formData,
-    })
-    .then(r => r.json())
-    .then(data => {
-        if (data.success) {
-            bootstrap.Modal.getInstance(document.getElementById('uploadActaModal'))?.hide();
-            Swal.fire({
-                icon: 'success', title: '✅ Acta subida',
-                text: data.message,
-                toast: true, position: 'top-end',
-                showConfirmButton: false, timer: 2500,
-            });
-        } else {
-            const msg = data.errors
-                ? Object.values(data.errors).flat().join('\n')
-                : (data.message ?? 'Error desconocido');
-            Swal.fire({ icon: 'error', title: '❌ Error', text: msg });
+        if (file.size > PHP_LIMIT_BYTES) {
+            wrap.classList.add('d-none');
+            showAlert('danger',
+                `⚠️ El archivo seleccionado pesa ${sizeMb.toFixed(2)} MB y supera el límite de ${PHP_LIMIT_MB} MB. ` +
+                `Reduzca la resolución de la imagen y vuelva a intentarlo. ` +
+                `Para aumentar el límite, edite <code>upload_max_filesize</code> y <code>post_max_size</code> en <code>php.ini</code>.`
+            );
+            this.value = '';
+            return;
         }
-    })
-    .catch(err => {
-        Swal.fire({ icon: 'error', title: '❌ Error de red', text: err.message });
-    })
-    .finally(() => {
-        btn.innerHTML = origHtml;
-        btn.disabled  = false;
+
+        hideAlert();
+        const reader = new FileReader();
+        reader.onload = function (e) {
+            prev.src = e.target.result;
+            wrap.classList.remove('d-none');
+            info.textContent = file.name + ' — ' + sizeMb.toFixed(2) + ' MB';
+        };
+        reader.readAsDataURL(file);
     });
-});
+    document.getElementById('submitUploadActaBtn')?.addEventListener('click', async function () {
+        const form = document.getElementById('uploadActaForm');
+        const tableId      = document.getElementById('uploadTableId').value;
+        const etId         = document.getElementById('uploadElectionTypeId').value;
+        const actaNumber   = document.getElementById('uploadActaNumber').value.trim();
+        const photoFile    = document.getElementById('uploadActaPhoto').files?.[0];
+
+        if (!tableId || !etId) { showAlert('danger', 'Error: no se identificó la mesa. Cierre y abra el modal nuevamente.'); return; }
+        if (!actaNumber)       { showAlert('danger', 'Ingrese el número de acta.'); return; }
+        if (!photoFile)        { showAlert('danger', 'Seleccione la foto del acta.'); return; }
+
+        if (photoFile.size > PHP_LIMIT_BYTES) {
+            showAlert('danger',
+                `El archivo pesa ${(photoFile.size / 1024 / 1024).toFixed(2)} MB y supera el límite de ${PHP_LIMIT_MB} MB.`
+            );
+            return;
+        }
+
+        const btn = this;
+        btn.disabled  = true;
+        btn.innerHTML = '<i class="ri-loader-4-line ri-spin me-1"></i>Subiendo…';
+        hideAlert();
+        showAlert('info', '<i class="ri-loader-4-line ri-spin me-1"></i>Subiendo acta, por favor espere…');
+
+        try {
+            const formData = new FormData(form);
+
+            const resp = await fetch('/actas/upload', {
+                method:  'POST',
+                headers: {
+                    'Accept':       'application/json',
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+                },
+                body: formData,
+            });
+
+            const data = await resp.json();
+
+            if (data.success) {
+                bootstrap.Modal.getInstance(document.getElementById('uploadActaModal'))?.hide();
+                Swal.fire({
+                    icon: 'success', title: '✅ Acta subida',
+                    text: data.message ?? 'Acta subida correctamente',
+                    toast: true, position: 'top-end',
+                    showConfirmButton: false, timer: 3000,
+                });
+                // Dispatch event so the table row can refresh without full reload
+                document.dispatchEvent(new CustomEvent('actaUploaded', {
+                    detail: { tableId, actaId: data.acta?.id }
+                }));
+                setTimeout(() => location.reload(), 1500);
+            } else {
+                let msg = data.message ?? 'Error al subir el acta';
+                if (data.errors) {
+                    msg = Object.values(data.errors).flat().join('<br>');
+                }
+                showAlert('danger', msg);
+            }
+
+        } catch (err) {
+            showAlert('danger', 'Error de conexión: ' + err.message);
+        } finally {
+            btn.disabled  = false;
+            btn.innerHTML = '<i class="ri-upload-line me-1"></i>Subir Acta';
+        }
+    });
+    function showAlert(type, html) {
+        const el = document.getElementById('uploadActaAlert');
+        if (!el) return;
+        el.className = `alert alert-${type}`;
+        el.innerHTML = html;
+        el.classList.remove('d-none');
+    }
+    function hideAlert() {
+        const el = document.getElementById('uploadActaAlert');
+        if (el) { el.classList.add('d-none'); el.innerHTML = ''; }
+    }
+})();
 </script>

@@ -12,13 +12,9 @@
             </div>
 
             <div class="modal-body">
-                {{-- Hidden fields --}}
                 <input type="hidden" id="observationTableId"    value="">
                 <input type="hidden" id="observationElectionTypeId" value="{{ $electionTypeId ?? '' }}">
-
                 <div class="row g-3">
-
-                    {{-- Tipo --}}
                     <div class="col-md-6">
                         <label for="observationType" class="form-label fw-bold">
                             Tipo de Observación <span class="text-danger">*</span>
@@ -30,8 +26,6 @@
                             @endforeach
                         </select>
                     </div>
-
-                    {{-- Severidad --}}
                     <div class="col-md-6">
                         <label for="observationSeverity" class="form-label fw-bold">
                             Severidad <span class="text-danger">*</span>
@@ -43,8 +37,6 @@
                             <option value="critical">Crítico</option>
                         </select>
                     </div>
-
-                    {{-- Descripción --}}
                     <div class="col-12">
                         <label for="observationDescription" class="form-label fw-bold">
                             Descripción <span class="text-danger">*</span>
@@ -54,8 +46,6 @@
                                   rows="3"
                                   placeholder="Describa detalladamente la observación..."></textarea>
                     </div>
-
-                    {{-- Evidencia --}}
                     <div class="col-12">
                         <label for="observationEvidence" class="form-label fw-bold">
                             Evidencia (foto)
@@ -66,8 +56,6 @@
                                class="form-control"
                                accept="image/jpeg,image/png,image/jpg">
                     </div>
-
-                    {{-- Votes list (loaded via JS) --}}
                     <div class="col-12">
                         <label class="form-label fw-bold">
                             Votos a observar

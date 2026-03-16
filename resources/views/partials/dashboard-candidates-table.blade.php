@@ -1,6 +1,4 @@
-{{--
-    resources/views/partials/dashboard-candidates-table.blade.php
---}}
+{{--resources/views/partials/dashboard-candidates-table.blade.php--}}
 <div class="table-responsive">
     <table class="table table-hover align-middle mb-0">
         <thead class="table-light">

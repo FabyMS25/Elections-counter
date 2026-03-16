@@ -9,11 +9,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 class Permission extends Model
 {
     use HasFactory;
-    protected $fillable = ['name', 'display_name', 'description', 'group', 'scope'];
-
-    protected $casts = [
-        'scope' => 'string',
-    ];
+    protected $fillable = ['name', 'display_name', 'description', 'group'];
 
     public function roles(): BelongsToMany
     {
@@ -24,17 +20,11 @@ class Permission extends Model
     public function users(): BelongsToMany
     {
         return $this->belongsToMany(User::class, 'permission_user')
-            ->withPivot('scope', 'scope_id', 'scope_type')
             ->withTimestamps();
     }
 
-    public function scopeByScope($query, $scope)
+    public function scopeByGroup($query, string $group)
     {
-        return $query->where('scope', $scope);
-    }
-
-    public function scopeGlobal($query)
-    {
-        return $query->where('scope', 'global');
+        return $query->where('group', $group);
     }
 }

@@ -9,10 +9,7 @@
     </div>
 </div>
 
-{{-- ══════════════════════════════════════════════════════════════════════════
-     ROW 1 · KPI cards
-═══════════════════════════════════════════════════════════════════════════ --}}
-<div class="row g-3 mb-3">
+<div class="row g-3 mb-2">
     <div class="col-xl-3 col-md-6">
         <div class="card h-100 border-0 shadow-sm">
             <div class="card-body">
@@ -31,7 +28,7 @@
                         <i class="ri-table-line"></i>
                     </span>
                 </div>
-                <div class="mt-3">
+                <div class="mt-2">
                     <div class="d-flex justify-content-between mb-1">
                         <small class="text-muted">Avance</small>
                         <small class="fw-bold text-primary" id="kpi-pct">{{ $progressPercentage }}%</small>
@@ -47,8 +44,6 @@
             </div>
         </div>
     </div>
-
-    {{-- Total papeletas en ánfora --}}
     <div class="col-xl-3 col-md-6">
         <div class="card h-100 border-0 shadow-sm">
             <div class="card-body">
@@ -66,7 +61,7 @@
                         <i class="ri-inbox-line"></i>
                     </span>
                 </div>
-                <div class="mt-3 d-flex gap-3">
+                <div class="mt-2 d-flex gap-3">
                     <div>
                         <small class="text-muted d-block">En Blanco</small>
                         <span class="fw-bold text-secondary" id="kpi-blank">{{ number_format($totalBlankVotes) }}</span>
@@ -86,7 +81,6 @@
         </div>
     </div>
 
-    {{-- Candidato líder (active category) --}}
     <div class="col-xl-3 col-md-6">
         <div class="card h-100 border-0 shadow-sm">
             <div class="card-body">
@@ -118,8 +112,7 @@
                             </div>
                         </div>
                     </div>
-                    {{-- Mini leader bar --}}
-                    <div class="mt-3">
+                    <div class="mt-2">
                         <div class="progress" style="height:5px;border-radius:5px;">
                             <div class="progress-bar bg-success"
                                  style="width:{{ $leader['percentage'] }}%;background:{{ $leader['candidate']->color ?? '#0ab39c' }} !important;"></div>
@@ -134,8 +127,6 @@
             </div>
         </div>
     </div>
-
-    {{-- Votos por mesa (promedio) --}}
     <div class="col-xl-3 col-md-6">
         <div class="card h-100 border-0 shadow-sm">
             <div class="card-body">
@@ -147,7 +138,7 @@
                 </h3>
                 <small class="text-muted">papeletas / mesa escrutada</small>
 
-                <div class="mt-3 row g-0 text-center border-top pt-3">
+                <div class="mt-2 row g-0 text-center border-top pt-3">
                     <div class="col-6 border-end">
                         <div class="fw-bold text-warning" id="kpi-pending">
                             {{ $totalTables - $reportedTables }}
@@ -185,16 +176,12 @@
         </div>
     </div>
 
-{{-- ══════════════════════════════════════════════════════════════════════════
-     ROW 2 · Category tabs + main results chart
-═══════════════════════════════════════════════════════════════════════════ --}}
-<div class="row g-3 mb-3">
+<div class="row g-3 mb-2">
     <div class="col-12">
         <div class="card border-0 shadow-sm">
             <div class="card-header border-bottom-0 pb-0 bg-transparent">
                 <div class="d-flex align-items-center justify-content-between flex-wrap gap-2">
                     <h5 class="card-title mb-0">Resultados por Candidato</h5>
-                    {{-- Category pills --}}
                     <ul class="nav nav-pills nav-sm gap-1" id="categoryTabs" role="tablist">
                         @foreach($typeCategories as $tc)
                             @php $code = $tc->electionCategory?->code ?? 'UNK'; @endphp
@@ -228,9 +215,7 @@
                         @endphp
                         <div class="tab-pane fade {{ $code === $activeCategoryCode ? 'show active' : '' }}"
                              id="panel-{{ $code }}" role="tabpanel">
-
-                            {{-- Special votes row --}}
-                            <div class="d-flex gap-3 mb-3 flex-wrap">
+                            <div class="d-flex gap-3 mb-2 flex-wrap">
                                 <span class="badge bg-primary-subtle text-primary border border-primary-subtle px-3 py-2">
                                     <i class="ri-inbox-line me-1"></i>
                                     Ánfora: <strong>{{ number_format($catTotal) }}</strong>
@@ -251,8 +236,6 @@
                                     @if($catTotal > 0) ({{ round(($catNull / $catTotal) * 100, 1) }}%) @endif
                                 </span>
                             </div>
-
-                            {{-- Horizontal bar results --}}
                             @forelse($sortedStats as $rank => $s)
                                 @php
                                     $cand  = $s['candidate'];
@@ -262,12 +245,10 @@
                                 @endphp
                                 <div class="mb-3 {{ $isLeader ? 'p-2 rounded bg-light border' : '' }}">
                                     <div class="d-flex align-items-center gap-2 mb-1">
-                                        {{-- Rank badge --}}
                                         <span class="badge rounded-pill fw-bold"
                                               style="background:{{ $color }};min-width:26px;">
                                             {{ $rank + 1 }}
                                         </span>
-                                        {{-- Photo / initial --}}
                                         @if($cand->photo)
                                             <img src="{{ asset('storage/'.$cand->photo) }}"
                                                  class="rounded-circle"
@@ -278,12 +259,10 @@
                                                 {{ strtoupper(substr($cand->name, 0, 1)) }}
                                             </div>
                                         @endif
-                                        {{-- Party logo --}}
                                         @if($cand->party_logo)
                                             <img src="{{ asset('storage/'.$cand->party_logo) }}"
                                                  style="height:22px;width:auto;object-fit:contain;" alt="{{ $cand->party }}">
                                         @endif
-                                        {{-- Name + party --}}
                                         <div class="flex-grow-1 min-w-0">
                                             <div class="fw-bold text-truncate" style="font-size:.88rem;">
                                                 {{ $cand->name }}
@@ -293,7 +272,6 @@
                                             </div>
                                             <small class="text-muted">{{ $cand->party }}</small>
                                         </div>
-                                        {{-- Vote count + % --}}
                                         <div class="text-end" style="min-width:100px;">
                                             <div class="fw-bold" style="color:{{ $color }};">
                                                 {{ number_format($s['votes']) }}
@@ -301,7 +279,6 @@
                                             <small class="text-muted">{{ $pct }}%</small>
                                         </div>
                                     </div>
-                                    {{-- Progress bar --}}
                                     <div class="progress ms-5" style="height:{{ $isLeader ? 10 : 6 }}px;border-radius:6px;">
                                         <div class="progress-bar"
                                              role="progressbar"
@@ -550,7 +527,7 @@
                 <h5 class="card-title mb-0">Progreso General</h5>
             </div>
             <div class="card-body progress-general">
-                <div class="progress mb-3" style="height: 20px;">
+                <div class="progress mb-2" style="height: 20px;">
                     <div class="progress-bar bg-success general-progress-bar" role="progressbar"
                          style="width: {{ $progressPercentage }}%"
                          aria-valuenow="{{ $progressPercentage }}"
@@ -567,15 +544,7 @@
     </div>
 </div>
 
-
-
-
-
-{{-- ══════════════════════════════════════════════════════════════════════════
-     ROW 3 · Charts side by side
-═══════════════════════════════════════════════════════════════════════════ --}}
-<div class="row g-3 mb-3">
-    {{-- Bar chart --}}
+<div class="row g-2 mb-2">
     <div class="col-lg-8">
         <div class="card border-0 shadow-sm h-100">
             <div class="card-header border-bottom-0 bg-transparent d-flex align-items-center justify-content-between">
@@ -599,8 +568,6 @@
             </div>
         </div>
     </div>
-
-    {{-- Donut chart --}}
     <div class="col-lg-4">
         <div class="card border-0 shadow-sm h-100">
             <div class="card-header border-bottom-0 bg-transparent">
@@ -615,10 +582,7 @@
     </div>
 </div>
 
-{{-- ══════════════════════════════════════════════════════════════════════════
-     ROW 4 · Progress + locality chart
-═══════════════════════════════════════════════════════════════════════════ --}}
-<div class="row g-3 mb-3">
+<div class="row g-3 mb-2">
     <div class="col-lg-8">
         <div class="card border-0 shadow-sm h-100">
             <div class="card-header border-bottom-0 bg-transparent d-flex align-items-center justify-content-between">
@@ -651,10 +615,8 @@
                 </h6>
             </div>
             <div class="card-body">
-                {{-- Big donut progress --}}
                 <div id="progress-radial-chart" style="height:200px;"></div>
-
-                <div class="row g-0 text-center mt-3 border-top pt-3">
+                <div class="row g-0 text-center mt-2 border-top pt-3">
                     <div class="col-4">
                         <div class="fw-bold fs-5 text-success" id="stat-reported">{{ $reportedTables }}</div>
                         <small class="text-muted">Escrutadas</small>
@@ -673,10 +635,7 @@
     </div>
 </div>
 
-{{-- ══════════════════════════════════════════════════════════════════════════
-     ROW 5 · Locality detail table
-═══════════════════════════════════════════════════════════════════════════ --}}
-<div class="row g-3 mb-3">
+<div class="row g-3 mb-2">
     <div class="col-12">
         <div class="card border-0 shadow-sm">
             <div class="card-header border-bottom-0 bg-transparent d-flex align-items-center justify-content-between">
@@ -693,7 +652,6 @@
         </div>
     </div>
 </div>
-
 
 <div class="auto-refresh-controls"
      style="position:fixed;bottom:20px;right:20px;z-index:1000;
@@ -723,26 +681,18 @@
         <small class="text-success">● Activo</small>
     </div>
 </div>
-{{-- ══════════════════════════════════════════════════════════════════════════
-     SCRIPTS
-═══════════════════════════════════════════════════════════════════════════ --}}
 @push('scripts')
 <script src="https://cdn.jsdelivr.net/npm/apexcharts@3.45.2/dist/apexcharts.min.js"></script>
 <script>
 document.addEventListener('DOMContentLoaded', function () {
-
-    // ── Data from server ───────────────────────────────────────────────────
     const ALL_STATS     = @json($categoryStats ?? []);
     const LOCALITY_DATA = @json($localityResults ?? []);
     const ACTIVE_CODE   = @json($activeCategoryCode ?? '');
     const TOTAL_TABLES  = {{ $totalTables ?? 0 }};
-
     let charts        = {};
     let activeCode    = ACTIVE_CODE;
     let refreshTimer  = null;
     let isRefreshing  = false;
-
-    // ── Build arrays for a given category code ─────────────────────────────
     function buildArrays(code) {
         const stats  = ALL_STATS[code] ?? {};
         const sorted = Object.values(stats.stats ?? {}).sort((a, b) => b.votes - a.votes);

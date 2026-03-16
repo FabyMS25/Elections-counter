@@ -53,6 +53,29 @@ class Candidate extends Model
         return $query->where('active', true);
     }
 
+    public function scopeNacional($query)
+    {
+        return $query->whereNull('department_id')
+                     ->whereNull('province_id')
+                     ->whereNull('municipality_id');
+    }
+
+    public function scopeForMunicipality($query, int $municipalityId)
+    {
+        return $query->where(function ($q) use ($municipalityId) {
+            $q->where('municipality_id', $municipalityId)
+              ->orWhereNull('municipality_id');
+        });
+    }
+
+    public function scopeForDepartment($query, int $departmentId)
+    {
+        return $query->where(function ($q) use ($departmentId) {
+            $q->where('department_id', $departmentId)
+              ->orWhereNull('department_id');
+        });
+    }
+
     public function scopeByElectionType($query, $electionTypeId)
     {
         return $query->whereHas('electionTypeCategory', function ($q) use ($electionTypeId) {

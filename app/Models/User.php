@@ -8,33 +8,20 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
-use App\Traits\HasPermissionsAndRoles;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Support\Facades\DB;
 
 class User extends Authenticatable
 {
-    use HasApiTokens, HasFactory, Notifiable, HasPermissionsAndRoles;
+    use HasApiTokens, HasFactory, Notifiable;
 
     protected $fillable = [
-        'name',
-        'last_name',
-        'id_card',
-        'email',
-        'phone',
-        'address',
-        'password',
-        'avatar',
-        'is_active',
-        'last_login_at',
-        'last_login_ip',
-        'created_by',
-        'updated_by',
+        'name', 'last_name', 'id_card', 'email', 'phone', 'address',
+        'password', 'avatar', 'is_active', 'last_login_at', 'last_login_ip',
+        'created_by', 'updated_by',
     ];
 
-    protected $hidden = [
-        'password',
-        'remember_token',
-    ];
+    protected $hidden = ['password', 'remember_token'];
 
     protected $casts = [
         'email_verified_at' => 'datetime',
@@ -42,23 +29,15 @@ class User extends Authenticatable
         'last_login_at'     => 'datetime',
     ];
 
-    public function assignments(): HasMany
-    {
-        return $this->hasMany(UserAssignment::class);
-    }
-
     public function roles(): BelongsToMany
     {
         return $this->belongsToMany(Role::class, 'role_user')
-            ->withPivot('scope', 'institution_id', 'voting_table_id', 'scope_settings')
             ->withTimestamps();
     }
 
-    public function permissions(): BelongsToMany
+    public function assignments(): HasMany
     {
-        return $this->belongsToMany(Permission::class, 'permission_user')
-            ->withPivot('scope', 'scope_id', 'scope_type')
-            ->withTimestamps();
+        return $this->hasMany(UserAssignment::class);
     }
 
     public function createdBy(): BelongsTo
@@ -86,16 +65,31 @@ class User extends Authenticatable
         return $this->hasMany(AuditLog::class, 'user_id');
     }
 
-    private $allPermissionsCache = null;
-
-    public function getAllPermissionsAttribute()
+    public function hasPermission(string $permission): bool
     {
-        if ($this->allPermissionsCache === null) {
-            $rolePermissions   = $this->roles->flatMap(fn($r) => $r->permissions);
-            $directPermissions = $this->permissions;
-            $this->allPermissionsCache = $rolePermissions->merge($directPermissions)->unique('id');
+        if (!isset($this->_permCache)) {
+            $this->_permCache = DB::table('permission_user')
+                ->join('permissions', 'permissions.id', '=', 'permission_user.permission_id')
+                ->where('permission_user.user_id', $this->id)
+                ->pluck('permissions.name')
+                ->flip()
+                ->toArray();
         }
-        return $this->allPermissionsCache;
+        return isset($this->_permCache[$permission]);
+    }
+
+    public function hasDelegationFor(int $institutionId, ?int $votingTableId = null): bool
+    {
+        $query = $this->assignments()
+            ->where('institution_id', $institutionId)
+            ->where('status', 'activo')
+            ->whereNull('deleted_at');
+
+        if ($votingTableId) {
+            $query->where('voting_table_id', $votingTableId);
+        }
+
+        return $query->exists();
     }
 
     public function scopeActive($query)
@@ -108,27 +102,24 @@ class User extends Authenticatable
         return $query->whereHas('roles', fn($q) => $q->where('name', $roleName));
     }
 
-    public function scopeByRecinto($query, $institutionId)
+    public function scopeByRecinto($query, int $institutionId)
     {
-        return $query->whereHas('roles', function ($q) use ($institutionId) {
-            $q->wherePivot('scope', 'recinto')
-            ->wherePivot('institution_id', $institutionId);
-        })->orWhereHas('assignments', function ($q) use ($institutionId) {
-            $q->where('institution_id', $institutionId)->where('status', 'activo');
-        });
-    }
-    public function scopeByMesa($query, $votingTableId)
-    {
-        return $query->whereHas('roles', function ($q) use ($votingTableId) {
-            $q->wherePivot('scope', 'mesa')
-            ->wherePivot('voting_table_id', $votingTableId);
-        })->orWhereHas('assignments', function ($q) use ($votingTableId) {
-            $q->where('voting_table_id', $votingTableId)->where('status', 'activo');
-        });
+        return $query->whereHas('assignments', fn($q) =>
+            $q->where('institution_id', $institutionId)->where('status', 'activo')
+        );
     }
 
-    protected static function booted()
+    public function scopeByMesa($query, int $votingTableId)
     {
-        static::saved(fn($u) => $u->allPermissionsCache = null);
+        return $query->whereHas('assignments', fn($q) =>
+            $q->where('voting_table_id', $votingTableId)->where('status', 'activo')
+        );
+    }
+
+    protected static function booted(): void
+    {
+        static::saved(function ($user) {
+            unset($user->_permCache);
+        });
     }
 }

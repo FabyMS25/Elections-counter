@@ -22,7 +22,7 @@ class Observation extends Model
         'voting_table_id',
         'election_type_id',
         'candidate_id',
-        'reviewed_by',      // ✅ nullable in DB — no longer NOT NULL
+        'reviewed_by',
         'reviewer_role',
         'resolved_by',
         'resolved_at',
@@ -82,11 +82,6 @@ class Observation extends Model
     {
         return $this->belongsTo(Candidate::class);
     }
-
-    /**
-     * The user who created/reviewed this observation.
-     * Nullable — system-generated observations may have no reviewer yet.
-     */
     public function reviewer(): BelongsTo
     {
         return $this->belongsTo(User::class, 'reviewed_by');
@@ -102,9 +97,6 @@ class Observation extends Model
         return $this->belongsTo(User::class, 'escalated_to');
     }
 
-    /**
-     * Votes that reference this observation as the reason they are observed.
-     */
     public function votes(): HasMany
     {
         return $this->hasMany(Vote::class);

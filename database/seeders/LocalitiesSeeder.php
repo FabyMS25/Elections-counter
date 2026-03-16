@@ -124,7 +124,7 @@ class LocalitiesSeeder extends Seeder
                 ['name' => 'Cotapachi', 'latitude' => -17.43139, 'longitude' => -66.27175],
                 ['name' => 'El Paso', 'latitude' => -17.4083, 'longitude' => -66.2917],
                 ['name' => 'Illataco', 'latitude' => -17.36861, 'longitude' => -66.30000],
-                ['name' => 'Liriumi', 'latitude' => -17.31667, 'longitude' => -66.33333],
+                ['name' => 'Liriuni', 'latitude' => -17.31667, 'longitude' => -66.33333],
                 ['name' => 'Misicuni', 'latitude' => -17.16667, 'longitude' => -66.36667],
                 ['name' => 'Paucarpata', 'latitude' => -17.4000, 'longitude' => -66.3000],
                 ['name' => 'Piñami', 'latitude' => -17.3833, 'longitude' => -66.2667],

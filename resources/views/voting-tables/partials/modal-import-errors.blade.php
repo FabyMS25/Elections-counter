@@ -1,16 +1,8 @@
 {{-- resources/views/voting-tables/partials/modal-import-errors.blade.php --}}
-{{--
-  Shown automatically when the import controller returns errors or partial success.
-  Sessions used:
-    import_errors   → array of ❌/⏭️ messages
-    import_warnings → array of ⚠️ messages (optional)
-    success_count   → int — rows that were actually inserted/updated
---}}
 @if(session('import_errors') || session('import_warnings'))
 <div class="modal fade" id="importErrorModal" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
         <div class="modal-content">
-
             <div class="modal-header {{ session('success_count') ? 'bg-warning' : 'bg-danger' }}">
                 <h5 class="modal-title text-white">
                     <i class="ri-alert-line me-1"></i>
@@ -18,10 +10,7 @@
                 </h5>
                 <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
             </div>
-
             <div class="modal-body">
-
-                {{-- Success count --}}
                 @if(session('success_count'))
                     <div class="alert alert-success d-flex gap-2">
                         <i class="ri-check-double-line fs-5 flex-shrink-0"></i>
@@ -35,8 +24,6 @@
                         </div>
                     </div>
                 @endif
-
-                {{-- Errors --}}
                 @if(session('import_errors') && count(session('import_errors')) > 0)
                     <div class="alert alert-danger d-flex gap-2">
                         <i class="ri-error-warning-line fs-5 flex-shrink-0"></i>
@@ -66,8 +53,6 @@
                         </table>
                     </div>
                 @endif
-
-                {{-- Warnings --}}
                 @if(session('import_warnings') && count(session('import_warnings')) > 0)
                     <div class="alert alert-warning d-flex gap-2">
                         <i class="ri-information-line fs-5 flex-shrink-0"></i>
@@ -94,8 +79,6 @@
                         </table>
                     </div>
                 @endif
-
-                {{-- Help hint --}}
                 <div class="alert alert-light border mt-2 mb-0 py-2">
                     <i class="ri-lightbulb-line me-1 text-warning"></i>
                     <small>
@@ -104,9 +87,7 @@
                         o el <em>código</em> del sistema.
                     </small>
                 </div>
-
             </div>
-
             <div class="modal-footer">
                 <a href="{{ route('voting-tables.template') }}" class="btn btn-outline-info">
                     <i class="ri-download-line me-1"></i>Descargar Plantilla

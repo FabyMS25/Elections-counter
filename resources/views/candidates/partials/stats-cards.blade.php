@@ -1,7 +1,3 @@
-{{--
-    $stats is passed from CandidateController::index()
-    Keys: byCategory, byDepartment, byElectionType, geo
---}}
 @php
     $totalCandidates   = $candidates->total();
     $byCategory        = $stats['byCategory'];
@@ -9,48 +5,14 @@
     $byElectionType    = $stats['byElectionType'];
     $geo               = $stats['geo'];
 @endphp
-
-{{-- ── Top summary cards ── --}}
-<div class="row g-3">
-    @php
-        $summaryCards = [
-            ['label' => 'Total Candidatos',   'value' => $totalCandidates,          'icon' => 'ri-user-star-line',   'color' => 'primary'],
-            ['label' => 'Categorías Activas', 'value' => $byCategory->count(),       'icon' => 'ri-stack-line',       'color' => 'success'],
-            ['label' => 'Departamentos',       'value' => $byDepartment->count(),    'icon' => 'ri-map-pin-line',     'color' => 'info'],
-            ['label' => 'Tipos de Elección',   'value' => $byElectionType->count(), 'icon' => 'ri-government-line', 'color' => 'warning'],
-        ];
-    @endphp
-
-    @foreach($summaryCards as $card)
-    <div class="col-xl-3 col-md-6">
-        <div class="card mb-0">
-            <div class="card-body">
-                <div class="d-flex align-items-center">
-                    <div class="avatar-sm me-3 flex-shrink-0">
-                        <span class="avatar-title bg-{{ $card['color'] }}-subtle text-{{ $card['color'] }} rounded fs-3">
-                            <i class="{{ $card['icon'] }}"></i>
-                        </span>
-                    </div>
-                    <div>
-                        <p class="text-muted mb-1 small">{{ $card['label'] }}</p>
-                        <h4 class="mb-0">{{ $card['value'] }}</h4>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-    @endforeach
-</div>
-
-{{-- ── By election type + category ── --}}
 @if($byCategory->isNotEmpty())
-<div class="row mt-3">
+<div class="row">
     <div class="col-12">
         <div class="card mb-0">
             <div class="card-header py-2">
                 <h6 class="card-title mb-0">Candidatos por Tipo de Elección y Categoría</h6>
             </div>
-            <div class="card-body p-0">
+            <div class="card-body p-0 px-1">
                 <div class="table-responsive">
                     <table class="table table-sm table-bordered mb-0">
                         <thead class="table-light">
@@ -86,16 +48,14 @@
     </div>
 </div>
 @endif
-
-{{-- ── By department  +  geographic scope ── --}}
 @if($byDepartment->isNotEmpty())
-<div class="row mt-3">
+<div class="row mt-2">
     <div class="col-md-6">
         <div class="card mb-0">
             <div class="card-header py-2">
                 <h6 class="card-title mb-0">Por Departamento</h6>
             </div>
-            <div class="card-body p-0">
+            <div class="card-body p-0 px-1">
                 <div class="table-responsive">
                     <table class="table table-sm table-bordered mb-0">
                         <thead class="table-light">
@@ -114,13 +74,12 @@
             </div>
         </div>
     </div>
-
     <div class="col-md-6">
         <div class="card mb-0">
             <div class="card-header py-2">
                 <h6 class="card-title mb-0">Por Ámbito Geográfico</h6>
             </div>
-            <div class="card-body p-0">
+            <div class="card-body p-0 px-1">
                 <div class="table-responsive">
                     <table class="table table-sm table-bordered mb-0">
                         <thead class="table-light">

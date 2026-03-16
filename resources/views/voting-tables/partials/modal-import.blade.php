@@ -1,21 +1,7 @@
 {{-- resources/views/voting-tables/partials/modal-import.blade.php --}}
-{{--
-  Import modal for VotingTable.
-  Columns that belong on voting_tables:
-    Código OEP, Código Interno, N° Mesa, Letra, Tipo, Recinto (nombre o código),
-    Rango Desde/Hasta, Votantes Esperados, Presidente…Vocal 4, Observaciones.
-
-  Optional election-level columns (written to voting_table_elections for EVERY active type):
-    Papeletas Recibidas, Papeletas Deterioradas, Total Votantes,
-    Estado, Hora Apertura, Hora Cierre, Fecha Elección.
-
-  NOTE: There is NO "Tipo Elección" column. The imported table is automatically
-  linked to all active ElectionTypes via voting_table_elections.
---}}
 <div class="modal fade" id="importModal" tabindex="-1" aria-labelledby="importModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered modal-xl">
         <div class="modal-content">
-
             <div class="modal-header bg-light">
                 <h5 class="modal-title" id="importModalLabel">
                     <i class="ri-file-upload-line me-1"></i>
@@ -23,20 +9,15 @@
                 </h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
             </div>
-
             <form action="{{ route('voting-tables.import') }}" method="POST"
                   enctype="multipart/form-data">
                 @csrf
-
                 <div class="modal-body">
-
-                    {{-- Column reference ──────────────────────────────────────────────── --}}
                     <div class="alert alert-info mb-3">
                         <div class="fw-semibold mb-2">
                             <i class="ri-list-check me-1"></i>
                             Columnas de la plantilla (reconocidas por nombre — el orden no importa):
                         </div>
-
                         <ul class="nav nav-tabs mb-2" id="importTabs" role="tablist">
                             <li class="nav-item" role="presentation">
                                 <button class="nav-link active" id="tab-table-tab"
@@ -60,10 +41,7 @@
                                 </button>
                             </li>
                         </ul>
-
                         <div class="tab-content bg-white rounded border p-2">
-
-                            {{-- Tab 1: Table-level columns --}}
                             <div class="tab-pane fade show active" id="tab-table" role="tabpanel">
                                 <div class="table-responsive">
                                     <table class="table table-sm table-bordered mb-0">
@@ -148,8 +126,6 @@
                                     </small>
                                 </div>
                             </div>
-
-                            {{-- Tab 2: Election-level columns --}}
                             <div class="tab-pane fade" id="tab-election" role="tabpanel">
                                 <p class="text-muted small mb-2">
                                     Estos valores se aplican a <strong>todos</strong> los tipos de elección activos
@@ -209,8 +185,6 @@
                                     </table>
                                 </div>
                             </div>
-
-                            {{-- Tab 3: Delegates --}}
                             <div class="tab-pane fade" id="tab-delegates" role="tabpanel">
                                 <p class="text-muted small mb-2">
                                     Ingrese el <strong>correo electrónico</strong> o el <strong>carnet de identidad</strong>
@@ -232,11 +206,9 @@
                                     </table>
                                 </div>
                             </div>
+                        </div>
+                    </div>
 
-                        </div>{{-- /.tab-content --}}
-                    </div>{{-- /.alert-info --}}
-
-                    {{-- Template download tip --}}
                     <div class="alert alert-success d-flex align-items-start gap-2 py-2">
                         <i class="ri-lightbulb-line fs-5 flex-shrink-0 mt-1"></i>
                         <div>
@@ -250,8 +222,6 @@
                             </a>
                         </div>
                     </div>
-
-                    {{-- File input --}}
                     <div class="mb-1">
                         <label for="import_file_vt" class="form-label fw-semibold">
                             Archivo XLSX / XLS / CSV <span class="text-danger">*</span>
@@ -262,9 +232,7 @@
                             Máximo 5 MB · Se recomienda XLSX para evitar problemas de codificación.
                         </small>
                     </div>
-
-                </div>{{-- /.modal-body --}}
-
+                </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-light" data-bs-dismiss="modal">
                         <i class="ri-close-line me-1"></i>Cancelar

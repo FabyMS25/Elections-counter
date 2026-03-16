@@ -1,8 +1,6 @@
-{{-- resources/views/voting-table-votes/partials/table-rows.blade.php--}}
+{{-- resources/views/voting-table-votes/partials/table-rows.blade.php --}}
 @php
-    if (empty($candidatesByCategory)) {
-        return;
-    }
+    if (empty($candidatesByCategory)) return;
     $regularCandidates = [];
     $voteMap           = [];
     foreach ($candidatesByCategory as $categoryCode => $categoryCandidates) {
@@ -13,13 +11,9 @@
             $voteMap[$vote->candidate_id] = $vote;
         }
     }
-    $maxRows = empty($regularCandidates)
-        ? 0
-        : max(array_map(fn($c) => $c->count(), $regularCandidates));
-
+    $maxRows    = empty($regularCandidates) ? 0 : max(array_map(fn($c) => $c->count(), $regularCandidates));
     $canObserve = ($permissions['can_observe'] ?? false) && !$isDisabled;
 @endphp
-
 @for($i = 0; $i < $maxRows; $i++)
 <tr>
     <td class="text-center fw-bold small">{{ $i + 1 }}</td>
@@ -29,7 +23,6 @@
             @php $c = $regularCandidates[$categoryCode][$i] ?? null; @endphp
             @if($c && !$firstCandidate) @php $firstCandidate = $c; @endphp @endif
         @endforeach
-
         @if($firstCandidate)
             <div class="d-flex align-items-center gap-1">
                 @if($firstCandidate->party_logo)
@@ -37,7 +30,8 @@
                          width="20" height="20" class="rounded" style="object-fit:contain;">
                 @else
                     <span style="background:{{ $firstCandidate->color ?? '#0ab39c' }};
-                                 width:14px;height:14px;border-radius:3px;display:inline-block;flex-shrink:0;"></span>
+                                 width:14px;height:14px;border-radius:3px;
+                                 display:inline-block;flex-shrink:0;"></span>
                 @endif
                 <span class="small">{{ $firstCandidate->party }}</span>
             </div>
@@ -58,7 +52,7 @@
                         <img src="{{ $candidate->photo_url }}"
                              class="rounded-circle" width="20" height="20" style="object-fit:cover;">
                     @endif
-                    <span class="small">{{ Str::limit($candidate->name, 25) }}</span>
+                    <span>{{ Str::limit($candidate->name, 25) }}</span>
                     @if($isObserved)
                         <i class="ri-alert-line text-danger" title="Observado"></i>
                     @endif
@@ -102,17 +96,18 @@
     @endforeach
 </tr>
 @endfor
+
 <tr class="table-light">
     <td class="text-center text-muted" style="font-size:0.7rem;">
         <i class="ri-subtract-line"></i>
     </td>
-    <td class="text-end small fw-semibold text-muted pe-2" style="white-space:nowrap; font-size:0.78rem;">
+    <td class="text-end fw-semibold text-muted pe-2" style="white-space:nowrap;font-size:0.78rem;">
         En Blanco
     </td>
     @foreach($candidatesByCategory as $categoryCode => $_)
         @php
             $blankQty = $table->results_by_category[$categoryCode]['blank_votes'] ?? 0;
-            $colClass  = 'table-' . ($categoryColorMap[$categoryCode] ?? 'secondary');
+            $colClass = 'table-' . ($categoryColorMap[$categoryCode] ?? 'secondary');
         @endphp
         <td class="{{ $colClass }}"></td>
         <td class="{{ $colClass }} text-center">
@@ -123,7 +118,7 @@
                        data-category="{{ $categoryCode }}"
                        value="{{ $blankQty }}"
                        min="0" step="1"
-                       style="width:70px; margin:0 auto;"
+                       style="width:70px;margin:0 auto;"
                        title="Votos en blanco — {{ $categoryCode }}">
             @else
                 <span class="fw-bold">{{ $blankQty }}</span>
@@ -136,7 +131,7 @@
     <td class="text-center text-muted" style="font-size:0.7rem;">
         <i class="ri-close-line"></i>
     </td>
-    <td class="text-end small fw-semibold text-muted pe-2" style="white-space:nowrap; font-size:0.78rem;">
+    <td class="text-end fw-semibold text-muted pe-2" style="white-space:nowrap;font-size:0.78rem;">
         Nulos
     </td>
     @foreach($candidatesByCategory as $categoryCode => $_)
@@ -153,7 +148,7 @@
                        data-category="{{ $categoryCode }}"
                        value="{{ $nullQty }}"
                        min="0" step="1"
-                       style="width:70px; margin:0 auto;"
+                       style="width:70px;margin:0 auto;"
                        title="Votos nulos — {{ $categoryCode }}">
             @else
                 <span class="fw-bold">{{ $nullQty }}</span>
@@ -162,6 +157,7 @@
         <td class="{{ $colClass }}"></td>
     @endforeach
 </tr>
+
 <tr class="table-info fw-bold">
     <td colspan="2" class="text-end small">TOTALES</td>
     @foreach($candidatesByCategory as $categoryCode => $_)
@@ -170,10 +166,11 @@
             $colClass = 'table-' . ($categoryColorMap[$categoryCode] ?? 'secondary');
         @endphp
         <td class="{{ $colClass }} text-center" colspan="2">
-            <span id="total-{{ $categoryCode }}-{{ $table->id }}">{{ $catTotal }}</span>
+            <span class="cat-total-display"
+                  data-display="cat-total"
+                  data-category="{{ $categoryCode }}"
+                  data-table="{{ $table->id }}">{{ $catTotal }}</span>
         </td>
         <td class="{{ $colClass }}"></td>
     @endforeach
 </tr>
-
-

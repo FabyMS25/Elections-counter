@@ -1,9 +1,7 @@
 <?php
-
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
-use Illuminate\Support\Facades\DB;
 
 return new class extends Migration
 {
@@ -15,7 +13,6 @@ return new class extends Migration
             $table->string('display_name')->nullable();
             $table->string('description')->nullable();
             $table->string('group')->nullable();
-            $table->enum('scope', ['global', 'recinto', 'mesa'])->default('global');
             $table->timestamps();
         });
 
@@ -24,7 +21,7 @@ return new class extends Migration
             $table->string('name')->unique();
             $table->string('display_name')->nullable();
             $table->string('description')->nullable();
-            $table->enum('default_scope', ['global', 'recinto', 'mesa'])->default('global');
+            // $table->enum('default_scope', ['global', 'recinto', 'mesa'])->default('global');
             $table->timestamps();
         });
 
@@ -40,51 +37,22 @@ return new class extends Migration
             $table->id();
             $table->foreignId('role_id')->constrained()->onDelete('cascade');
             $table->foreignId('user_id')->constrained()->onDelete('cascade');
-            $table->enum('scope', ['global', 'recinto', 'mesa'])->default('global');
-            $table->foreignId('institution_id')->nullable()->constrained();
-            $table->foreignId('voting_table_id')->nullable()->constrained();
-            $table->json('scope_settings')->nullable();
             $table->timestamps();
-            $table->index(['user_id']);
-            $table->index(['institution_id']);
-            $table->index(['voting_table_id']);
+            $table->unique(['role_id', 'user_id']);
         });
-        // Global: no institution, no table
-        DB::statement('
-            CREATE UNIQUE INDEX unique_role_user_global
-            ON role_user (role_id, user_id)
-            WHERE institution_id IS NULL AND voting_table_id IS NULL
-        ');
-        // Recinto: institution set, no table
-        DB::statement('
-            CREATE UNIQUE INDEX unique_role_user_recinto
-            ON role_user (role_id, user_id, institution_id)
-            WHERE institution_id IS NOT NULL AND voting_table_id IS NULL
-        ');
-        // Mesa: specific voting table
-        DB::statement('
-            CREATE UNIQUE INDEX unique_role_user_mesa
-            ON role_user (role_id, user_id, voting_table_id)
-            WHERE voting_table_id IS NOT NULL
-        ');
+
         Schema::create('permission_user', function (Blueprint $table) {
             $table->id();
             $table->foreignId('permission_id')->constrained()->onDelete('cascade');
             $table->foreignId('user_id')->constrained()->onDelete('cascade');
-            $table->enum('scope', ['global', 'recinto', 'mesa'])->default('global');
-            $table->unsignedBigInteger('scope_id')->nullable();
-            $table->string('scope_type')->nullable();
             $table->timestamps();
-            $table->unique(['permission_id', 'user_id', 'scope', 'scope_id', 'scope_type'], 'unique_permission_user_scope');
+            $table->unique(['permission_id', 'user_id'], 'uniq_perm_user');
         });
     }
 
     public function down(): void
     {
         Schema::dropIfExists('permission_user');
-        DB::statement('DROP INDEX IF EXISTS unique_role_user_global');
-        DB::statement('DROP INDEX IF EXISTS unique_role_user_recinto');
-        DB::statement('DROP INDEX IF EXISTS unique_role_user_mesa');
         Schema::dropIfExists('role_user');
         Schema::dropIfExists('permission_role');
         Schema::dropIfExists('roles');

@@ -54,11 +54,16 @@ class HomeController extends Controller
     public function toggleDashboardVisibility(Request $request)
     {
         if (!Auth::check()) {
-            return response()->json(['error' => 'Unauthorized'], 401);
+            return response()->json(['error' => 'No autenticado.'], 401);
         }
-        $dashboard = Dashboard::first();
+        if (!Auth::user()->hasPermission('manage_settings')) {
+            return response()->json(['error' => 'No tienes permiso para realizar esta acción.'], 403);
+        }
+
+        $dashboard            = Dashboard::first();
         $dashboard->is_public = !$dashboard->is_public;
         $dashboard->save();
+
         return response()->json([
             'success'   => true,
             'is_public' => $dashboard->is_public,
@@ -66,10 +71,6 @@ class HomeController extends Controller
         ]);
     }
 
-    /**
-     * Called by the AJAX refresh button — returns only the data needed to
-     * update counters and charts without a full page reload.
-     */
     public function refreshDashboard(Request $request)
     {
         $dashboard = Dashboard::first();
@@ -100,12 +101,74 @@ class HomeController extends Controller
         ));
     }
 
+    public function updateProfile(Request $request)
+    {
+        $user = Auth::user();
+
+        $request->validate([
+            'name'   => ['required', 'string', 'max:255'],
+            'email'  => ['required', 'string', 'email', 'unique:users,email,' . $user->id],
+            'avatar' => ['nullable', 'image', 'mimes:jpg,jpeg,png', 'max:1024'],
+        ]);
+
+        $user->name  = $request->name;
+        $user->email = $request->email;
+
+        if ($request->hasFile('avatar')) {
+            $path         = $request->file('avatar')->store('avatars', 'public');
+            $user->avatar = basename($path);
+        }
+
+        $user->save();
+
+        return redirect()->back()->with('success', 'Perfil actualizado correctamente.');
+    }
+
+    public function updatePassword(Request $request)
+    {
+        $user = Auth::user();
+
+        $request->validate([
+            'current_password' => ['required', 'string'],
+            'password'         => ['required', 'string', 'min:8', 'confirmed'],
+        ]);
+
+        if (!Hash::check($request->current_password, $user->password)) {
+            return redirect()->back()->with('error', 'Su contraseña actual no coincide.');
+        }
+
+        $user->update(['password' => Hash::make($request->password)]);
+
+        return redirect()->back()->with('success', 'Contraseña actualizada correctamente.');
+    }
+
+    public function getProvinces($departmentId)
+    {
+        return response()->json(Province::where('department_id', $departmentId)->get());
+    }
+
+    public function getMunicipalities($provinceId)
+    {
+        return response()->json(Municipality::where('province_id', $provinceId)->get());
+    }
+
+    public function lang($locale)
+    {
+        if ($locale) {
+            App::setLocale($locale);
+            Session::put('lang', $locale);
+            Session::save();
+            return redirect()->back()->with('locale', $locale);
+        }
+        return redirect()->back();
+    }
 
     private function buildDashboardData(Request $request, ?Dashboard $dashboard): array
     {
         $electionTypes       = ElectionType::where('active', true)->get();
         $departments         = Department::all();
         $defaultElectionType = $dashboard?->defaultElectionType ?? $electionTypes->first();
+
         $defaultDeptId = $dashboard?->default_department_id
             ?? $departments->first()?->id;
         $defaultProvId = $dashboard?->default_province_id
@@ -127,9 +190,9 @@ class HomeController extends Controller
             );
         }
 
-        $municipalityId = (int) $municipalityId;
         $departmentId   = (int) $departmentId;
         $provinceId     = (int) $provinceId;
+        $municipalityId = (int) $municipalityId;
         $provinces      = Province::where('department_id', $departmentId)->get();
         $municipalities = Municipality::where('province_id', $provinceId)->get();
 
@@ -142,15 +205,12 @@ class HomeController extends Controller
             );
         }
 
-        // ── Voting tables in this municipality for this election ──────────────
         $tableIds = VotingTable::whereHas('institution', function ($q) use ($municipalityId) {
             $q->whereHas('locality', fn($q2) => $q2->where('municipality_id', $municipalityId));
         })->pluck('id');
 
         $totalTables = $tableIds->count();
 
-        // ── reportedTables: tables that have FINISHED counting (escrutada/transmitida)
-        //    for THIS election type ──────────────────────────────────────────────
         $reportedTables = \App\Models\VotingTableElection::whereIn('voting_table_id', $tableIds)
             ->where('election_type_id', $selectedElectionType->id)
             ->whereIn('status', [
@@ -163,7 +223,6 @@ class HomeController extends Controller
             ? round(($reportedTables / $totalTables) * 100, 2)
             : 0;
 
-        // ── Per-category stats ────────────────────────────────────────────────
         $typeCategories = ElectionTypeCategory::where('election_type_id', $selectedElectionType->id)
             ->with('electionCategory')
             ->orderBy('ballot_order')
@@ -183,7 +242,6 @@ class HomeController extends Controller
                 ->orderBy('list_order')
                 ->get();
 
-            // Use Vote table for candidate-level counts
             $votes = Vote::select('candidate_id', DB::raw('SUM(quantity) as total_votes'))
                 ->where('election_type_id', $selectedElectionType->id)
                 ->where('election_type_category_id', $tcId)
@@ -195,7 +253,6 @@ class HomeController extends Controller
 
             $totalValidVotes = (int) $votes->sum('total_votes');
 
-            // Blank/null come from VotingTableCategoryResult (entered per acta)
             $specialVotes = VotingTableCategoryResult::where('election_type_category_id', $tcId)
                 ->whereIn('voting_table_id', $tableIds)
                 ->selectRaw('COALESCE(SUM(blank_votes), 0) as blank, COALESCE(SUM(null_votes), 0) as null_v')
@@ -203,8 +260,6 @@ class HomeController extends Controller
 
             $catBlank = (int) ($specialVotes->blank  ?? 0);
             $catNull  = (int) ($specialVotes->null_v ?? 0);
-
-            // Total for percentage calculation = valid + blank + null (= papeletas en ánfora)
             $catTotal = $totalValidVotes + $catBlank + $catNull;
 
             $totalBlankVotes += $catBlank;
@@ -216,28 +271,21 @@ class HomeController extends Controller
                 'candidates'     => $candidates,
                 'stats'          => $this->calculateStats($votes, $catTotal),
                 'totalVotes'     => $totalValidVotes,
-                'totalBallots'   => $catTotal,   // valid + blank + null = ánfora
+                'totalBallots'   => $catTotal,
                 'blankVotes'     => $catBlank,
                 'nullVotes'      => $catNull,
             ];
         }
 
-        // ── Active category for display ───────────────────────────────────────
         $defaultCategoryCode = $dashboard?->defaultCategory?->code ?? array_key_first($categoryStats);
         $activeCategoryCode  = $request->get('category', $defaultCategoryCode);
         if (!isset($categoryStats[$activeCategoryCode])) {
             $activeCategoryCode = array_key_first($categoryStats);
         }
 
-        // ── totalVotes = ánfora ballots for the active category ───────────────
-        // (all categories share the same ánfora, so any category total is equivalent)
-        $totalVotes = $categoryStats[$activeCategoryCode]['totalBallots'] ?? 0;
-
-        // ── Locality breakdown ────────────────────────────────────────────────
-        $localityResults = $this->getLocalityResults(
-            $selectedElectionType->id, $municipalityId, $typeCategories
-        );
-        $localityStats = $this->getLocalityStats($municipalityId, $selectedElectionType->id);
+        $totalVotes      = $categoryStats[$activeCategoryCode]['totalBallots'] ?? 0;
+        $localityResults = $this->getLocalityResults($selectedElectionType->id, $municipalityId, $typeCategories);
+        $localityStats   = $this->getLocalityStats($municipalityId, $selectedElectionType->id);
 
         return [
             'dashboard'            => $dashboard,
@@ -257,7 +305,6 @@ class HomeController extends Controller
             'progressPercentage'   => $progressPercentage,
             'localityResults'      => $localityResults,
             'localityStats'        => $localityStats,
-            // Convenience shortcuts kept for backwards-compat with existing partials
             'alcaldeCandidates'    => $categoryStats['ALC']['candidates']  ?? collect(),
             'alcaldeStats'         => $categoryStats['ALC']['stats']        ?? [],
             'concejalCandidates'   => $categoryStats['CON']['candidates']  ?? collect(),
@@ -272,7 +319,6 @@ class HomeController extends Controller
         ];
     }
 
-    // ── Also fix getLocalityStats to accept electionTypeId ────────────────────
     private function getLocalityStats(int $municipalityId, int $electionTypeId = 0)
     {
         return Locality::where('municipality_id', $municipalityId)
@@ -283,7 +329,6 @@ class HomeController extends Controller
             ])
             ->get()
             ->map(function ($locality) use ($electionTypeId) {
-                // Count tables that are escrutada/transmitida for this election type
                 $locality->reported_tables = DB::table('voting_table_elections as vte')
                     ->join('voting_tables as vt', 'vte.voting_table_id', '=', 'vt.id')
                     ->join('institutions as inst', 'vt.institution_id', '=', 'inst.id')
@@ -291,10 +336,10 @@ class HomeController extends Controller
                     ->when($electionTypeId, fn($q) => $q->where('vte.election_type_id', $electionTypeId))
                     ->whereIn('vte.status', ['escrutada', 'transmitida'])
                     ->count();
-
                 return $locality;
             });
     }
+
     private function calculateStats($votes, int $totalVotes): array
     {
         $stats = [];
@@ -321,17 +366,19 @@ class HomeController extends Controller
             $tableIds = VotingTable::whereHas('institution', fn($q) =>
                 $q->where('locality_id', $locality->id)
             )->pluck('id');
+
             $specialVotes = VotingTableCategoryResult::whereIn('voting_table_id', $tableIds)
                 ->selectRaw('COALESCE(SUM(blank_votes), 0) as blank, COALESCE(SUM(null_votes), 0) as null_v')
                 ->first();
+
             $results[$locality->id] = [
-                'name'        => $locality->name,
-                'latitude'    => $locality->latitude,
-                'longitude'   => $locality->longitude,
-                'total_votes' => 0,
-                'blank_votes' => (int) ($specialVotes->blank  ?? 0),
-                'null_votes'  => (int) ($specialVotes->null_v ?? 0),
-                'categories'  => [],
+                'name'                 => $locality->name,
+                'latitude'             => $locality->latitude,
+                'longitude'            => $locality->longitude,
+                'total_votes'          => 0,
+                'blank_votes'          => (int) ($specialVotes->blank  ?? 0),
+                'null_votes'           => (int) ($specialVotes->null_v ?? 0),
+                'categories'           => [],
                 'total_votes_alcalde'  => 0,
                 'total_votes_concejal' => 0,
                 'alcalde'              => [],
@@ -350,8 +397,10 @@ class HomeController extends Controller
                     ->with('candidate')
                     ->orderByDesc(DB::raw('SUM(quantity)'))
                     ->get();
+
                 $catTotal = (int) $votes->sum('total');
                 $results[$locality->id]['total_votes'] += $catTotal;
+
                 $candidateList = $votes->map(fn($v) => [
                     'id'             => $v->candidate_id,
                     'candidate_name' => $v->candidate?->name ?? '—',
@@ -362,11 +411,13 @@ class HomeController extends Controller
                     'votes'          => (int) $v->total,
                     'percentage'     => $catTotal > 0 ? round(($v->total / $catTotal) * 100, 1) : 0,
                 ])->values()->toArray();
+
                 $results[$locality->id]['categories'][$code] = [
                     'label'       => $catName,
                     'total_votes' => $catTotal,
                     'candidates'  => $candidateList,
                 ];
+
                 if ($code === 'ALC') {
                     $results[$locality->id]['total_votes_alcalde'] = $catTotal;
                     $results[$locality->id]['alcalde']             = $candidateList;
@@ -413,58 +464,5 @@ class HomeController extends Controller
             'totalBlankVotes'      => 0,
             'totalNullVotes'       => 0,
         ];
-    }
-
-    public function getProvinces($departmentId)
-    {
-        return response()->json(Province::where('department_id', $departmentId)->get());
-    }
-    public function getMunicipalities($provinceId)
-    {
-        return response()->json(Municipality::where('province_id', $provinceId)->get());
-    }
-
-    public function lang($locale)
-    {
-        if ($locale) {
-            App::setLocale($locale);
-            Session::put('lang', $locale);
-            Session::save();
-            return redirect()->back()->with('locale', $locale);
-        }
-        return redirect()->back();
-    }
-
-    public function updateProfile(Request $request, $id)
-    {
-        $request->validate([
-            'name'   => ['required', 'string', 'max:255'],
-            'email'  => ['required', 'string', 'email', 'unique:users,email,' . $id],
-            'avatar' => ['nullable', 'image', 'mimes:jpg,jpeg,png', 'max:1024'],
-        ]);
-        $user = User::findOrFail($id);
-        $user->name  = $request->name;
-        $user->email = $request->email;
-        if ($request->file('avatar')) {
-            $avatar = $request->file('avatar');
-            $name   = time() . '.' . $avatar->getClientOriginalExtension();
-            $avatar->move(public_path('/images/'), $name);
-            $user->avatar = $name;
-        }
-        $user->save();
-        return redirect()->back()->with('success', 'Perfil actualizado correctamente.');
-    }
-
-    public function updatePassword(Request $request, $id)
-    {
-        $request->validate([
-            'current_password' => ['required', 'string'],
-            'password'         => ['required', 'string', 'min:6', 'confirmed'],
-        ]);
-        if (!Hash::check($request->current_password, Auth::user()->password)) {
-            return redirect()->back()->with('error', 'Su contraseña actual no coincide.');
-        }
-        User::findOrFail($id)->update(['password' => Hash::make($request->password)]);
-        return redirect()->back()->with('success', 'Contraseña actualizada correctamente.');
     }
 }

@@ -16,11 +16,8 @@
             <form action="{{ route('candidates.import') }}" method="POST"
                   enctype="multipart/form-data">
                 @csrf
-
                 <div class="modal-body">
-
-                    {{-- ── Column reference ── --}}
-                    <div class="alert alert-info mb-3">
+                    <div class="alert alert-info mb-2">
                         <div class="fw-semibold mb-2">
                             <i class="ri-list-check me-1"></i>
                             Columnas requeridas en el CSV:
@@ -115,8 +112,6 @@
                             </table>
                         </div>
                     </div>
-
-                    {{-- ── Tip: use the template ── --}}
                     <div class="alert alert-success d-flex align-items-start gap-2 py-2">
                         <i class="ri-lightbulb-line fs-5 flex-shrink-0 mt-1"></i>
                         <div>
@@ -132,8 +127,6 @@
                             </a>
                         </div>
                     </div>
-
-                    {{-- ── File input ── --}}
                     <div class="mb-2">
                         <label for="import_file" class="form-label fw-semibold">
                             Archivo CSV <span class="text-danger">*</span>

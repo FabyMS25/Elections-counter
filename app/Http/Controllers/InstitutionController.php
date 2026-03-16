@@ -24,9 +24,9 @@ class InstitutionController extends Controller
     {
         $this->middleware('auth');
         $this->middleware('permission:view_recintos')->only(['index', 'show', 'exportAll', 'exportSelected', 'downloadTemplate']);
-        $this->middleware('permission:create_recintos')->only(['create', 'store']);
-        $this->middleware('permission:edit_recintos')->only(['edit', 'update']);
-        $this->middleware('permission:delete_recintos')->only(['destroy', 'deleteMultiple']);
+        $this->middleware('permission:create_recinto')->only(['create', 'store', 'import']);
+        $this->middleware('permission:edit_recinto')->only(['edit', 'update']);
+        $this->middleware('permission:delete_recinto')->only(['destroy', 'deleteMultiple']);
     }
 
     private function validationMessages()

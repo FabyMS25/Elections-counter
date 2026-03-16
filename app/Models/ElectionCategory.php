@@ -77,6 +77,11 @@ class ElectionCategory extends Model
         );
     }
 
+    public function isNacional(): bool
+    {
+        return $this->geographic_scope === self::SCOPE_NACIONAL;
+    }
+
     public function isMunicipal(): bool
     {
         return $this->geographic_scope === self::SCOPE_MUNICIPAL;
@@ -85,6 +90,16 @@ class ElectionCategory extends Model
     public function isDepartamental(): bool
     {
         return $this->geographic_scope === self::SCOPE_DEPARTAMENTAL;
+    }
+
+    public function isProvincial(): bool
+    {
+        return $this->geographic_scope === self::SCOPE_PROVINCIAL;
+    }
+
+    public function requiresGeography(): bool
+    {
+        return $this->geographic_scope !== self::SCOPE_NACIONAL;
     }
 
     public function isListBased(): bool

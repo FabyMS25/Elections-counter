@@ -1,16 +1,12 @@
-<div class="row g-4 mb-2">
-    {{-- ── Left: Action buttons ── --}}
+<div class="row g-4">
     <div class="col-sm-auto">
         <div class="d-flex flex-wrap gap-2 align-items-center">
-
             @can('create_candidatos')
             <button type="button" class="btn btn-success"
                     data-bs-toggle="modal" data-bs-target="#candidateModal" id="create-btn">
                 <i class="ri-add-line me-1"></i> Agregar Candidato
             </button>
             @endcan
-
-            {{-- Export dropdown --}}
             <div class="btn-group">
                 <button type="button" class="btn btn-info dropdown-toggle" data-bs-toggle="dropdown">
                     <i class="ri-download-line me-1"></i> Exportar
@@ -48,21 +44,16 @@
                     </li>
                 </ul>
             </div>
-
-            {{-- Delete multiple (visible only when items are checked) --}}
             <button class="btn btn-soft-danger d-none" id="delete-multiple-btn"
                     onclick="deleteMultiple()">
                 <i class="ri-delete-bin-2-line me-1"></i> Eliminar Seleccionados
             </button>
         </div>
     </div>
-
-    {{-- ── Right: Filters ── --}}
     <div class="col-sm">
         <form method="GET" action="{{ route('candidates.index') }}" id="filter-form">
 
             <div class="row g-2 align-items-center">
-                {{-- Search --}}
                 <div class="col-md-5">
                     <div class="input-group">
                         <span class="input-group-text bg-white border-end-0">
@@ -73,8 +64,6 @@
                                value="{{ request('search') }}">
                     </div>
                 </div>
-
-                {{-- Department --}}
                 <div class="col-md-3">
                     <select name="department_id" class="form-select" id="filter-department">
                         <option value="">Todos los departamentos</option>
@@ -86,12 +75,10 @@
                         @endforeach
                     </select>
                 </div>
-
-                {{-- Election type / category --}}
                 <div class="col-md-4">
                     <select name="election_type_category_id" class="form-select" id="filter-category">
                         <option value="">Todas las categorías</option>
-                        @foreach($electionTypeCategories as $etc)
+                        @foreach($etcs as $etc)
                             <option value="{{ $etc->id }}"
                                 {{ request('election_type_category_id') == $etc->id ? 'selected' : '' }}>
                                 {{ $etc->electionType->name }} – {{ $etc->electionCategory->name }}
@@ -102,7 +89,6 @@
             </div>
 
             <div class="row g-2 mt-1">
-                {{-- Province --}}
                 <div class="col-md-4">
                     <select name="province_id" class="form-select" id="filter-province"
                             {{ request('department_id') ? '' : 'disabled' }}>
@@ -115,8 +101,6 @@
                         @endforeach
                     </select>
                 </div>
-
-                {{-- Municipality --}}
                 <div class="col-md-4">
                     <select name="municipality_id" class="form-select" id="filter-municipality"
                             {{ request('province_id') ? '' : 'disabled' }}>
@@ -129,8 +113,6 @@
                         @endforeach
                     </select>
                 </div>
-
-                {{-- Submit / clear --}}
                 <div class="col-md-4">
                     <div class="d-flex gap-2">
                         <button type="submit" class="btn btn-primary flex-fill">
@@ -145,14 +127,10 @@
                     </div>
                 </div>
             </div>
-
-            {{-- Preserve sort / pagination --}}
             <input type="hidden" name="sort"      value="{{ request('sort', 'name') }}">
             <input type="hidden" name="direction" value="{{ request('direction', 'asc') }}">
             <input type="hidden" name="per_page"  value="{{ request('per_page', 20) }}">
         </form>
-
-        {{-- Active filter badges --}}
         @if(request()->hasAny(['search','election_type_category_id','department_id','province_id','municipality_id']))
         <div class="mt-2 d-flex align-items-center gap-2 flex-wrap">
             <span class="text-muted small">Filtros:</span>
@@ -164,7 +142,7 @@
                 </span>
             @endif
 
-            @if(request('election_type_category_id') && ($selCat = $electionTypeCategories->find(request('election_type_category_id'))))
+            @if(request('election_type_category_id') && ($selCat = $etcs->find(request('election_type_category_id'))))
                 <span class="badge bg-info d-inline-flex align-items-center gap-1">
                     <i class="ri-stack-line"></i> {{ $selCat->electionType->name }} – {{ $selCat->electionCategory->name }}
                     <a href="{{ route('candidates.index', request()->except(['election_type_category_id','page'])) }}" class="text-white"><i class="ri-close-line"></i></a>
@@ -196,20 +174,14 @@
     </div>
 </div>
 
-{{--
-    Export-selected form
-    JS populates this with multiple hidden inputs (selected_ids[]) before submit
---}}
 <form id="export-selected-form"
       action="{{ route('candidates.export-selected') }}"
       method="POST" style="display:none;">
     @csrf
-    {{-- JS appends <input name="selected_ids[]" value="…"> elements here --}}
 </form>
 
 <script>
 document.addEventListener('DOMContentLoaded', function () {
-    // ── Department → Province cascade (filter bar) ───────────────
     const filterDept = document.getElementById('filter-department');
     if (filterDept) {
         filterDept.addEventListener('change', function () {
@@ -223,8 +195,6 @@ document.addEventListener('DOMContentLoaded', function () {
             window.location.href = url.toString();
         });
     }
-
-    // ── Province → Municipality cascade (filter bar) ──────────────
     const filterProv = document.getElementById('filter-province');
     if (filterProv) {
         filterProv.addEventListener('change', function () {
@@ -237,8 +207,6 @@ document.addEventListener('DOMContentLoaded', function () {
             window.location.href = url.toString();
         });
     }
-
-    // ── Category filter (auto-submit) ────────────────────────────
     const filterCat = document.getElementById('filter-category');
     if (filterCat) {
         filterCat.addEventListener('change', function () {

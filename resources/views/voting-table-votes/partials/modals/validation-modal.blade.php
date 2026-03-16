@@ -14,7 +14,7 @@
                     @csrf
                     <input type="hidden" id="validationTableId">
 
-                    <div class="mb-3">
+                    <div class="mb-2">
                         <label class="form-label">Acción</label>
                         <select class="form-select" id="validationAction" required>
                             <option value="validate">Validar</option>
@@ -23,7 +23,7 @@
                         </select>
                     </div>
 
-                    <div class="mb-3">
+                    <div class="mb-2">
                         <label class="form-label">Notas</label>
                         <textarea class="form-control" id="validationNotes" rows="3"></textarea>
                     </div>

@@ -14,12 +14,11 @@ return new class extends Migration
 
             $table->enum('level', [
                 'nacional',
-                'departamental',   // Gobernador + Asambleístas (3-franja)
-                'municipal',       // Alcalde + Concejales (2-franja)
+                'departamental',
+                'municipal', 
                 'regional',
                 'indigena_ioc',
             ]);
-
             $table->string('geographic_scope_type')->nullable(); // e.g. 'App\Models\Department'
             $table->unsignedBigInteger('geographic_scope_id')->nullable();
 

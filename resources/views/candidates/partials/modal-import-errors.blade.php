@@ -23,22 +23,18 @@
             </div>
 
             <div class="modal-body">
-
-                {{-- Summary messages --}}
                 @if($importSuccess)
-                <div class="alert alert-success py-2 d-flex align-items-center gap-2 mb-3">
+                <div class="alert alert-success py-2 d-flex align-items-center gap-2 mb-2">
                     <i class="ri-check-double-line fs-5 flex-shrink-0"></i>
                     <span>{{ $importSuccess }}</span>
                 </div>
                 @elseif($importFail)
-                <div class="alert alert-danger py-2 d-flex align-items-center gap-2 mb-3">
+                <div class="alert alert-danger py-2 d-flex align-items-center gap-2 mb-2">
                     <i class="ri-close-circle-line fs-5 flex-shrink-0"></i>
                     <span>{{ $importFail }}</span>
                 </div>
                 @endif
-
-                {{-- Stats --}}
-                <div class="row g-2 text-center mb-3">
+                <div class="row g-2 text-center mb-2">
                     @if(count($skippedRows) > 0)
                     <div class="col">
                         <div class="border rounded p-2 bg-warning-subtle">
@@ -56,8 +52,6 @@
                     </div>
                     @endif
                 </div>
-
-                {{-- Tabs (only when both types exist) --}}
                 @if(count($skippedRows) > 0 && count($errorRows) > 0)
                 <ul class="nav nav-tabs mb-2" role="tablist">
                     <li class="nav-item">
@@ -76,8 +70,6 @@
                 @endif
 
                 <div class="tab-content">
-
-                    {{-- ERROR rows --}}
                     <div class="tab-pane fade show active" id="tab-errors">
                         @if(count($errorRows) > 0)
                         <div class="alert alert-danger py-2 mb-2">
@@ -116,8 +108,6 @@
                         </div>
                         @endif
                     </div>
-
-                    {{-- SKIPPED rows --}}
                     <div class="tab-pane fade" id="tab-skipped">
                         @if(count($skippedRows) > 0)
                         <div class="alert alert-warning py-2 mb-2">
@@ -151,10 +141,8 @@
                         </div>
                         @endif
                     </div>
-
-                </div>{{-- /tab-content --}}
-            </div>{{-- /modal-body --}}
-
+                </div>
+            </div>
             <div class="modal-footer gap-2">
                 <button type="button" class="btn btn-light" data-bs-dismiss="modal">
                     <i class="ri-close-line me-1"></i> Cerrar

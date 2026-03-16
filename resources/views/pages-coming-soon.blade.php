@@ -79,7 +79,7 @@
     <!-- end auth-page-wrapper -->
 @endsection
 @section('script')
-    <script src="{{ URL::asset('build/libs/particles.js/particles.js') }}"></script>
+    {{-- <script src="{{ URL::asset('build/libs/particles.js/particles.js') }}"></script> --}}
     <script src="{{ URL::asset('build/js/pages/particles.app.js') }}"></script>
     <script src="{{ URL::asset('build/js/pages/coming-soon.init.js') }}"></script>
 @endsection

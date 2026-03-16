@@ -1,58 +1,56 @@
 {{-- resources/views/voting-tables/edit.blade.php --}}
 @extends('layouts.master')
+@section('title') Editar Mesa {{ $votingTable->number }} @endsection
 
-@section('title', 'Editar Mesa de Votación')
+@section('css')
+<link href="{{ URL::asset('build/libs/choices.js/public/assets/styles/choices.min.css') }}" rel="stylesheet"/>
+@endsection
 
 @section('content')
-    @component('components.breadcrumb')
-        @slot('li_1') <a href="{{ route('voting-tables.index') }}">Mesas</a> @endslot
-        @slot('li_2')
-            <a href="{{ route('voting-tables.show', $votingTable->id) }}">
-                Mesa {{ $votingTable->oep_code ?? $votingTable->internal_code }}
+@component('components.breadcrumb')
+    @slot('li_1') <a href="{{ route('voting-tables.index') }}">Mesas</a> @endslot
+    @slot('li_2') <a href="{{ route('voting-tables.show', $votingTable) }}">Mesa {{ $votingTable->number }}{{ $votingTable->letter ?? '' }}</a> @endslot
+    @slot('title') Editar Mesa @endslot
+@endcomponent
+
+@include('components.alerts')
+<div class="card">
+    <div class="card-header d-flex align-items-center justify-content-between">
+        <h5 class="card-title mb-0">
+            <i class="ri-pencil-line me-1"></i>Editando: <span class="text-primary">Mesa {{ $votingTable->number }}{{ $votingTable->letter ?? '' }}</span></h5>
+        <div class="d-flex gap-2">
+            <a href="{{ route('voting-tables.show', $votingTable) }}" class="btn btn-soft-info btn-sm">
+                <i class="ri-eye-line me-1"></i>Ver
             </a>
-        @endslot
-        @slot('title') Editar Mesa @endslot
-    @endcomponent
-
-    <div class="row">
-        <div class="col-lg-12">
-            <div class="card">
-                <div class="card-header bg-warning text-dark">
-                    <h4 class="card-title mb-0">
-                        <i class="ri-edit-line me-1"></i>
-                        Editando Mesa: {{ $votingTable->oep_code ?? $votingTable->internal_code }}
-                        <small class="text-dark-50 ms-2">(N° {{ $votingTable->number }}{{ $votingTable->letter }})</small>
-                    </h4>
-                </div>
-                <div class="card-body">
-                    <form action="{{ route('voting-tables.update', $votingTable->id) }}" method="POST">
-                        @csrf
-                        @method('PUT')
-
-                        @include('voting-tables.partials.form-fields', [
-                            'votingTable' => $votingTable,
-                            'institutions' => $institutions,
-                            'users' => $users,
-                        ])
-
-                        <hr class="my-4">
-
-                        <div class="d-flex justify-content-end gap-2">
-                            <a href="{{ route('voting-tables.show', $votingTable->id) }}" class="btn btn-secondary">
-                                <i class="ri-arrow-left-line me-1"></i>Cancelar
-                            </a>
-                            <button type="submit" class="btn btn-warning">
-                                <i class="ri-save-line me-1"></i>Actualizar Mesa
-                            </button>
-                        </div>
-                    </form>
-                </div>
-            </div>
+            <a href="{{ route('voting-tables.index') }}" class="btn btn-soft-secondary btn-sm">
+                <i class="ri-arrow-left-line me-1"></i>Volver
+            </a>
         </div>
     </div>
+    <div class="card-body">
+        <form action="{{ route('voting-tables.update', $votingTable) }}" method="POST" id="votingTableForm">
+            @csrf
+            @method('PUT')
+            @include('voting-tables.partials.form-fields', [
+                'votingTable' => $votingTable,
+                'institutions' => $institutions,
+                'users' => $users ?? [],
+                'departments' => $departments ?? [],
+            ])
+            <div class="d-flex justify-content-end gap-2 mt-4 pt-3 border-top">
+                <a href="{{ route('voting-tables.show', $votingTable) }}" class="btn btn-soft-secondary">
+                    <i class="ri-close-line me-1"></i>Cancelar
+                </a>
+                <button type="submit" class="btn btn-primary">
+                    <i class="ri-save-line me-1"></i>Actualizar Mesa
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
 @endsection
 
 @section('script')
-    @include('voting-tables.scripts.voting-table-js')
-    @stack('scripts')
+<script src="{{ URL::asset('build/libs/choices.js/public/assets/scripts/choices.min.js') }}"></script>
+@include('voting-tables.scripts.voting-table-js')
 @endsection

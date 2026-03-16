@@ -1,322 +1,207 @@
 <?php
-
 namespace Database\Seeders;
 
 use Illuminate\Database\Seeder;
 use App\Models\Permission;
 use App\Models\Role;
 use Illuminate\Support\Facades\DB;
+
 class PermissionRoleSeeder extends Seeder
 {
-    protected $permissionStructure = [
-        'Usuarios' => [
-            'global' => [
-                ['name' => 'view_users',     'display_name' => 'Ver Usuarios'],
-                ['name' => 'create_users',   'display_name' => 'Crear Usuarios'],
-                ['name' => 'edit_users',     'display_name' => 'Editar Usuarios'],
-                ['name' => 'delete_users',   'display_name' => 'Eliminar/Desactivar Usuarios'],
-                ['name' => 'activate_users', 'display_name' => 'Activar Usuarios'],
-            ]
-        ],
-        'Roles y Permisos' => [
-            'global' => [
-                ['name' => 'view_roles',         'display_name' => 'Ver Roles'],
-                ['name' => 'create_roles',       'display_name' => 'Crear Roles'],
-                ['name' => 'edit_roles',         'display_name' => 'Editar Roles'],
-                ['name' => 'delete_roles',       'display_name' => 'Eliminar Roles'],
-                ['name' => 'assign_roles',       'display_name' => 'Asignar Roles a Usuarios'],
-                ['name' => 'view_permissions',   'display_name' => 'Ver Permisos'],
-                ['name' => 'assign_permissions', 'display_name' => 'Asignar Permisos Directos'],
-            ]
-        ],
-        'Recintos (Instituciones)' => [
-            'global' => [
-                ['name' => 'view_recintos',  'display_name' => 'Ver Recintos'],
-                ['name' => 'create_recinto', 'display_name' => 'Crear Recinto'],
-                ['name' => 'edit_recinto',   'display_name' => 'Editar Recinto'],
-                ['name' => 'delete_recinto', 'display_name' => 'Eliminar Recinto'],
-            ],
-            'recinto' => [
-                ['name' => 'view_recintos', 'display_name' => 'Ver Recintos'],
-                ['name' => 'edit_recinto',  'display_name' => 'Editar Recinto'],
-            ]
-        ],
-        'Mesas de Votación' => [
-            'global' => [
-                ['name' => 'view_mesas',    'display_name' => 'Ver Mesas'],
-                ['name' => 'create_mesa',   'display_name' => 'Crear Mesa'],
-                ['name' => 'edit_mesa',     'display_name' => 'Editar Mesa'],
-                ['name' => 'delete_mesa',   'display_name' => 'Eliminar Mesa'],
-                ['name' => 'configure_mesa','display_name' => 'Configurar Mesa'],
-            ],
-            'recinto' => [
-                ['name' => 'view_mesas',    'display_name' => 'Ver Mesas'],
-                ['name' => 'create_mesa',   'display_name' => 'Crear Mesa'],
-                ['name' => 'edit_mesa',     'display_name' => 'Editar Mesa'],
-                ['name' => 'configure_mesa','display_name' => 'Configurar Mesa'],
-            ],
-            'mesa' => [
-                ['name' => 'view_mesas', 'display_name' => 'Ver Mesas'],
-                ['name' => 'edit_mesa',  'display_name' => 'Editar Mesa'],
-            ]
-        ],
-        'Votos' => [
-            'global' => [
-                ['name' => 'view_votes',    'display_name' => 'Ver Votos'],
-                ['name' => 'register_votes','display_name' => 'Registrar Votos'],
-                ['name' => 'observe_votes', 'display_name' => 'Observar Votos'],
-                ['name' => 'correct_votes', 'display_name' => 'Corregir Votos'],
-                ['name' => 'validate_votes','display_name' => 'Validar Votos'],
-                ['name' => 'export_votes',  'display_name' => 'Exportar Votos'],
-            ],
-            'recinto' => [
-                ['name' => 'view_votes',    'display_name' => 'Ver Votos'],
-                ['name' => 'register_votes','display_name' => 'Registrar Votos'],
-                ['name' => 'observe_votes', 'display_name' => 'Observar Votos'],
-                ['name' => 'correct_votes', 'display_name' => 'Corregir Votos'],
-                ['name' => 'validate_votes','display_name' => 'Validar Votos'],
-            ],
-            'mesa' => [
-                ['name' => 'view_votes',    'display_name' => 'Ver Votos'],
-                ['name' => 'register_votes','display_name' => 'Registrar Votos'],
-                ['name' => 'observe_votes', 'display_name' => 'Observar Votos'],
-            ]
-        ],
-        'Actas' => [
-            'global' => [
-                ['name' => 'view_actas',   'display_name' => 'Ver Actas'],
-                ['name' => 'upload_acta',  'display_name' => 'Subir Acta'],
-                ['name' => 'verify_actas', 'display_name' => 'Verificar Actas'],
-                ['name' => 'approve_actas','display_name' => 'Aprobar Actas'],
-            ],
-            'recinto' => [
-                ['name' => 'view_actas',   'display_name' => 'Ver Actas'],
-                ['name' => 'upload_acta',  'display_name' => 'Subir Acta'],
-                ['name' => 'verify_actas', 'display_name' => 'Verificar Actas'],
-            ],
-            'mesa' => [
-                ['name' => 'view_actas',  'display_name' => 'Ver Actas'],
-                ['name' => 'upload_acta', 'display_name' => 'Subir Acta'],
-            ]
-        ],
-        'Observaciones' => [
-            'global' => [
-                ['name' => 'view_observations',   'display_name' => 'Ver Observaciones'],
-                ['name' => 'create_observation',  'display_name' => 'Crear Observación'],
-                ['name' => 'resolve_observation', 'display_name' => 'Resolver Observación'],
-            ],
-            'recinto' => [
-                ['name' => 'view_observations',   'display_name' => 'Ver Observaciones'],
-                ['name' => 'create_observation',  'display_name' => 'Crear Observación'],
-                ['name' => 'resolve_observation', 'display_name' => 'Resolver Observación'],
-            ],
-            'mesa' => [
-                ['name' => 'view_observations',  'display_name' => 'Ver Observaciones'],
-                ['name' => 'create_observation', 'display_name' => 'Crear Observación'],
-            ]
-        ],
-        'Delegaciones (Asignaciones)' => [
-            'global' => [
-                ['name' => 'view_assignments',   'display_name' => 'Ver Asignaciones'],
-                ['name' => 'assign_delegates',   'display_name' => 'Asignar Delegados'],
-                ['name' => 'manage_assignments', 'display_name' => 'Gestionar Asignaciones'],
-            ],
-            'recinto' => [
-                ['name' => 'view_assignments',   'display_name' => 'Ver Asignaciones'],
-                ['name' => 'manage_assignments', 'display_name' => 'Gestionar Asignaciones'],
-                ['name' => 'assign_delegates',   'display_name' => 'Asignar Delegados'],
-            ]
-        ],
-        'Auditoría' => [
-            'global' => [
-                ['name' => 'view_audit_logs',         'display_name' => 'Ver Logs de Auditoría'],
-                ['name' => 'view_validation_history', 'display_name' => 'Ver Historial de Validaciones'],
-            ]
-        ],
-        'Configuración' => [
-            'global' => [
-                ['name' => 'view_settings',         'display_name' => 'Ver Configuración'],
-                ['name' => 'manage_settings',       'display_name' => 'Gestionar Configuración'],
-                ['name' => 'manage_election_types', 'display_name' => 'Gestionar Tipos de Elección'],
-                ['name' => 'manage_categories',     'display_name' => 'Gestionar Categorías'],
-            ]
-        ],
-        'Dashboard' => [
-            'global'  => [['name' => 'view_dashboard', 'display_name' => 'Ver Dashboard']],
-            'recinto' => [['name' => 'view_dashboard', 'display_name' => 'Ver Dashboard']],
-        ],
-        'Mesas (Acciones Operativas)' => [
-            'global' => [
-                ['name' => 'close_table',  'display_name' => 'Cerrar Mesa'],
-                ['name' => 'reopen_table', 'display_name' => 'Reabrir Mesa'],
-            ],
-            'recinto' => [
-                ['name' => 'close_table',  'display_name' => 'Cerrar Mesa'],
-                ['name' => 'reopen_table', 'display_name' => 'Reabrir Mesa'],
-            ],
-            'mesa' => [
-                ['name' => 'close_table', 'display_name' => 'Cerrar Mesa'],
-            ]
-        ],
-    ];
+    protected array $permissions = [
+        // ── Usuarios ──────────────────────────────────────────────────────────
+        ['name' => 'view_users',     'display_name' => 'Ver Usuarios',                 'group' => 'Usuarios'],
+        ['name' => 'create_users',   'display_name' => 'Crear Usuarios',               'group' => 'Usuarios'],
+        ['name' => 'edit_users',     'display_name' => 'Editar Usuarios',              'group' => 'Usuarios'],
+        ['name' => 'delete_users',   'display_name' => 'Eliminar/Desactivar Usuarios', 'group' => 'Usuarios'],
+        ['name' => 'activate_users', 'display_name' => 'Activar Usuarios',             'group' => 'Usuarios'],
 
-    protected $roles = [
+        // ── Roles y Permisos ──────────────────────────────────────────────────
+        ['name' => 'view_roles',         'display_name' => 'Ver Roles',                'group' => 'Roles y Permisos'],
+        ['name' => 'create_roles',       'display_name' => 'Crear Roles',              'group' => 'Roles y Permisos'],
+        ['name' => 'edit_roles',         'display_name' => 'Editar Roles',             'group' => 'Roles y Permisos'],
+        ['name' => 'delete_roles',       'display_name' => 'Eliminar Roles',           'group' => 'Roles y Permisos'],
+        ['name' => 'assign_roles',       'display_name' => 'Asignar Roles a Usuarios', 'group' => 'Roles y Permisos'],
+        ['name' => 'view_permissions',   'display_name' => 'Ver Permisos',             'group' => 'Roles y Permisos'],
+        ['name' => 'assign_permissions', 'display_name' => 'Asignar Permisos Directos','group' => 'Roles y Permisos'],
+
+        // ── Recintos ──────────────────────────────────────────────────────────
+        ['name' => 'view_recintos',  'display_name' => 'Ver Recintos',    'group' => 'Recintos'],
+        ['name' => 'create_recinto', 'display_name' => 'Crear Recinto',   'group' => 'Recintos'],
+        ['name' => 'edit_recinto',   'display_name' => 'Editar Recinto',  'group' => 'Recintos'],
+        ['name' => 'delete_recinto', 'display_name' => 'Eliminar Recinto','group' => 'Recintos'],
+
+        // ── Mesas de Votación ─────────────────────────────────────────────────
+        ['name' => 'view_mesas',     'display_name' => 'Ver Mesas',        'group' => 'Mesas de Votación'],
+        ['name' => 'create_mesa',    'display_name' => 'Crear Mesa',       'group' => 'Mesas de Votación'],
+        ['name' => 'edit_mesa',      'display_name' => 'Editar Mesa',      'group' => 'Mesas de Votación'],
+        ['name' => 'delete_mesa',    'display_name' => 'Eliminar Mesa',    'group' => 'Mesas de Votación'],
+        ['name' => 'configure_mesa', 'display_name' => 'Configurar Mesa',  'group' => 'Mesas de Votación'],
+        ['name' => 'close_table',    'display_name' => 'Cerrar Mesa',      'group' => 'Mesas de Votación'],
+        ['name' => 'reopen_table',   'display_name' => 'Reabrir Mesa',     'group' => 'Mesas de Votación'],
+
+        // ── Votos ─────────────────────────────────────────────────────────────
+        ['name' => 'view_votes',     'display_name' => 'Ver Votos',       'group' => 'Votos'],
+        ['name' => 'register_votes', 'display_name' => 'Registrar Votos', 'group' => 'Votos'],
+        ['name' => 'observe_votes',  'display_name' => 'Observar Votos',  'group' => 'Votos'],
+        ['name' => 'correct_votes',  'display_name' => 'Corregir Votos',  'group' => 'Votos'],
+        ['name' => 'validate_votes', 'display_name' => 'Validar Votos',   'group' => 'Votos'],
+        ['name' => 'export_votes',   'display_name' => 'Exportar Votos',  'group' => 'Votos'],
+
+        // ── Actas ─────────────────────────────────────────────────────────────
+        ['name' => 'view_actas',    'display_name' => 'Ver Actas',       'group' => 'Actas'],
+        ['name' => 'upload_acta',   'display_name' => 'Subir Acta',      'group' => 'Actas'],
+        ['name' => 'verify_actas',  'display_name' => 'Verificar Actas', 'group' => 'Actas'],
+        ['name' => 'approve_actas', 'display_name' => 'Aprobar Actas',   'group' => 'Actas'],
+
+        // ── Observaciones ─────────────────────────────────────────────────────
+        ['name' => 'view_observations',   'display_name' => 'Ver Observaciones',    'group' => 'Observaciones'],
+        ['name' => 'create_observation',  'display_name' => 'Crear Observación',    'group' => 'Observaciones'],
+        ['name' => 'resolve_observation', 'display_name' => 'Resolver Observación', 'group' => 'Observaciones'],
+
+        // ── Delegaciones ──────────────────────────────────────────────────────
+        ['name' => 'view_assignments',   'display_name' => 'Ver Delegaciones',       'group' => 'Delegaciones'],
+        ['name' => 'assign_delegates',   'display_name' => 'Asignar Delegados',      'group' => 'Delegaciones'],
+        ['name' => 'manage_assignments', 'display_name' => 'Gestionar Delegaciones', 'group' => 'Delegaciones'],
+
+        // ── Auditoría ─────────────────────────────────────────────────────────
+        ['name' => 'view_audit_logs',         'display_name' => 'Ver Logs de Auditoría',        'group' => 'Auditoría'],
+        ['name' => 'view_validation_history', 'display_name' => 'Ver Historial de Validaciones','group' => 'Auditoría'],
+
+        // ── Configuración ─────────────────────────────────────────────────────
+        ['name' => 'view_settings',         'display_name' => 'Ver Configuración',           'group' => 'Configuración'],
+        ['name' => 'manage_settings',       'display_name' => 'Gestionar Configuración',     'group' => 'Configuración'],
+        ['name' => 'manage_election_types', 'display_name' => 'Gestionar Tipos de Elección', 'group' => 'Configuración'],
+        ['name' => 'manage_categories',     'display_name' => 'Gestionar Categorías',        'group' => 'Configuración'],
+
+        // ── Dashboard ─────────────────────────────────────────────────────────
+        ['name' => 'view_dashboard', 'display_name' => 'Ver Dashboard', 'group' => 'Dashboard'],
+    ];
+    protected array $roles = [
+        // ── Administrador ─────────────────────────────────────────────────────
         'administrador' => [
             'display_name'  => 'Administrador del Sistema',
             'description'   => 'Control total del sistema sin restricciones',
-            'default_scope' => 'global',
             'permissions'   => 'ALL',
         ],
-        'delegado_recinto' => [
-            'display_name'  => 'Delegado de Recinto',
-            'description'   => 'Encargado de un recinto electoral - puede gestionar todas las mesas del recinto',
-            'default_scope' => 'recinto',
+        // ── Supervisor ────────────────────────────────────────────────────────
+        'supervisor' => [
+            'display_name'  => 'Supervisor Electoral',
+            'description'   => 'Valida votos, aprueba actas y resuelve observaciones',
             'permissions'   => [
-                'view_recintos', 'edit_recinto',
-                'view_mesas', 'create_mesa', 'edit_mesa', 'configure_mesa',
-                'view_votes', 'register_votes', 'observe_votes', 'correct_votes', 'validate_votes',
-                'view_actas', 'upload_acta', 'verify_actas',
+                'view_recintos', 'view_mesas',
+                'view_votes',    'validate_votes', 'observe_votes',
+                'view_actas',    'verify_actas',   'approve_actas',
                 'view_observations', 'create_observation', 'resolve_observation',
-                'view_assignments', 'assign_delegates', 'manage_assignments',
+                'view_assignments',
                 'close_table', 'reopen_table',
-                'view_dashboard',
-            ]
+                'view_audit_logs', 'view_validation_history',
+            ],
         ],
-        'delegado_mesa' => [
-            'display_name'  => 'Delegado de Mesa',
-            'description'   => 'Encargado de una mesa de votación específica',
-            'default_scope' => 'mesa',
+        // ── Registrador ───────────────────────────────────────────────────────
+        'registrador' => [
+            'display_name'  => 'Registrador de Votos',
+            'description'   => 'Ingresa resultados de votación y sube actas',
             'permissions'   => [
-                'view_mesas', 'edit_mesa',
-                'view_votes', 'register_votes', 'observe_votes',
-                'view_actas', 'upload_acta',
+                'view_recintos', 'view_mesas',
+                'view_votes',    'register_votes', 'observe_votes',
+                'view_actas',    'upload_acta',
                 'view_observations', 'create_observation',
                 'close_table',
-            ]
+            ],
         ],
-        'revisor' => [
-            'display_name'  => 'Revisor',
-            'description'   => 'Revisa y valida votos y actas',
-            'default_scope' => 'recinto',
-            'permissions'   => [
-                'view_recintos', 'view_mesas',
-                'view_votes', 'validate_votes', 'observe_votes',
-                'view_actas', 'verify_actas', 'approve_actas',
-                'view_observations', 'resolve_observation',
-            ]
-        ],
+        // ── Modificador ───────────────────────────────────────────────────────
         'modificador' => [
-            'display_name'  => 'Modificador',
-            'description'   => 'Corrige votos observados',
-            'default_scope' => 'recinto',
+            'display_name'  => 'Modificador de Votos',
+            'description'   => 'Corrige votos observados o impugnados',
             'permissions'   => [
                 'view_recintos', 'view_mesas',
-                'view_votes', 'correct_votes',
+                'view_votes',    'correct_votes', 'observe_votes',
+                'view_actas',
                 'view_observations',
-            ]
+            ],
         ],
+
+        // ── Observador ────────────────────────────────────────────────────────
         'observador' => [
-            'display_name'  => 'Observador',
-            'description'   => 'Solo puede ver resultados, no modificar',
-            'default_scope' => 'global',
-            'permissions'   => [
-                'view_recintos', 'view_mesas', 'view_votes',
-                'view_actas', 'view_observations', 'view_dashboard',
-            ]
-        ],
-        'tecnico' => [
-            'display_name'  => 'Técnico/Soporte',
-            'description'   => 'Soporte técnico del sistema',
-            'default_scope' => 'recinto',
-            'permissions'   => [
-                'view_recintos', 'view_mesas', 'view_votes',
-                'view_assignments', 'reopen_table', 'view_dashboard',
-            ]
-        ],
-        'registrador' => [
-            'display_name'  => 'Registrador',
-            'description'   => 'Solo puede registrar votos, no validar',
-            'default_scope' => 'mesa',
-            'permissions'   => [
-                'view_mesas',
-                'view_votes', 'register_votes', 'observe_votes',
-                'view_actas', 'upload_acta',
-            ]
-        ],
-        'validador' => [
-            'display_name'  => 'Validador',
-            'description'   => 'Valida votos y actas',
-            'default_scope' => 'recinto',
+            'display_name'  => 'Observador Electoral',
+            'description'   => 'Solo puede ver resultados, sin modificar datos',
             'permissions'   => [
                 'view_recintos', 'view_mesas',
-                'view_votes', 'validate_votes',
-                'view_actas', 'verify_actas', 'approve_actas',
-                'view_observations', 'resolve_observation',
-            ]
+                'view_votes',    'view_actas',
+                'view_observations',
+                'view_assignments',
+            ],
         ],
     ];
 
     public function run(): void
     {
         DB::transaction(function () {
-            $this->createPermissions();
-            $this->createRoles();
+            $this->seedPermissions();
+            $this->seedRoles();
         });
     }
 
-    private function createPermissions(): void
+    private function seedPermissions(): void
     {
-        foreach ($this->permissionStructure as $group => $scopes) {
-            foreach ($scopes as $scope => $permissions) {
-                foreach ($permissions as $permData) {
-                    Permission::updateOrCreate(
-                        ['name' => $permData['name']],
-                        [
-                            'display_name' => $permData['display_name'],
-                            'group'        => $group,
-                            'scope'        => $scope,
-                            'description'  => $this->generateDescription($permData['name'], $group, $scope),
-                        ]
-                    );
-                }
-            }
+        foreach ($this->permissions as $data) {
+            Permission::updateOrCreate(
+                ['name' => $data['name']],
+                [
+                    'display_name' => $data['display_name'],
+                    'group'        => $data['group'],
+                    'description'  => "Permiso para {$data['display_name']}",
+                ]
+            );
+        }
+        $validNames = array_column($this->permissions, 'name');
+        $removed    = Permission::whereNotIn('name', $validNames)->get();
+        foreach ($removed as $perm) {
+            $this->command?->warn("  🗑  Removing obsolete permission: {$perm->name}");
+            $perm->roles()->detach();
+            DB::table('permission_user')->where('permission_id', $perm->id)->delete();
+            $perm->delete();
         }
     }
 
-    private function createRoles(): void
+    private function seedRoles(): void
     {
-        foreach ($this->roles as $name => $roleData) {
+        foreach ($this->roles as $name => $data) {
             $role = Role::updateOrCreate(
                 ['name' => $name],
                 [
-                    'display_name'  => $roleData['display_name'],
-                    'description'   => $roleData['description'],
-                    'default_scope' => $roleData['default_scope'],
+                    'display_name'  => $data['display_name'],
+                    'description'   => $data['description'],
                 ]
             );
 
-            if ($roleData['permissions'] === 'ALL') {
-                $role->permissions()->sync(Permission::all()->pluck('id'));
+            if ($data['permissions'] === 'ALL') {
+                $role->permissions()->sync(Permission::pluck('id'));
+                $this->command?->info("  ✓  Role [{$name}] synced with ALL " . Permission::count() . " permissions");
             } else {
-                $permissionIds    = Permission::whereIn('name', $roleData['permissions'])->pluck('id');
-                $foundNames       = Permission::whereIn('name', $roleData['permissions'])->pluck('name')->toArray();
-                $missingNames     = array_diff($roleData['permissions'], $foundNames);
-                if (!empty($missingNames)) {
-                    $this->command->warn("  ⚠️  Role [{$name}] missing permissions: " . implode(', ', $missingNames));
+                $permIds  = Permission::whereIn('name', $data['permissions'])->pluck('id');
+                $found    = Permission::whereIn('name', $data['permissions'])->pluck('name')->toArray();
+                $missing  = array_diff($data['permissions'], $found);
+
+                if (!empty($missing)) {
+                    $this->command?->warn("  ⚠  Role [{$name}] missing: " . implode(', ', $missing));
                 }
 
-                $role->permissions()->sync($permissionIds);
+                $role->permissions()->sync($permIds);
+                $this->command?->info("  ✓  Role [{$name}] synced with {$permIds->count()} permissions");
             }
         }
-    }
 
-    private function generateDescription(string $name, string $group, string $scope): string
-    {
-        $scopeText = [
-            'global'  => 'sin restricciones',
-            'recinto' => 'limitado al recinto asignado',
-            'mesa'    => 'limitado a la mesa asignada',
-        ];
-        return "Permiso para {$name} en {$group} - " . ($scopeText[$scope] ?? $scope);
+        $validNames = array_keys($this->roles);
+        $removed    = Role::whereNotIn('name', $validNames)->get();
+        foreach ($removed as $role) {
+            $this->command?->warn("  🗑  Removing obsolete role: {$role->name}");
+            $roleUserIds = DB::table('role_user')->where('role_id', $role->id)->pluck('id');
+            DB::table('permission_user')->whereIn('role_user_id', $roleUserIds)->delete();
+            DB::table('role_user')->where('role_id', $role->id)->delete();
+            $role->permissions()->detach();
+            $role->delete();
+        }
     }
 }

@@ -6,7 +6,6 @@
                 <i class="ri-add-line align-bottom me-1"></i> Agregar Recinto
             </a>
             @endcan
-
             <div class="btn-group" role="group">
                 <button type="button" class="btn btn-info dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
                     <i class="ri-download-line align-bottom me-1"></i> Exportar
@@ -97,8 +96,6 @@
                         </div>
                     </div>
                 </div>
-
-                <!-- Hidden inputs for sorting -->
                 <input type="hidden" name="sort" value="{{ request('sort', 'name') }}">
                 <input type="hidden" name="direction" value="{{ request('direction', 'asc') }}">
                 <input type="hidden" name="per_page" value="{{ request('per_page', 20) }}">
@@ -144,13 +141,10 @@
         @endif
     </div>
 </div>
-
-<!-- Hidden form for exporting selected items -->
 <form id="export-selected-form" action="{{ route('institutions.export-selected') }}" method="POST" style="display: none;">
     @csrf
     <input type="hidden" name="selected_ids" id="selected-ids-input" value="">
 </form>
-
 <script>
 document.addEventListener('DOMContentLoaded', function() {
     const filterSelects = document.querySelectorAll('#filter-form select');

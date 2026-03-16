@@ -14,7 +14,6 @@ return new class extends Migration
             $table->string('code', 20)->unique(); // e.g. "ALC", "CON", "GOB", "AST", "ASP"
             $table->text('description')->nullable();
             $table->integer('default_order')->default(0);
-
             $table->enum('geographic_scope', [
                 'nacional',
                 'departamental',  // e.g. Gobernador, Asambleísta por Población
@@ -22,8 +21,6 @@ return new class extends Migration
                 'municipal',      // e.g. Alcalde, Concejal
                 'indigena_ioc',
             ])->default('municipal');
-
-            // Concejales = true (list), Alcalde = false (single), Gobernador = false (single)
             $table->boolean('allows_list')->default(false);
             $table->boolean('active')->default(true);
             $table->timestamps();

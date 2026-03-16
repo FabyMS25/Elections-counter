@@ -1,5 +1,5 @@
 {{-- resources/views/voting-table-votes/partials/summary-cards.blade.php --}}
-<div class="row mb-4">
+<div class="row ">
     <div class="col-xl-3 col-md-6">
         <div class="card stats-card bg-primary text-white">
             <div class="card-body">
@@ -143,7 +143,7 @@
                             $categoryClass = $candidate->election_category_id == $alcaldeCategory?->id ? 'primary' : 'success';
                         @endphp
                         @if($votes > 0)
-                        <div class="col-md-4 col-lg-3 mb-3">
+                        <div class="col-md-4 col-lg-3 mb-2">
                             <div class="card border-{{ $categoryClass }} h-100">
                                 <div class="card-body p-3">
                                     <div class="d-flex align-items-center">

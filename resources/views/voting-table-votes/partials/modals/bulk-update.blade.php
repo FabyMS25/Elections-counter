@@ -2,7 +2,7 @@
 <div class="modal fade" id="bulkUpdateModal" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">
-            <div class="modal-header bg-primary text-white">
+            <div class="modal-header">
                 <h5 class="modal-title">
                     <i class="ri-stack-line me-1"></i>
                     Actualización Masiva

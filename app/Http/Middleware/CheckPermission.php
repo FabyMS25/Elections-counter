@@ -4,24 +4,22 @@ namespace App\Http\Middleware;
 
 use Closure;
 use Illuminate\Http\Request;
-use Symfony\Component\HttpFoundation\Response;
 use Illuminate\Support\Facades\Auth;
 
 class CheckPermission
 {
-
-    public function handle(Request $request, Closure $next, $permission)
+    public function handle(Request $request, Closure $next, string $permission)
     {
         if (!Auth::check()) {
-            abort(403, 'No autenticado');
+            if ($request->expectsJson()) {
+                abort(401, 'No autenticado.');
+            }
+            return redirect()->route('login');
         }
-        $user = Auth::user();
-        if ($user->hasRole('administrador')) {
-            return $next($request);
+        if (!Auth::user()->hasPermission($permission)) {
+            abort(403, "Acceso denegado: se requiere el permiso '{$permission}'.");
         }
-        if (!$user->hasPermission($permission)) {
-            abort(403, 'No tienes permiso para realizar esta acción');
-        }
+
         return $next($request);
     }
 }

@@ -13,10 +13,23 @@ use Illuminate\Support\Facades\DB;
 use App\Exports\VotingTablesExport;
 use App\Imports\VotingTablesImport;
 use App\Models\User;
+use App\Models\Department;
+use App\Models\Province;
+use App\Models\Municipality;
+use App\Models\Locality;
 
 class VotingTableController extends Controller
 {
     const ITEMS_PER_PAGE = 20;
+    public function __construct()
+    {
+        $this->middleware('auth');
+        $this->middleware('permission:view_mesas')->only(['index', 'show', 'exportAll', 'exportSelected', 'downloadTemplate']);
+        $this->middleware('permission:create_mesa')->only(['create', 'store', 'import']);
+        $this->middleware('permission:edit_mesa')->only(['edit', 'update', 'electionConfig', 'updateElectionConfig', 'assignDelegatesForm', 'assignDelegates']);
+        $this->middleware('permission:delete_mesa')->only(['destroy', 'deleteMultiple']);
+    }
+
     public static function statusOptions(): array
     {
         return [
@@ -30,15 +43,6 @@ class VotingTableController extends Controller
             'transmitida'   => 'Transmitida',
             'anulada'       => 'Anulada',
         ];
-    }
-
-    public function __construct()
-    {
-        $this->middleware('auth');
-        $this->middleware('permission:view_mesas')->only(['index', 'show', 'exportAll', 'exportSelected', 'downloadTemplate']);
-        $this->middleware('permission:create_mesas')->only(['create', 'store', 'import']);
-        $this->middleware('permission:edit_mesas')->only(['edit', 'update', 'electionConfig', 'updateElectionConfig', 'assignDelegatesForm', 'assignDelegates']);
-        $this->middleware('permission:delete_mesas')->only(['destroy', 'deleteMultiple']);
     }
 
     private function validationRules(?int $id = null): array
@@ -146,6 +150,11 @@ class VotingTableController extends Controller
                 return $table;
             });
             $electionTypes = ElectionType::where('active', true)->orderBy('name')->get();
+            $tableStats = \App\Models\VotingTableElection::selectRaw('status, COUNT(*) as count')
+                ->groupBy('status')->pluck('count','status')->toArray();
+            $tableStats['total']           = \App\Models\VotingTable::count();
+            $tableStats['expected_voters'] = \App\Models\VotingTable::sum('expected_voters');
+
             return view('voting-tables.index', [
                 'votingTables'  => $votingTables,
                 'institutions'  => $this->institutions(),
@@ -153,6 +162,7 @@ class VotingTableController extends Controller
                 'statusOptions' => self::statusOptions(),
                 'sortField'     => $sortField,
                 'sortDirection' => $sortDirection,
+                'tableStats'    => $tableStats,
             ]);
         } catch (\Exception $e) {
             Log::error('Error loading voting tables: ' . $e->getMessage(), ['trace' => $e->getTraceAsString()]);
@@ -166,12 +176,30 @@ class VotingTableController extends Controller
             return view('voting-tables.create', [
                 'votingTable' => null,
                 'institutions' => $this->institutions(),
-                'users'        => $this->users(),
+                'users' => $this->users(),
+                'departments' => Department::orderBy('name')->get(),
             ]);
         } catch (\Exception $e) {
             Log::error('Error loading create form: ' . $e->getMessage());
             return redirect()->route('voting-tables.index')
                 ->with('error', 'Error al cargar el formulario de creación.');
+        }
+    }
+
+    public function edit($id)
+    {
+        try {
+            $votingTable = VotingTable::findOrFail($id);
+            return view('voting-tables.edit', [
+                'votingTable' => $votingTable,
+                'institutions' => $this->institutions(),
+                'users' => $this->users(),
+                'departments' => Department::orderBy('name')->get(),
+            ]);
+        } catch (\Exception $e) {
+            Log::error('Error loading edit form: ' . $e->getMessage(), ['id' => $id]);
+            return redirect()->route('voting-tables.index')
+                ->with('error', 'Error al cargar el formulario de edición.');
         }
     }
 
@@ -237,21 +265,6 @@ class VotingTableController extends Controller
             Log::error('Error showing voting table: ' . $e->getMessage(), ['id' => $id]);
             return redirect()->route('voting-tables.index')
                 ->with('error', 'Error al cargar los detalles de la mesa de votación.');
-        }
-    }
-    public function edit($id)
-    {
-        try {
-            $votingTable = VotingTable::findOrFail($id);
-            return view('voting-tables.edit', [
-                'votingTable'  => $votingTable,
-                'institutions' => $this->institutions(),
-                'users'        => $this->users(),
-            ]);
-        } catch (\Exception $e) {
-            Log::error('Error loading edit form: ' . $e->getMessage(), ['id' => $id]);
-            return redirect()->route('voting-tables.index')
-                ->with('error', 'Error al cargar el formulario de edición.');
         }
     }
 

@@ -1,9 +1,9 @@
 @extends('layouts.master-without-nav')
 {{-- @extends('layouts.minimal') --}}
 @section('title', 'Centro de Monitoreo')
-@section('css')
+{{-- @section('css')
     <link href="{{ URL::asset('build/libs/swiper/swiper-bundle.min.css') }}" rel="stylesheet" type="text/css" />
-@endsection
+@endsection --}}
 
 @section('content')
     <div class="layout-wrapper">
@@ -51,6 +51,7 @@
                         <p class="text-muted mb-0">Última actualización: {{ now()->format('d/m/Y H:i') }}</p>
                     </div>
                     @auth
+                    @if(auth()->user()->hasPermission('manage_settings'))
                     <div class="dashboard-controls">
                         <button id="toggleDashboardBtn"
                                 class="btn {{ $dashboard->is_public ? 'btn-warning' : 'btn-success' }}"
@@ -63,6 +64,7 @@
                             </span>
                         </button>
                     </div>
+                    @endif
                     @endauth
                 </div>
             </div>
@@ -90,10 +92,10 @@
 @endsection
 @section('script')
     <script src="{{ URL::asset('build/libs/swiper/swiper-bundle.min.js') }}"></script>
-    {{-- ❌ removed: landing.init.js requires #back-to-top which is commented out --}}
     @yield('dashboard-scripts')
 
     @auth
+    @if(auth()->user()->hasPermission('manage_settings'))
     <script>
     document.getElementById('toggleDashboardBtn')?.addEventListener('click', function () {
         const btn          = this;
@@ -130,5 +132,6 @@
         .finally(() => { btn.disabled = false; });
     });
     </script>
+    @endif
     @endauth
 @endsection

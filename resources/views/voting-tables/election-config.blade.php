@@ -47,7 +47,7 @@
     <div class="row">
         <div class="col-lg-12">
             <div class="card">
-                <div class="card-header bg-primary text-white">
+                <div class="card-header py-2 px-3">
                     <h5 class="card-title mb-0">
                         <i class="ri-settings-4-line me-1"></i>
                         Configuración por Tipo de Elección
@@ -82,14 +82,13 @@
                             @endphp
                             <div class="col-md-6 mb-4">
                                 <div class="card config-card">
-                                    <div class="card-header bg-light">
+                                    <div class="card-header py-2 px-3">
                                         <h5 class="card-title mb-0">
                                             {{ $electionType->name }}
                                             <small class="text-muted d-block">{{ $electionType->short_name ?? '' }}</small>
                                         </h5>
                                     </div>
                                     <div class="card-body">
-                                        {{-- Información fija del tipo de elección --}}
                                         <div class="election-info">
                                             <div class="row">
                                                 <div class="col-6">
@@ -179,7 +178,7 @@
                                                         Estado actual: {{ \App\Models\VotingTable::getStatuses()[$config->status] ?? $config->status }}
                                                     </span>
                                                 @endif
-                                                <button type="submit" class="btn btn-primary">
+                                                <button type="submit" class="btn btn-primary btn-sm">
                                                     <i class="ri-save-line me-1"></i>Guardar Configuración
                                                 </button>
                                             </div>
@@ -213,7 +212,7 @@
 
                     <div class="row">
                         <div class="col-12 text-end">
-                            <a href="{{ route('voting-tables.show', $votingTable->id) }}" class="btn btn-secondary">
+                            <a href="{{ route('voting-tables.show', $votingTable->id) }}" class="btn btn-secondary btn-sm">
                                 <i class="ri-arrow-left-line me-1"></i>Volver a la Mesa
                             </a>
                         </div>
@@ -227,7 +226,6 @@
 @section('script')
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            // Auto-calculate ballot consistency
             const forms = document.querySelectorAll('.election-config-form');
             forms.forEach(form => {
                 const received = form.querySelector('input[name="ballots_received"]');
@@ -246,12 +244,9 @@
                         received.setCustomValidity('');
                     }
                 }
-
                 [received, used, leftover, spoiled].forEach(input => {
                     input.addEventListener('input', validateBallots);
                 });
-
-                // Validate that total voters doesn't exceed ballots received
                 const totalVoters = form.querySelector('input[name="total_voters"]');
 
                 function validateTotalVoters() {

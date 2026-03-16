@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Providers;
 
 use Illuminate\Foundation\Support\Providers\AuthServiceProvider as ServiceProvider;
@@ -6,38 +7,22 @@ use Illuminate\Support\Facades\Gate;
 
 class AuthServiceProvider extends ServiceProvider
 {
-    protected $policies = [
-        // 'App\Models\Model' => 'App\Policies\ModelPolicy',
-    ];
+    protected $policies = [];
 
     public function boot(): void
     {
         $this->registerPolicies();
         Gate::before(function ($user, $ability) {
-            if ($user->hasRole('administrador')) {
+            if ($user->roles()->where('roles.name', 'administrador')->exists()) {
                 return true;
             }
         });
-        Gate::define('has-permission', function ($user, $permission, $scope = null, $scopeId = null) {
-            return $user->hasPermissionTo($permission, $scope, $scopeId);
-        });
+        try {
+            \App\Models\Permission::pluck('name')->each(function ($name) {
+                Gate::define($name, fn ($user) => $user->hasPermission($name));
+            });
+        } catch (\Exception) {
 
-
-        // Registrar cada permiso como un Gate
-        // try {
-        //     if (app()->runningInConsole()) {
-        //         return;
-        //     }
-
-        //     $permissions = Permission::all();
-        //     foreach ($permissions as $permission) {
-        //         Gate::define($permission->name, function (User $user) use ($permission) {
-        //             return $user->hasPermission($permission->name);
-        //         });
-        //     }
-        // } catch (\Exception $e) {
-        //     // La tabla de permisos puede no existir durante la migración
-        //     // Ignoramos el error silenciosamente
-        // }
+        }
     }
 }

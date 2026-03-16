@@ -19,18 +19,22 @@ class ObservationController extends Controller
     {
         $this->middleware('auth');
         $this->middleware('permission:view_observations')->only(['index', 'show', 'getByTable', 'getTableObservations', 'getStats']);
-        $this->middleware('permission:create_observations')->only(['store']);
-        $this->middleware('permission:resolve_observations')->only(['resolve', 'escalate', 'reject']);
+        $this->middleware('permission:create_observation')->only(['store']);
+        $this->middleware('permission:resolve_observation')->only(['resolve', 'escalate', 'reject']);
     }
 
     private function getUserRole(): string
     {
         $user = Auth::user();
-        $allowed = ["revisor","fiscal","notario","coordinador"];
-        foreach ($allowed as $role) {
-            if ($user->hasRole($role)) return $role;
-        }
-        return $user->hasRole("administrador") ? "coordinador" : "revisor";
+
+        $roleNames = \Illuminate\Support\Facades\DB::table('role_user')
+            ->join('roles', 'roles.id', '=', 'role_user.role_id')
+            ->where('role_user.user_id', $user->id)
+            ->pluck('roles.name');
+
+        if ($roleNames->contains('administrador')) return 'coordinador';
+        if ($roleNames->contains('supervisor'))    return 'revisor';
+        return 'revisor';
     }
 
     private function tableCanBeObserved(VotingTable $table, ?int $electionTypeId): bool

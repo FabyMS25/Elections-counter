@@ -1,98 +1,105 @@
+{{-- resources/views/voting-table-votes/partials/table-actions.blade.php --}}
 @php
-    $status       = $table->current_status ?? 'sin_configurar';
-    $isFinal      = in_array($status, ['escrutada', 'transmitida', 'anulada']);
-    $isEditable   = in_array($status, ['configurada', 'en_espera', 'votacion'])
-                    && !$isFinal
-                    && ($permissions['can_register'] ?? false);
-    $isObservable = in_array($status, ['votacion', 'en_escrutinio', 'observada'])
-                    && !$isFinal;
-    $isCorrectable = $status === 'observada';
-    $canValidate  = in_array($status, ['votacion', 'observada'])
-                    && !$isFinal
-                    && ($permissions['can_validate'] ?? false);
-    $canEscrutar  = $status === 'en_escrutinio'
-                    && ($permissions['can_validate'] ?? false);
-    $canReject    = in_array($status, ['votacion', 'en_escrutinio', 'observada'])
-                    && !$isFinal
-                    && ($permissions['can_validate'] ?? false);
-    $isReopenable = in_array($status, ['observada', 'en_escrutinio'])
-                    && ($permissions['can_reopen'] ?? false);
+    $status      = $table->current_status ?? 'sin_configurar';
+    $isFinal     = in_array($status, ['escrutada','transmitida','anulada']);
+    $isEditable  = in_array($status, ['configurada','en_espera','votacion']) && !$isFinal && ($permissions['can_register'] ?? false);
+    $canSave     = $isEditable;
+    $canObserve  = !$isFinal && in_array($status, ['votacion','en_escrutinio','observada']) && ($permissions['can_observe']  ?? false);
+    $canCorrect  = $status === 'observada' && ($permissions['can_correct']  ?? false);
+    $canValidate = in_array($status, ['votacion','observada'])    && !$isFinal && ($permissions['can_validate'] ?? false);
+    $canEscrutar = $status === 'en_escrutinio'                    && ($permissions['can_validate'] ?? false);
+    $canReject   = in_array($status, ['votacion','en_escrutinio','observada']) && !$isFinal && ($permissions['can_validate'] ?? false);
+    $canReopen   = in_array($status, ['observada','en_escrutinio'])            && ($permissions['can_reopen']   ?? false);
+    $canUpload   = !$isFinal && ($permissions['can_upload_acta'] ?? false);
+    $canView     = $permissions['can_view'] ?? false;
 @endphp
-<div class="btn-group btn-group-sm flex-wrap" role="group">
-    @if(($table->observations_count ?? 0) > 0)
-        <button type="button" class="btn btn-warning view-observations"
-                data-table-id="{{ $table->id }}"
-                title="Ver {{ $table->observations_count }} observación(es) pendiente(s)">
-            <i class="ri-alert-line"></i>
-            <span class="badge bg-white text-warning ms-1">{{ $table->observations_count }}</span>
-        </button>
-    @endif
-    @if($isEditable)
-        <button type="button" class="btn btn-success save-table"
-                data-table-id="{{ $table->id }}"
-                data-election-type-id="{{ $electionTypeId }}"
-                title="Guardar votos">
-            <i class="ri-save-line"></i>
-        </button>
-    @endif
-    @if($isObservable && ($permissions['can_observe'] ?? false))
-        <button type="button" class="btn btn-warning observe-table-general"
-                data-table-id="{{ $table->id }}"
-                data-election-type-id="{{ $electionTypeId }}"
-                title="Agregar observación">
-            <i class="ri-chat-1-line"></i>
-        </button>
-    @endif
-    @if($isCorrectable && ($permissions['can_correct'] ?? false))
-        <button type="button" class="btn btn-primary correct-table"
-                data-table-id="{{ $table->id }}"
-                data-election-type-id="{{ $electionTypeId }}"
-                title="Corregir votos observados">
-            <i class="ri-edit-line"></i>
-        </button>
+
+<div class="d-flex gap-1 flex-wrap justify-content-end align-items-center">
+    @if($canSave)
+    <button type="button"
+            class="btn btn-sm btn-soft-success save-table"
+            data-table-id="{{ $table->id }}"
+            data-election-type-id="{{ $electionTypeId }}"
+            title="Guardar votos">
+        <i class="ri-save-line"></i>
+    </button>
     @endif
     @if($canValidate)
-        <button type="button" class="btn btn-info text-white validate-table"
-                data-table-id="{{ $table->id }}"
-                data-election-type-id="{{ $electionTypeId }}"
-                data-action="validate"
-                title="Validar votos — pasa a En Escrutinio">
-            <i class="ri-checkbox-circle-line me-1"></i>Validar
-        </button>
+    <button type="button"
+            class="btn btn-sm btn-soft-info validate-table"
+            data-table-id="{{ $table->id }}"
+            data-election-type-id="{{ $electionTypeId }}"
+            data-action="validate"
+            title="Validar votos — pasa a En Escrutinio">
+        <i class="ri-checkbox-circle-line me-1"></i>Validar
+    </button>
     @endif
     @if($canEscrutar)
-        <button type="button" class="btn btn-success validate-table"
-                data-table-id="{{ $table->id }}"
-                data-election-type-id="{{ $electionTypeId }}"
-                data-action="escrutar"
-                title="Escrutar — cierra el conteo definitivamente">
-            <i class="ri-check-double-line me-1"></i>Escrutar
-        </button>
+    <button type="button"
+            class="btn btn-sm btn-soft-success validate-table"
+            data-table-id="{{ $table->id }}"
+            data-election-type-id="{{ $electionTypeId }}"
+            data-action="escrutar"
+            title="Escrutar — cierra el conteo">
+        <i class="ri-check-double-line me-1"></i>Escrutar
+    </button>
+    @endif
+    @if($canCorrect)
+    <button type="button"
+            class="btn btn-sm btn-soft-warning correct-table"
+            data-table-id="{{ $table->id }}"
+            data-election-type-id="{{ $electionTypeId }}"
+            title="Corregir votos observados">
+        <i class="ri-edit-line me-1"></i>Corregir
+    </button>
+    @endif
+    @if($canObserve)
+    <button type="button"
+            class="btn btn-sm btn-soft-warning observe-table-general"
+            data-table-id="{{ $table->id }}"
+            data-election-type-id="{{ $electionTypeId }}"
+            title="Agregar observación">
+        <i class="ri-chat-1-line"></i>
+    </button>
     @endif
     @if($canReject)
-        <button type="button" class="btn btn-danger validate-table"
-                data-table-id="{{ $table->id }}"
-                data-election-type-id="{{ $electionTypeId }}"
-                data-action="reject"
-                title="Rechazar — mesa vuelve a Observada">
-            <i class="ri-close-circle-line"></i>
-        </button>
+    <button type="button"
+            class="btn btn-sm btn-soft-danger validate-table"
+            data-table-id="{{ $table->id }}"
+            data-election-type-id="{{ $electionTypeId }}"
+            data-action="reject"
+            title="Rechazar — mesa vuelve a Observada">
+        <i class="ri-close-circle-line"></i>
+    </button>
     @endif
-    @if(!$isFinal && ($permissions['can_upload_acta'] ?? false))
-        <button type="button" class="btn btn-secondary upload-acta"
-                data-table-id="{{ $table->id }}"
-                data-election-type-id="{{ $electionTypeId }}"
-                onclick="openActaModal({{ $table->id }}, {{ $electionTypeId ?? 'null' }})"
-                title="Subir acta">
-            <i class="ri-upload-line"></i>
-        </button>
+    @if($canUpload)
+    <button type="button"
+            class="btn btn-sm btn-soft-primary upload-acta"
+            data-table-id="{{ $table->id }}"
+            data-election-type-id="{{ $electionTypeId }}"
+            onclick="openActaModal({{ $table->id }}, {{ $electionTypeId ?? 'null' }}, '{{ addslashes($table->number . ' - ' . ($table->internal_code ?? $table->oep_code)) }}')"
+            title="Subir acta electoral">
+        <i class="ri-upload-line"></i>
+    </button>
     @endif
-    @if($isReopenable)
-        <button type="button" class="btn btn-outline-secondary reopen-table"
-                data-table-id="{{ $table->id }}"
-                data-election-type-id="{{ $electionTypeId }}"
-                title="Reabrir mesa — vuelve a Votación">
-            <i class="ri-lock-unlock-line"></i>
-        </button>
+    @if($canView)
+    <button type="button"
+            class="btn btn-sm btn-soft-secondary view-actas-btn"
+            data-table-id="{{ $table->id }}"
+            data-election-type-id="{{ $electionTypeId }}"
+            title="Ver actas subidas">
+        <i class="ri-file-copy-2-line"></i>
+    </button>
     @endif
+
+    @if($canReopen)
+    <button type="button"
+            class="btn btn-sm btn-soft-secondary reopen-table"
+            data-table-id="{{ $table->id }}"
+            data-election-type-id="{{ $electionTypeId }}"
+            title="Reabrir mesa — vuelve a Votación">
+        <i class="ri-lock-unlock-line"></i>
+    </button>
+    @endif
+
 </div>
