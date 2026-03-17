@@ -129,11 +129,14 @@ Route::middleware(['auth', 'verified'])->group(function () {
     });
 
     // ── PERFIL ────────────────────────────────────────────────────────────────
-    Route::prefix('profile')->name('profile.')->group(function () {
-        Route::get('/',               [ProfileController::class, 'index'])->name('index');
-        Route::get('/settings',       [ProfileController::class, 'settings'])->name('settings');
-        Route::post('/update',        [HomeController::class, 'updateProfile'])->name('update');
-        Route::post('/update-password',[HomeController::class, 'updatePassword'])->name('update-password');
+    Route::prefix('profile')->name('profile.')->middleware(['auth'])->group(function () {
+        Route::get('/', [ProfileController::class, 'index'])->name('index');
+        Route::get('/settings', [ProfileController::class, 'settings'])->name('settings');
+        Route::post('/update', [ProfileController::class, 'update'])->name('update');
+        Route::post('/avatar', [ProfileController::class, 'updateAvatar'])->name('avatar');
+        Route::post('/avatar-select', [ProfileController::class, 'selectAvatar'])->name('avatar-select');
+        Route::post('/password', [ProfileController::class, 'updatePassword'])->name('password');
+        Route::get('/activity', [ProfileController::class, 'getActivity'])->name('activity');
     });
 });
 

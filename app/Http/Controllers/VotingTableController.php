@@ -24,7 +24,7 @@ class VotingTableController extends Controller
     public function __construct()
     {
         $this->middleware('auth');
-        $this->middleware('permission:view_mesas')->only(['index', 'show', 'exportAll', 'exportSelected', 'downloadTemplate']);
+        $this->middleware('permission:view_mesas')->only(['index', 'show', 'exportAll', 'exportSelected', 'downloadTemplate', 'apiIndex', 'apiShow', 'getByInstitution']);
         $this->middleware('permission:create_mesa')->only(['create', 'store', 'import']);
         $this->middleware('permission:edit_mesa')->only(['edit', 'update', 'electionConfig', 'updateElectionConfig', 'assignDelegatesForm', 'assignDelegates']);
         $this->middleware('permission:delete_mesa')->only(['destroy', 'deleteMultiple']);
@@ -515,6 +515,106 @@ class VotingTableController extends Controller
         } catch (\Exception $e) {
             Log::error('Error getting voting tables by institution: ' . $e->getMessage());
             return response()->json(['error' => 'Error loading voting tables'], 500);
+        }
+    }
+
+    // ── API methods (routes/api.php — auth:sanctum) ───────────────────────────
+    public function apiIndex(Request $request)
+    {
+        try {
+            $query = VotingTable::with(['institution:id,name,code']);
+
+            if ($request->filled('institution_id')) {
+                $query->where('institution_id', $request->institution_id);
+            }
+            if ($request->filled('type')) {
+                $query->where('type', $request->type);
+            }
+            if ($request->filled('election_type_id')) {
+                $etId = (int) $request->election_type_id;
+                $query->with(['elections' => fn($q) => $q->where('election_type_id', $etId)]);
+                if ($request->filled('status')) {
+                    $query->whereHas('elections', fn($q) => $q
+                        ->where('election_type_id', $etId)
+                        ->where('status', $request->status)
+                    );
+                }
+            }
+
+            $perPage = min((int) $request->get('per_page', 20), 100);
+            $tables  = $query->orderBy('institution_id')->orderBy('number')->paginate($perPage);
+
+            $tables->getCollection()->transform(function ($table) {
+                $te = $table->elections->first();
+                $table->current_status  = $te?->status ?? 'sin_configurar';
+                $table->total_voters    = $te?->total_voters ?? 0;
+                return $table;
+            });
+
+            return response()->json($tables);
+        } catch (\Exception $e) {
+            Log::error('VotingTableController@apiIndex: ' . $e->getMessage());
+            return response()->json(['error' => 'Error al cargar mesas', 'detail' => $e->getMessage()], 500);
+        }
+    }
+
+    /**
+     * GET /api/voting-tables/{table}
+     * Single table with full relationships.
+     */
+    public function apiShow(VotingTable $table)
+    {
+        try {
+            $table->load([
+                'institution:id,name,code,address',
+                'president:id,name,last_name',
+                'secretary:id,name,last_name',
+                'vocal1:id,name,last_name',
+                'vocal2:id,name,last_name',
+                'elections.electionType:id,name,election_date',
+                'categoryResults',
+            ]);
+
+            return response()->json([
+                'id'              => $table->id,
+                'number'          => $table->number,
+                'letter'          => $table->letter,
+                'oep_code'        => $table->oep_code,
+                'internal_code'   => $table->internal_code,
+                'type'            => $table->type,
+                'expected_voters' => $table->expected_voters,
+                'voter_range'     => ['start' => $table->voter_range_start_name, 'end' => $table->voter_range_end_name],
+                'institution'     => ['id' => $table->institution?->id, 'name' => $table->institution?->name, 'code' => $table->institution?->code],
+                'jury'            => [
+                    'president' => $table->president ? trim("{$table->president->name} {$table->president->last_name}") : null,
+                    'secretary' => $table->secretary ? trim("{$table->secretary->name} {$table->secretary->last_name}") : null,
+                    'vocal1'    => $table->vocal1    ? trim("{$table->vocal1->name} {$table->vocal1->last_name}") : null,
+                    'vocal2'    => $table->vocal2    ? trim("{$table->vocal2->name} {$table->vocal2->last_name}") : null,
+                ],
+                'elections' => $table->elections->map(fn($e) => [
+                    'election_type_id'   => $e->election_type_id,
+                    'election_type_name' => $e->electionType?->name,
+                    'status'             => $e->status,
+                    'total_voters'       => $e->total_voters,
+                    'ballots_received'   => $e->ballots_received,
+                    'ballots_leftover'   => $e->ballots_leftover,
+                    'ballots_spoiled'    => $e->ballots_spoiled,
+                    'opening_time'       => $e->opening_time,
+                    'closing_time'       => $e->closing_time,
+                    'participation'      => $e->participation_percentage ?? null,
+                ]),
+                'category_results' => $table->categoryResults->map(fn($r) => [
+                    'code'          => $r->category_code,
+                    'valid_votes'   => $r->valid_votes,
+                    'blank_votes'   => $r->blank_votes,
+                    'null_votes'    => $r->null_votes,
+                    'total_votes'   => $r->total_votes,
+                    'is_consistent' => $r->is_consistent,
+                ]),
+            ]);
+        } catch (\Exception $e) {
+            Log::error('VotingTableController@apiShow: ' . $e->getMessage());
+            return response()->json(['error' => 'Mesa no encontrada', 'detail' => $e->getMessage()], 404);
         }
     }
 }

@@ -23,7 +23,7 @@ class InstitutionController extends Controller
     public function __construct()
     {
         $this->middleware('auth');
-        $this->middleware('permission:view_recintos')->only(['index', 'show', 'exportAll', 'exportSelected', 'downloadTemplate']);
+        $this->middleware('permission:view_recintos')->only(['index', 'show', 'exportAll', 'exportSelected', 'downloadTemplate', 'apiIndex', 'apiShow', 'getByLocality']);
         $this->middleware('permission:create_recinto')->only(['create', 'store', 'import']);
         $this->middleware('permission:edit_recinto')->only(['edit', 'update']);
         $this->middleware('permission:delete_recinto')->only(['destroy', 'deleteMultiple']);
@@ -615,6 +615,86 @@ class InstitutionController extends Controller
         } catch (\Exception $e) {
             Log::error('Error getting institutions by locality: ' . $e->getMessage());
             return response()->json(['error' => 'Error al cargar instituciones'], 500);
+        }
+    }
+
+    // ── API methods (routes/api.php — auth:sanctum) ───────────────────────────
+    public function apiIndex(Request $request)
+    {
+        try {
+            $query = Institution::with([
+                'locality.municipality.province.department',
+            ])->where('status', 'activo');
+
+            if ($request->filled('search')) {
+                $s = $request->search;
+                $query->where(fn($q) => $q
+                    ->where('name', 'like', "%{$s}%")
+                    ->orWhere('code', 'like', "%{$s}%")
+                );
+            }
+            if ($request->filled('municipality_id')) {
+                $query->where('municipality_id', $request->municipality_id);
+            }
+            if ($request->filled('locality_id')) {
+                $query->where('locality_id', $request->locality_id);
+            }
+            if ($request->filled('is_operative')) {
+                $query->where('is_operative', (bool) $request->is_operative);
+            }
+
+            $perPage      = min((int) $request->get('per_page', 20), 100);
+            $institutions = $query->orderBy('name')->paginate($perPage);
+
+            return response()->json($institutions);
+        } catch (\Exception $e) {
+            Log::error('InstitutionController@apiIndex: ' . $e->getMessage());
+            return response()->json(['error' => 'Error al cargar instituciones', 'detail' => $e->getMessage()], 500);
+        }
+    }
+
+    public function apiShow(Institution $institution)
+    {
+        try {
+            $institution->load([
+                'locality.municipality.province.department',
+                'district',
+                'zone',
+                'votingTables' => fn($q) => $q->select('id', 'institution_id', 'number', 'letter', 'oep_code', 'internal_code', 'type', 'expected_voters')->orderBy('number'),
+            ]);
+
+            return response()->json([
+                'id'           => $institution->id,
+                'code'         => $institution->code,
+                'name'         => $institution->name,
+                'short_name'   => $institution->short_name,
+                'address'      => $institution->address,
+                'reference'    => $institution->reference,
+                'latitude'     => $institution->latitude,
+                'longitude'    => $institution->longitude,
+                'status'       => $institution->status,
+                'is_operative' => $institution->is_operative,
+                'locality'     => $institution->locality ? [
+                    'id'           => $institution->locality->id,
+                    'name'         => $institution->locality->name,
+                    'municipality' => $institution->locality->municipality?->name,
+                    'province'     => $institution->locality->municipality?->province?->name,
+                    'department'   => $institution->locality->municipality?->province?->department?->name,
+                ] : null,
+                'voting_tables_count' => $institution->votingTables->count(),
+                'voting_tables'       => $institution->votingTables->map(fn($t) => [
+                    'id'             => $t->id,
+                    'number'         => $t->number,
+                    'letter'         => $t->letter,
+                    'oep_code'       => $t->oep_code,
+                    'internal_code'  => $t->internal_code,
+                    'type'           => $t->type,
+                    'expected_voters'=> $t->expected_voters,
+                ]),
+            ]);
+        } catch (\Exception $e) {
+            Log::error('InstitutionController@apiShow: ' . $e->getMessage());
+            return response()->json(['error' => 'Institución no encontrada', 'detail' => $e->getMessage()], 404);
         }
     }
 }

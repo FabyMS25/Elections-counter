@@ -24,10 +24,25 @@
             @include('layouts.footer')
         </div>
     </div>
+    <script src="https://cdn.jsdelivr.net/npm/feather-icons/dist/feather.min.js"></script>
+    <script>
+        feather.replace();
+    </script>
     @include('layouts.vendor-scripts')
+    <script src="{{ URL::asset('build/libs/swiper/swiper-bundle.min.js') }}"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script>
         window.Swal = Swal;
     </script>
+    <!-- Choices.js -->
+<script src="{{ URL::asset('build/libs/choices.js/public/assets/scripts/choices.min.js') }}"></script>
+    {{-- <script src="https://cdn.jsdelivr.net/npm/choices.js/public/assets/scripts/choices.min.js"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/choices.js/public/assets/styles/choices.min.css"> --}}
+
+    <!-- Flatpickr -->
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+    {{-- <script src="{{ URL::asset('build/libs/w/aves/waves.min.js') }}"></script> --}}
+    {{-- <script> Waves.init();</script> --}}
 </body>
 </html>

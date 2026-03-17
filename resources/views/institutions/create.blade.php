@@ -3,7 +3,7 @@
 @section('title') Nuevo Recinto Electoral @endsection
 
 @section('css')
-<link href="{{ URL::asset('build/libs/choices.js/public/assets/styles/choices.min.css') }}" rel="stylesheet"/>
+{{-- <link href="{{ URL::asset('build/libs/choices.js/public/assets/styles/choices.min.css') }}" rel="stylesheet"/> --}}
 @endsection
 
 @section('content')

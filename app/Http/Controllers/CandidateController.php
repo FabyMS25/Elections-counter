@@ -89,56 +89,103 @@ class CandidateController extends Controller
 
     public function store(Request $request)
     {
+        $wantsJson = $request->expectsJson() || $request->wantsJson();
         try {
-            $data = $this->validateAndPrepare($request);
-            $data = $this->handleImages($request, $data);
-            Candidate::create($data);
+            $data      = $this->validateAndPrepare($request);
+            $data      = $this->handleImages($request, $data);
+            $candidate = Candidate::create($data);
+            if ($wantsJson) {
+                return response()->json([
+                    'success'   => true,
+                    'message'   => 'Candidato creado correctamente.',
+                    'candidate' => ['id' => $candidate->id, 'name' => $candidate->name],
+                ], 201);
+            }
             return redirect()->route('candidates.index')->with('success', '✅ Candidato creado correctamente.');
         } catch (ValidationException $e) {
+            if ($wantsJson) {
+                return response()->json(['success' => false, 'errors' => $e->errors()], 422);
+            }
             return redirect()->back()->withErrors($e->validator)->withInput();
         } catch (\Exception $e) {
             Log::error('CandidateController@store: ' . $e->getMessage());
+            if ($wantsJson) {
+                return response()->json(['success' => false, 'message' => $e->getMessage()], 500);
+            }
             return redirect()->back()->withInput()->with('error', '❌ Error al crear el candidato.');
         }
     }
 
     public function update(Request $request, int $id)
     {
+        $wantsJson = $request->expectsJson() || $request->wantsJson();
         try {
             $candidate = Candidate::findOrFail($id);
             $data      = $this->validateAndPrepare($request);
             $data      = $this->handleImages($request, $data, $candidate);
             $candidate->update($data);
+            if ($wantsJson) {
+                return response()->json([
+                    'success'   => true,
+                    'message'   => 'Candidato actualizado correctamente.',
+                    'candidate' => ['id' => $candidate->id, 'name' => $candidate->name],
+                ]);
+            }
             return redirect()->route('candidates.index')->with('success', '✅ Candidato actualizado correctamente.');
         } catch (ValidationException $e) {
+            if ($wantsJson) {
+                return response()->json(['success' => false, 'errors' => $e->errors()], 422);
+            }
             return redirect()->back()->withErrors($e->validator)->withInput();
         } catch (\Exception $e) {
             Log::error('CandidateController@update: ' . $e->getMessage(), ['id' => $id]);
+            if ($wantsJson) {
+                return response()->json(['success' => false, 'message' => $e->getMessage()], 500);
+            }
             return redirect()->back()->withInput()->with('error', '❌ Error al actualizar el candidato.');
         }
     }
 
-    public function destroy(int $id)
+    public function destroy(Request $request, int $id)
     {
+        $wantsJson = $request->expectsJson() || $request->wantsJson();
         try {
             Candidate::findOrFail($id)->update(['active' => false]);
+            if ($wantsJson) {
+                return response()->json(['success' => true, 'message' => 'Candidato eliminado correctamente.']);
+            }
             return redirect()->route('candidates.index')->with('success', '✅ Candidato eliminado.');
         } catch (\Exception $e) {
             Log::error('CandidateController@destroy: ' . $e->getMessage());
+            if ($wantsJson) {
+                return response()->json(['success' => false, 'message' => $e->getMessage()], 500);
+            }
             return redirect()->back()->with('error', '❌ Error al eliminar el candidato.');
         }
     }
 
     public function multipleDelete(Request $request)
     {
+        $wantsJson = $request->expectsJson() || $request->wantsJson();
         try {
+            $ids = $request->input('ids') ?? $request->input('selected_ids') ?? [];
+            $request->merge(['ids' => $ids]);
             $request->validate(['ids' => 'required|array|min:1', 'ids.*' => 'integer|exists:candidates,id']);
-            $count = Candidate::whereIn('id', $request->ids)->update(['active' => false]);
+            $count = Candidate::whereIn('id', $ids)->update(['active' => false]);
+            if ($wantsJson) {
+                return response()->json(['success' => true, 'message' => "{$count} candidato(s) eliminados.", 'count' => $count]);
+            }
             return redirect()->route('candidates.index')->with('success', "✅ {$count} candidato(s) eliminados.");
         } catch (ValidationException $e) {
+            if ($wantsJson) {
+                return response()->json(['success' => false, 'errors' => $e->errors()], 422);
+            }
             return redirect()->back()->withErrors($e->validator);
         } catch (\Exception $e) {
             Log::error('CandidateController@multipleDelete: ' . $e->getMessage());
+            if ($wantsJson) {
+                return response()->json(['success' => false, 'message' => $e->getMessage()], 500);
+            }
             return redirect()->back()->with('error', '❌ Error al eliminar candidatos.');
         }
     }
@@ -335,5 +382,178 @@ class CandidateController extends Controller
             'byCategory'     => collect(), 'byDepartment'   => collect(),
             'byElectionType' => collect(), 'geo'            => ['nacional'=>0,'departamental'=>0,'provincial'=>0,'municipal'=>0],
         ];
+    }
+
+    // ── API methods (called from routes/api.php via auth:sanctum) ─────────────
+    public function apiIndex(Request $request)
+    {
+        try {
+            $query = Candidate::with([
+                'electionTypeCategory.electionType',
+                'electionTypeCategory.electionCategory',
+                'department', 'province', 'municipality',
+            ])->where('active', true);
+
+            if ($request->filled('search')) {
+                $s = $request->search;
+                $query->where(fn($q) => $q
+                    ->where('name',             'like', "%{$s}%")
+                    ->orWhere('party',          'like', "%{$s}%")
+                    ->orWhere('party_full_name', 'like', "%{$s}%")
+                );
+            }
+            if ($request->filled('election_type_id')) {
+                $query->whereHas('electionTypeCategory',
+                    fn($q) => $q->where('election_type_id', $request->election_type_id)
+                );
+            }
+            if ($request->filled('election_type_category_id')) {
+                $query->where('election_type_category_id', $request->election_type_category_id);
+            }
+            if ($request->filled('category_code')) {
+                $query->byCategoryCode($request->category_code);
+            }
+            if ($request->filled('department_id'))   $query->where('department_id',   $request->department_id);
+            if ($request->filled('province_id'))     $query->where('province_id',     $request->province_id);
+            if ($request->filled('municipality_id')) $query->where('municipality_id', $request->municipality_id);
+
+            $perPage = min((int) $request->get('per_page', 50), 200);
+            $candidates = $query->orderBy('list_order')->orderBy('name')->paginate($perPage);
+
+            return response()->json($candidates);
+        } catch (\Exception $e) {
+            Log::error('CandidateController@apiIndex: ' . $e->getMessage());
+            return response()->json(['error' => 'Error al cargar candidatos'], 500);
+        }
+    }
+
+    /**
+     * GET /api/candidates/{candidate}
+     * Single candidate with full relationships.
+     */
+    public function apiShow(Candidate $candidate)
+    {
+        try {
+            $candidate->load([
+                'electionTypeCategory.electionType',
+                'electionTypeCategory.electionCategory',
+                'department', 'province', 'municipality',
+            ]);
+            return response()->json([
+                'id'                        => $candidate->id,
+                'name'                      => $candidate->name,
+                'party'                     => $candidate->party,
+                'party_full_name'           => $candidate->party_full_name,
+                'color'                     => $candidate->color,
+                'list_order'                => $candidate->list_order,
+                'list_name'                 => $candidate->list_name,
+                'active'                    => $candidate->active,
+                'photo_url'                 => $candidate->photo_url,
+                'party_logo_url'            => $candidate->party_logo_url,
+                'election_type'             => $candidate->electionTypeCategory?->electionType?->name,
+                'election_category'         => $candidate->electionTypeCategory?->electionCategory?->name,
+                'election_category_code'    => $candidate->electionTypeCategory?->electionCategory?->code,
+                'ballot_order'              => $candidate->electionTypeCategory?->ballot_order,
+                'votes_per_person'          => $candidate->electionTypeCategory?->votes_per_person,
+                'department'                => $candidate->department?->name,
+                'province'                  => $candidate->province?->name,
+                'municipality'              => $candidate->municipality?->name,
+            ]);
+        } catch (\Exception $e) {
+            Log::error('CandidateController@apiShow: ' . $e->getMessage());
+            return response()->json(['error' => 'Candidato no encontrado'], 404);
+        }
+    }
+
+    /**
+     * GET /api/candidates/by-election/{electionTypeId}
+     * All active candidates for one election, grouped by category code.
+     * Use this to build the vote registration form.
+     *
+     * Response: { "ALC": [{...}, ...], "CON": [{...}, ...] }
+     */
+    public function getByElection(int $electionTypeId)
+    {
+        try {
+            $candidates = Candidate::with([
+                'electionTypeCategory.electionCategory',
+            ])
+            ->where('active', true)
+            ->whereHas('electionTypeCategory',
+                fn($q) => $q->where('election_type_id', $electionTypeId)
+            )
+            ->orderBy('list_order')
+            ->orderBy('name')
+            ->get()
+            ->map(fn($c) => [
+                'id'                     => $c->id,
+                'name'                   => $c->name,
+                'party'                  => $c->party,
+                'party_full_name'        => $c->party_full_name,
+                'color'                  => $c->color,
+                'list_order'             => $c->list_order,
+                'list_name'              => $c->list_name,
+                'photo_url'              => $c->photo_url,
+                'party_logo_url'         => $c->party_logo_url,
+                'election_category_code' => $c->electionTypeCategory?->electionCategory?->code,
+                'election_category_name' => $c->electionTypeCategory?->electionCategory?->name,
+                'ballot_order'           => $c->electionTypeCategory?->ballot_order,
+                'election_type_category_id' => $c->election_type_category_id,
+            ])
+            ->groupBy('election_category_code');
+
+            return response()->json($candidates);
+        } catch (\Exception $e) {
+            Log::error('CandidateController@getByElection: ' . $e->getMessage());
+            return response()->json(['error' => 'Error al cargar candidatos'], 500);
+        }
+    }
+
+    /**
+     * POST /candidates or PUT /candidates/{id}
+     * When called via API (Accept: application/json), return JSON instead of redirect.
+     * The existing store() and update() already handle validation correctly —
+     * this helper is used internally if you want to call them from the API.
+     * The modal form submits via fetch() with Accept: application/json,
+     * so store/update automatically return JSON errors on 422 (Laravel default).
+     * On success we need to explicitly return JSON:
+     */
+    public function storeApi(Request $request)
+    {
+        try {
+            $data = $this->validateAndPrepare($request);
+            $data = $this->handleImages($request, $data);
+            $candidate = Candidate::create($data);
+            return response()->json([
+                'success'   => true,
+                'message'   => 'Candidato creado correctamente.',
+                'candidate' => ['id' => $candidate->id, 'name' => $candidate->name],
+            ], 201);
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            return response()->json(['success' => false, 'errors' => $e->errors()], 422);
+        } catch (\Exception $e) {
+            Log::error('CandidateController@storeApi: ' . $e->getMessage());
+            return response()->json(['success' => false, 'message' => $e->getMessage()], 500);
+        }
+    }
+
+    public function updateApi(Request $request, int $id)
+    {
+        try {
+            $candidate = Candidate::findOrFail($id);
+            $data      = $this->validateAndPrepare($request);
+            $data      = $this->handleImages($request, $data, $candidate);
+            $candidate->update($data);
+            return response()->json([
+                'success'   => true,
+                'message'   => 'Candidato actualizado correctamente.',
+                'candidate' => ['id' => $candidate->id, 'name' => $candidate->name],
+            ]);
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            return response()->json(['success' => false, 'errors' => $e->errors()], 422);
+        } catch (\Exception $e) {
+            Log::error('CandidateController@updateApi: ' . $e->getMessage());
+            return response()->json(['success' => false, 'message' => $e->getMessage()], 500);
+        }
     }
 }

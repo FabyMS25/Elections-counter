@@ -178,18 +178,14 @@ class PermissionRoleSeeder extends Seeder
 
             if ($data['permissions'] === 'ALL') {
                 $role->permissions()->sync(Permission::pluck('id'));
-                $this->command?->info("  ✓  Role [{$name}] synced with ALL " . Permission::count() . " permissions");
             } else {
                 $permIds  = Permission::whereIn('name', $data['permissions'])->pluck('id');
                 $found    = Permission::whereIn('name', $data['permissions'])->pluck('name')->toArray();
                 $missing  = array_diff($data['permissions'], $found);
-
                 if (!empty($missing)) {
                     $this->command?->warn("  ⚠  Role [{$name}] missing: " . implode(', ', $missing));
                 }
-
                 $role->permissions()->sync($permIds);
-                $this->command?->info("  ✓  Role [{$name}] synced with {$permIds->count()} permissions");
             }
         }
 

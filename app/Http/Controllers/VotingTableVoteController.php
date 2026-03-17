@@ -117,10 +117,10 @@ class VotingTableVoteController extends Controller
             ]);
             if ($institutionId)  $query->where('institution_id', $institutionId);
             if ($tableNumber)    $query->where('number', $tableNumber);
-            if ($tableCode)      $query->where(fn($q) => $q->where('oep_code', 'ilike', "%{$tableCode}%")->orWhere('internal_code', 'ilike', "%{$tableCode}%"));
+            if ($tableCode)      $query->where(fn($q) => $q->where('oep_code', $this->likeOp(), "%{$tableCode}%")->orWhere('internal_code', $this->likeOp(), "%{$tableCode}%"));
             if ($tableType)      $query->where('type', $tableType);
-            if ($fromName)       $query->where('voter_range_start_name', 'ilike', "%{$fromName}%");
-            if ($toName)         $query->where('voter_range_end_name', 'ilike', "%{$toName}%");
+            if ($fromName)       $query->where('voter_range_start_name', $this->likeOp(), "%{$fromName}%");
+            if ($toName)         $query->where('voter_range_end_name', $this->likeOp(), "%{$toName}%");
             if ($status)         $query->whereHas('elections', fn($q) => $q->where('election_type_id', $electionTypeId)->where('status', $status));
             if ($minVotes)       $query->whereHas('elections', fn($q) => $q->where('election_type_id', $electionTypeId)->where('total_voters', '>=', $minVotes));
             if ($maxVotes)       $query->whereHas('elections', fn($q) => $q->where('election_type_id', $electionTypeId)->where('total_voters', '<=', $maxVotes));
@@ -183,7 +183,7 @@ class VotingTableVoteController extends Controller
             return view('voting-table-votes.index', compact(
                 'votingTables', 'typeCategories', 'candidatesByCategory', 'institutions',
                 'electionTypes', 'electionType', 'electionTypeId', 'totals', 'tableStats',
-                'permissions', 'statusLabels', 'validationLabels', 'dashboard', 'request'
+                'permissions', 'statusLabels', 'validationLabels', 'dashboard'
             ));
         } catch (\Exception $e) {
             Log::error('VotingTableVoteController@index: ' . $e->getMessage(), ['trace' => $e->getTraceAsString()]);
@@ -744,5 +744,9 @@ class VotingTableVoteController extends Controller
         if ($roleNames->contains('administrador')) return 'coordinador';
         if ($roleNames->contains('supervisor'))    return 'revisor';
         return 'revisor';
+    }
+    private function likeOp(): string
+    {
+        return DB::connection()->getDriverName() === 'pgsql' ? 'ilike' : 'like';
     }
 }

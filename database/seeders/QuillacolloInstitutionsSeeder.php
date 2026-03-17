@@ -2,117 +2,224 @@
 namespace Database\Seeders;
 
 use Illuminate\Database\Seeder;
-use App\Models\{Locality, Institution, Municipality, VotingTable, VotingTableElection, ElectionType};
+use App\Models\{Locality, Institution, Municipality, District, VotingTable, VotingTableElection, ElectionType};
 use Illuminate\Support\Facades\DB;
 
 class QuillacolloInstitutionsSeeder extends Seeder
 {
     protected $recintos = [
-        ['name' => 'UNIDAD EDUCATIVA NESTOR ADRIAZOLA', 'code' => '309010101', 'locality' => 'Quillacollo', 'mesas' => 31, 'last_mesa_voters' => 85, 'oep_inicio' => 303066],
-        ['name' => 'ESCUELA SIMON BOLIVAR', 'code' => '309010102', 'locality' => 'Quillacollo', 'mesas' => 16, 'last_mesa_voters' => 21, 'oep_inicio' => 303139],
-        ['name' => 'INSTITUTO PARTICULAR QUILLACOLLO', 'code' => '309010103', 'locality' => 'Quillacollo', 'mesas' => 14, 'last_mesa_voters' => 129, 'oep_inicio' => 303052],
-        ['name' => 'UNIDAD EDUCATIVA VILLA MODERNA', 'code' => '309010104', 'locality' => 'Quillacollo', 'mesas' => 19, 'last_mesa_voters' => 167, 'oep_inicio' => 303098],
-        ['name' => 'CARCEL PENAL DE SAN PABLO', 'code' => '309010105', 'locality' => 'Quillacollo', 'mesas' => 2, 'last_mesa_voters' => 177, 'oep_inicio' => 303027],
-        ['name' => 'UNIDAD EDUCATIVA 1RO DE MAYO', 'code' => '309010106', 'locality' => 'Quillacollo', 'mesas' => 4, 'last_mesa_voters' => 120, 'oep_inicio' => 303023],
-        ['name' => 'UNIDAD EDUCATIVA SAN MARTIN DE PORRES (TARDE)', 'code' => '309010107', 'locality' => 'Quillacollo', 'mesas' => 1, 'last_mesa_voters' => 250, 'oep_inicio' => 303218, 'suffix' => '-T'],
-        ['name' => 'COLEGIO CRISTINA PRADO', 'code' => '309010108', 'locality' => 'Quillacollo', 'mesas' => 14, 'last_mesa_voters' => 192, 'oep_inicio' => 303182],
-        ['name' => 'COLEGIO FRANZ TAMAYO', 'code' => '309010109', 'locality' => 'Quillacollo', 'mesas' => 22, 'last_mesa_voters' => 69, 'oep_inicio' => 303196],
-        ['name' => 'LICEO AMERICA', 'code' => '309010110', 'locality' => 'Quillacollo', 'mesas' => 23, 'last_mesa_voters' => 130, 'oep_inicio' => 303029],
-        ['name' => 'ESCUELA FIDELIA C. DE SANCHEZ', 'code' => '309010111', 'locality' => 'Quillacollo', 'mesas' => 12, 'last_mesa_voters' => 70, 'oep_inicio' => 303157],
-        ['name' => 'UNIDAD EDUCATIVA HEROINAS', 'code' => '309010112', 'locality' => 'Quillacollo', 'mesas' => 13, 'last_mesa_voters' => 30, 'oep_inicio' => 303169],
-        ['name' => 'TEOFILO VARGAS CANDIA B', 'code' => '309010113', 'locality' => 'Quillacollo', 'mesas' => 22, 'last_mesa_voters' => 185, 'oep_inicio' => 303117],
-        ['name' => 'UNIDAD EDUCATIVA FLORA SALINAS HINOJOSA - AMALIA ECHALAR', 'code' => '309010114', 'locality' => 'Quillacollo', 'mesas' => 1, 'last_mesa_voters' => 166, 'oep_inicio' => 303218, 'suffix' => '-F'],
-        ['name' => 'UNIDAD EDUCATIVA NUESTRA SEÑORA DE URCUPIÑA', 'code' => '309010115', 'locality' => 'Quillacollo', 'mesas' => 2, 'last_mesa_voters' => 234, 'oep_inicio' => 303155],
-        ['name' => 'UNIDAD EDUCATIVA MILIVOY ETEROVIC MATENDA', 'code' => '309010116', 'locality' => 'Quillacollo', 'mesas' => 14, 'last_mesa_voters' => 168, 'oep_inicio' => 303001],
-        ['name' => 'ESCUELA 12 DE SEPTIEMBRE', 'code' => '309010117', 'locality' => 'Quillacollo', 'mesas' => 16, 'last_mesa_voters' => 126, 'oep_inicio' => 303243],
-        ['name' => 'ESCUELA TOMAS BATA', 'code' => '309010118', 'locality' => 'Quillacollo', 'mesas' => 13, 'last_mesa_voters' => 14, 'oep_inicio' => 303223],
-        ['name' => 'UNIDAD EDUCATIVA 12 DE ENERO B', 'code' => '309010119', 'locality' => 'Quillacollo', 'mesas' => 5, 'last_mesa_voters' => 254, 'oep_inicio' => 303238],
-        ['name' => 'UNIDAD EDUCATIVA VILLA ASUNCION', 'code' => '309010120', 'locality' => 'Quillacollo', 'mesas' => 4, 'last_mesa_voters' => 224, 'oep_inicio' => 303219],
-        ['name' => 'UNIDAD EDUCATIVA SAN MARTIN DE PORRES', 'code' => '309010121', 'locality' => 'Quillacollo', 'mesas' => 2, 'last_mesa_voters' => 289, 'oep_inicio' => 303236],
-        ['name' => 'COLEGIO NACIONAL CALAMA', 'code' => '309010122', 'locality' => 'Quillacollo', 'mesas' => 6, 'last_mesa_voters' => 238, 'oep_inicio' => 303457],
-        ['name' => 'UNIDAD EDUCATIVA IRONCOLLO', 'code' => '309010123', 'locality' => 'Quillacollo', 'mesas' => 15, 'last_mesa_voters' => 267, 'oep_inicio' => 303281],
-        ['name' => 'UNIDAD EDUCATIVA MARTIN CARDENAS', 'code' => '309010124', 'locality' => 'Quillacollo', 'mesas' => 11, 'last_mesa_voters' => 192, 'oep_inicio' => 303270],
-        ['name' => 'UNIDAD EDUCATIVA TUNARI', 'code' => '309010125', 'locality' => 'Quillacollo', 'mesas' => 8, 'last_mesa_voters' => 107, 'oep_inicio' => 303259],
-        ['name' => 'UNIDAD EDUCATIVA 23 DE MARZO', 'code' => '309010126', 'locality' => 'Quillacollo', 'mesas' => 3, 'last_mesa_voters' => 159, 'oep_inicio' => 303267],
-        ['name' => 'ESCUELA FELIZ MARTINEZ', 'code' => '309010130', 'locality' => 'Quillacollo', 'mesas' => 29, 'last_mesa_voters' => 120, 'oep_inicio' => 303387],
-        ['name' => 'CENTRO INTEGRAL NIÑO JESUS FE Y ALEGRIA', 'code' => '309010131', 'locality' => 'Quillacollo', 'mesas' => 9, 'last_mesa_voters' => 128, 'oep_inicio' => 303416],
-        ['name' => 'UNIDAD EDUCATIVA VILLA URCUPIÑA', 'code' => '309010133', 'locality' => 'Quillacollo', 'mesas' => 18, 'last_mesa_voters' => 71, 'oep_inicio' => 303309, 'suffix' => '-U'],
-        ['name' => 'ESCUELA ARTURO QUITON', 'code' => '309010140', 'locality' => 'Quillacollo', 'mesas' => 19, 'last_mesa_voters' => 198, 'oep_inicio' => 303354],
-        ['name' => 'UNIDAD EDUCATIVA RENE CRESPO RICO', 'code' => '309010141', 'locality' => 'Quillacollo', 'mesas' => 3, 'last_mesa_voters' => 78, 'oep_inicio' => 303373],
-        ['name' => 'UNIDAD EDUCATIVA JOSE MIGUEL LANZA', 'code' => '309010201', 'locality' => 'Illataco', 'mesas' => 9, 'last_mesa_voters' => 58, 'oep_inicio' => 303376],
-        ['name' => 'NORMAL SIMON RODRIGUEZ', 'code' => '309010301', 'locality' => 'Piñami', 'mesas' => 14, 'last_mesa_voters' => 32, 'oep_inicio' => 303429],
-        ['name' => 'UNIDAD EDUCATIVA 21 DE SEPTIEMBRE', 'code' => '309010302', 'locality' => 'Piñami', 'mesas' => 13, 'last_mesa_voters' => 165, 'oep_inicio' => 303296],
-        ['name' => 'UNIDAD EDUCATIVA POCPOCOLLO', 'code' => '309010303', 'locality' => 'Piñami', 'mesas' => 2, 'last_mesa_voters' => 262, 'oep_inicio' => 303385],
-        ['name' => 'UNIDAD EDUCATIVA JOSE BALLIVIAN', 'code' => '309010304', 'locality' => 'Piñami', 'mesas' => 14, 'last_mesa_voters' => 117, 'oep_inicio' => 303465],
-        ['name' => 'UNIDAD EDUCATIVA OSCAR ALFARO', 'code' => '309010401', 'locality' => 'Paucarpata', 'mesas' => 4, 'last_mesa_voters' => 194, 'oep_inicio' => 303425],
-        ['name' => 'UNIDAD EDUCATIVA CERRO COTA', 'code' => '309010501', 'locality' => 'Cotapachi', 'mesas' => 2, 'last_mesa_voters' => 226, 'oep_inicio' => 303327],
-        ['name' => 'UNIDAD EDUCATIVA COTAPACHI', 'code' => '309010502', 'locality' => 'Cotapachi', 'mesas' => 2, 'last_mesa_voters' => 331, 'oep_inicio' => 303463],
-        ['name' => 'UNIDAD EDUCATIVA CALVARIO', 'code' => '309010503', 'locality' => 'Cotapachi', 'mesas' => 13, 'last_mesa_voters' => 222, 'oep_inicio' => 303309, 'suffix' => '-C'],
-        ['name' => 'UNIDAD EDUCATIVA PIÑAMI', 'code' => '309010504', 'locality' => 'Cotapachi', 'mesas' => 19, 'last_mesa_voters' => 266, 'oep_inicio' => 303354, 'suffix' => '-P'],
-        ['name' => 'UNIDAD EDUCATIVA EL PASO', 'code' => '309010601', 'locality' => 'El Paso', 'mesas' => 18, 'last_mesa_voters' => 166, 'oep_inicio' => 303486],
-        ['name' => 'UNIDAD EDUCATIVA MARIA AUXILIADORA', 'code' => '309010602', 'locality' => 'El Paso', 'mesas' => 7, 'last_mesa_voters' => 139, 'oep_inicio' => 303479],
-        ['name' => 'INSTITUTO TECNOLOGICO EL PASO', 'code' => '309010603', 'locality' => 'El Paso', 'mesas' => 9, 'last_mesa_voters' => 213, 'oep_inicio' => 303520],
-        ['name' => 'UNIDAD EDUCATIVA EL PASO A', 'code' => '309010604', 'locality' => 'El Paso', 'mesas' => 16, 'last_mesa_voters' => 170, 'oep_inicio' => 303504],
-        ['name' => 'UNIDAD EDUCATIVA MOLLE MOLLE', 'code' => '309010605', 'locality' => 'El Paso', 'mesas' => 2, 'last_mesa_voters' => 203, 'oep_inicio' => 303529],
-        ['name' => 'UNIDAD EDUCATIVA SANTIAGO APOSTOL', 'code' => '309010606', 'locality' => 'El Paso', 'mesas' => 2, 'last_mesa_voters' => 225, 'oep_inicio' => 303531],
-        ['name' => 'UNIDAD EDUCATIVA BELLA VISTA', 'code' => '309010701', 'locality' => 'Bella Vista', 'mesas' => 23, 'last_mesa_voters' => 220, 'oep_inicio' => 303533],
-        ['name' => 'UNIDAD EDUCATIVA RENE BARRIENTOS ORTUÑO', 'code' => '309010801', 'locality' => 'Misicuni', 'mesas' => 2, 'last_mesa_voters' => 156, 'oep_inicio' => 303556],
-        ['name' => 'CENTRO INTERNADO MISICUNI', 'code' => '309010802', 'locality' => 'Misicuni', 'mesas' => 3, 'last_mesa_voters' => 100, 'oep_inicio' => 303558],
-        ['name' => 'UNIDAD EDUCATIVA LIRIUNI', 'code' => '309010901', 'locality' => 'Liriuni', 'mesas' => 1, 'last_mesa_voters' => 246, 'oep_inicio' => 303561],
-        ['name' => 'UNIDAD EDUCATIVA POTRERO', 'code' => '309011001', 'locality' => 'Potrero', 'mesas' => 6, 'last_mesa_voters' => 271, 'oep_inicio' => 303443],
+        ['locality' => 'Bella Vista', 'recinto' => 'Unidad Educativa Bella Vista', 'mesas' => 23, 'habilitados' => 5338, 'circunscripcion' => 28, 'tipo' => 'Urbano'],
+        ['locality' => 'Cotapachi', 'recinto' => 'U. E. Mcal. José Ballivian', 'mesas' => 14, 'habilitados' => 3237, 'circunscripcion' => 28, 'tipo' => 'Urbano'],
+        ['locality' => 'Cotapachi', 'recinto' => 'U. E. Milivoy Eterovic Matenda', 'mesas' => 13, 'habilitados' => 3048, 'circunscripcion' => 28, 'tipo' => 'Urbano'],
+        ['locality' => 'Cotapachi', 'recinto' => 'Colegio Nacional Calama (Nueva Infraestructura)', 'mesas' => 6, 'habilitados' => 1438, 'circunscripcion' => 28, 'tipo' => 'Urbano'],
+        ['locality' => 'Cotapachi', 'recinto' => 'U.E. Cotapachi', 'mesas' => 3, 'habilitados' => 571, 'circunscripcion' => 28, 'tipo' => 'Urbano'],
+        ['locality' => 'El Paso', 'recinto' => 'Unidad Educativa Maria Auxiliadora', 'mesas' => 7, 'habilitados' => 1579, 'circunscripcion' => 28, 'tipo' => 'Urbano'],
+        ['locality' => 'El Paso', 'recinto' => 'U. E. El Paso A', 'mesas' => 16, 'habilitados' => 3770, 'circunscripcion' => 28, 'tipo' => 'Urbano'],
+        ['locality' => 'El Paso', 'recinto' => 'Unidad Educativa El Paso', 'mesas' => 17, 'habilitados' => 4006, 'circunscripcion' => 28, 'tipo' => 'Urbano'],
+        ['locality' => 'El Paso', 'recinto' => 'Instituto Tecnologico El Paso', 'mesas' => 9, 'habilitados' => 2133, 'circunscripcion' => 28, 'tipo' => 'Urbano'],
+        ['locality' => 'El Paso', 'recinto' => 'U.E. Molle Molle', 'mesas' => 2, 'habilitados' => 443, 'circunscripcion' => 28, 'tipo' => 'Urbano'],
+        ['locality' => 'El Paso', 'recinto' => 'U.E. Santiago Apóstol', 'mesas' => 2, 'habilitados' => 465, 'circunscripcion' => 28, 'tipo' => 'Urbano'],
+        ['locality' => 'Illataco', 'recinto' => 'U. E. Jose Miguel Lanza (Illataco)', 'mesas' => 9, 'habilitados' => 1978, 'circunscripcion' => 28, 'tipo' => 'Urbano'],
+        ['locality' => 'Liriuni', 'recinto' => 'Unidad Educativa Liriuni', 'mesas' => 1, 'habilitados' => 246, 'circunscripcion' => 28, 'tipo' => 'Rural'],
+        ['locality' => 'Misicuni', 'recinto' => 'U. E. Rene Barrientos Ortuño (Misicuni)', 'mesas' => 2, 'habilitados' => 396, 'circunscripcion' => 28, 'tipo' => 'Rural'],
+        ['locality' => 'Misicuni', 'recinto' => 'Centro Internado Misicuni', 'mesas' => 3, 'habilitados' => 580, 'circunscripcion' => 28, 'tipo' => 'Rural'],
+        ['locality' => 'Paucarpata', 'recinto' => 'Normal Simón Rodríguez (Ex Nucleo Escolar Paucarpata)', 'mesas' => 14, 'habilitados' => 3152, 'circunscripcion' => 28, 'tipo' => 'Urbano'],
+        ['locality' => 'Piñami', 'recinto' => 'U.E. Pocpocollo', 'mesas' => 3, 'habilitados' => 502, 'circunscripcion' => 28, 'tipo' => 'Urbano'],
+        ['locality' => 'Piñami', 'recinto' => 'Centro Integral Niño Jesus Fe y Alegria', 'mesas' => 9, 'habilitados' => 2048, 'circunscripcion' => 28, 'tipo' => 'Urbano'],
+        ['locality' => 'Piñami', 'recinto' => 'Escuela Felix Martinez', 'mesas' => 27, 'habilitados' => 6360, 'circunscripcion' => 28, 'tipo' => 'Urbano'],
+        ['locality' => 'Piñami', 'recinto' => 'U.E. Oscar Alfaro', 'mesas' => 4, 'habilitados' => 914, 'circunscripcion' => 28, 'tipo' => 'Urbano'],
+        ['locality' => 'Potrero', 'recinto' => 'U. E. Potrero', 'mesas' => 7, 'habilitados' => 1471, 'circunscripcion' => 28, 'tipo' => 'Rural'],
+        ['locality' => 'Quillacollo', 'recinto' => 'U.E. 1ro. de Mayo', 'mesas' => 4, 'habilitados' => 840, 'circunscripcion' => 28, 'tipo' => 'Urbano'],
+        ['locality' => 'Quillacollo', 'recinto' => '(Cárcel) Penal San Pablo', 'mesas' => 2, 'habilitados' => 400, 'circunscripcion' => 28, 'tipo' => 'Urbano'],
+        ['locality' => 'Quillacollo', 'recinto' => 'Liceo América', 'mesas' => 22, 'habilitados' => 5175, 'circunscripcion' => 28, 'tipo' => 'Urbano'],
+        ['locality' => 'Quillacollo', 'recinto' => 'Instituto Particular Quillacollo', 'mesas' => 14, 'habilitados' => 3249, 'circunscripcion' => 28, 'tipo' => 'Urbano'],
+        ['locality' => 'Quillacollo', 'recinto' => 'Unidad Educativa Nestor Adriazola (Ex Colegio Nacional Calama)', 'mesas' => 29, 'habilitados' => 6976, 'circunscripcion' => 28, 'tipo' => 'Urbano'],
+        ['locality' => 'Quillacollo', 'recinto' => 'U.E. San Martín de Porres Tarde', 'mesas' => 1, 'habilitados' => 250, 'circunscripcion' => 28, 'tipo' => 'Urbano'],
+        ['locality' => 'Quillacollo', 'recinto' => 'Unidad Educativa Villa Moderna', 'mesas' => 18, 'habilitados' => 4247, 'circunscripcion' => 28, 'tipo' => 'Urbano'],
+        ['locality' => 'Quillacollo', 'recinto' => 'Teofilo Vargas Candia B', 'mesas' => 21, 'habilitados' => 4985, 'circunscripcion' => 28, 'tipo' => 'Urbano'],
+        ['locality' => 'Quillacollo', 'recinto' => 'Escuela Simón Bolivar', 'mesas' => 15, 'habilitados' => 3501, 'circunscripcion' => 28, 'tipo' => 'Urbano'],
+        ['locality' => 'Quillacollo', 'recinto' => 'U. E. Nuestra Señora de Urkupiña', 'mesas' => 2, 'habilitados' => 474, 'circunscripcion' => 28, 'tipo' => 'Urbano'],
+        ['locality' => 'Quillacollo', 'recinto' => 'Escuela Fidelia C. De Sanchez', 'mesas' => 11, 'habilitados' => 2613, 'circunscripcion' => 28, 'tipo' => 'Urbano'],
+        ['locality' => 'Quillacollo', 'recinto' => 'Unidad Educativa Heroinas', 'mesas' => 13, 'habilitados' => 2910, 'circunscripcion' => 28, 'tipo' => 'Urbano'],
+        ['locality' => 'Quillacollo', 'recinto' => 'Colegio Cristina Prada', 'mesas' => 13, 'habilitados' => 3072, 'circunscripcion' => 28, 'tipo' => 'Urbano'],
+        ['locality' => 'Quillacollo', 'recinto' => 'Colegio Franz Tamayo', 'mesas' => 22, 'habilitados' => 5109, 'circunscripcion' => 28, 'tipo' => 'Urbano'],
+        ['locality' => 'Quillacollo', 'recinto' => 'Unidad Educativa Flora Salinas Hinojosa / Amalia Echalar', 'mesas' => 1, 'habilitados' => 166, 'circunscripcion' => 28, 'tipo' => 'Urbano'],
+        ['locality' => 'Quillacollo', 'recinto' => 'U.E. Villa Asunción', 'mesas' => 4, 'habilitados' => 944, 'circunscripcion' => 28, 'tipo' => 'Urbano'],
+        ['locality' => 'Quillacollo', 'recinto' => 'Escuela Tomas Bata', 'mesas' => 12, 'habilitados' => 2894, 'circunscripcion' => 28, 'tipo' => 'Urbano'],
+        ['locality' => 'Quillacollo', 'recinto' => 'U. E. San Martín de Porres', 'mesas' => 3, 'habilitados' => 529, 'circunscripcion' => 28, 'tipo' => 'Urbano'],
+        ['locality' => 'Quillacollo', 'recinto' => 'U.E. 12 de Enero B', 'mesas' => 5, 'habilitados' => 1214, 'circunscripcion' => 28, 'tipo' => 'Urbano'],
+        ['locality' => 'Quillacollo', 'recinto' => 'Escuela 12 de Septiembre', 'mesas' => 15, 'habilitados' => 3486, 'circunscripcion' => 28, 'tipo' => 'Urbano'],
+        ['locality' => 'Quillacollo', 'recinto' => 'U. E. Tunari', 'mesas' => 8, 'habilitados' => 1787, 'circunscripcion' => 28, 'tipo' => 'Urbano'],
+        ['locality' => 'Quillacollo', 'recinto' => 'U.E. 23 de Marzo', 'mesas' => 3, 'habilitados' => 639, 'circunscripcion' => 28, 'tipo' => 'Urbano'],
+        ['locality' => 'Quillacollo', 'recinto' => 'Unidad Educativa Martin Cardenas', 'mesas' => 11, 'habilitados' => 2592, 'circunscripcion' => 28, 'tipo' => 'Urbano'],
+        ['locality' => 'Quillacollo', 'recinto' => 'Unidad Educativa Ironcollo', 'mesas' => 14, 'habilitados' => 3147, 'circunscripcion' => 28, 'tipo' => 'Urbano'],
+        ['locality' => 'Quillacollo', 'recinto' => 'U.E. 21 de Septiembre', 'mesas' => 13, 'habilitados' => 3045, 'circunscripcion' => 28, 'tipo' => 'Urbano'],
+        ['locality' => 'Quillacollo', 'recinto' => 'Unidad Educativa Villa De Urkupiña', 'mesas' => 18, 'habilitados' => 4151, 'circunscripcion' => 28, 'tipo' => 'Urbano'],
+        ['locality' => 'Quillacollo', 'recinto' => 'U.E. Cerro Cota', 'mesas' => 2, 'habilitados' => 466, 'circunscripcion' => 28, 'tipo' => 'Urbano'],
+        ['locality' => 'Quillacollo', 'recinto' => 'Unidad Educativa Marquina', 'mesas' => 20, 'habilitados' => 4695, 'circunscripcion' => 28, 'tipo' => 'Urbano'],
+        ['locality' => 'Quillacollo', 'recinto' => 'Unidad Educativa Marquina (Secundaria)', 'mesas' => 5, 'habilitados' => 1006, 'circunscripcion' => 28, 'tipo' => 'Urbano'],
+        ['locality' => 'Quillacollo', 'recinto' => 'Escuela Arturo Quitón', 'mesas' => 18, 'habilitados' => 4278, 'circunscripcion' => 28, 'tipo' => 'Urbano'],
+        ['locality' => 'Quillacollo', 'recinto' => 'U.E. Rene Crespo Rico', 'mesas' => 3, 'habilitados' => 558, 'circunscripcion' => 28, 'tipo' => 'Urbano'],
     ];
 
     public function run(): void
     {
         $municipality = Municipality::where('name', 'Quillacollo')->first();
         $election = ElectionType::where('name', 'LIKE', '%Municipal%2026%')->first();
-        if (!$municipality || !$election) return;
+        
+        if (!$municipality) {
+            $this->command->error("❌ Municipio Quillacollo no encontrado");
+            return;
+        }
+        
+        if (!$election) {
+            $this->command->error("❌ Elección Municipal 2026 no encontrada");
+            return;
+        }
+        $district = District::firstOrCreate(
+            ['name' => 'Circunscripción 28 - Quillacollo', 'municipality_id' => $municipality->id],
+            [
+                'name' => 'Circunscripción 28 - Quillacollo',
+                'municipality_id' => $municipality->id
+            ]
+        );
 
         DB::beginTransaction();
         try {
-            foreach ($this->recintos as $data) {
-                $totalCitizens = ($data['mesas'] > 1)
-                    ? (240 * ($data['mesas'] - 1)) + $data['last_mesa_voters']
-                    : $data['last_mesa_voters'];
-                $locality = Locality::firstOrCreate(['name' => $data['locality'], 'municipality_id' => $municipality->id]);
-                $inst = Institution::updateOrCreate(
-                    ['code' => $data['code']],
+            $createdCount = 0;
+            $updatedCount = 0;
+            $totalMesasCreadas = 0;
+            $processedRecintos = 0;
+            
+            foreach ($this->recintos as $index => $data) {
+                $locality = Locality::firstOrCreate(
+                    ['name' => $data['locality'], 'municipality_id' => $municipality->id],
                     [
-                        'name' => $data['name'],
+                        'name' => $data['locality'],
                         'municipality_id' => $municipality->id,
-                        'locality_id' => $locality->id,
-                        'registered_citizens' => $totalCitizens,
-                        'total_voting_tables' => $data['mesas'],
-                        'status' => 'activo'
+                        'latitude' => null,
+                        'longitude' => null
                     ]
                 );
+                
+                $code = 'REC-' . str_pad($index + 1, 3, '0', STR_PAD_LEFT) . '-Q';
+                $words = explode(' ', $data['recinto']);
+                $shortName = count($words) > 4 ? implode(' ', array_slice($words, 0, 4)) . '...' : $data['recinto'];
+                
+                $existingInstitution = Institution::where('name', $data['recinto'])
+                    ->where('municipality_id', $municipality->id)
+                    ->first();
+                
+                if ($existingInstitution) {
+                    $inst = $existingInstitution;
+                    $inst->update([
+                        'code' => $code,
+                        'short_name' => $shortName,
+                        'locality_id' => $locality->id,
+                        'district_id' => $district->id,
+                        'registered_citizens' => $data['habilitados'],
+                        'total_voting_tables' => $data['mesas'],
+                        'observations' => 'Tipo: ' . $data['tipo'] . ', Circunscripción: ' . $data['circunscripcion']
+                    ]);
+                } else {
+                    $inst = Institution::create([
+                        'code' => $code,
+                        'name' => $data['recinto'],
+                        'short_name' => $shortName,
+                        'municipality_id' => $municipality->id,
+                        'locality_id' => $locality->id,
+                        'district_id' => $district->id,
+                        'registered_citizens' => $data['habilitados'],
+                        'total_voting_tables' => $data['mesas'],
+                        'status' => 'activo',
+                        'is_operative' => true,
+                        'observations' => 'Tipo: ' . $data['tipo'] . ', Circunscripción: ' . $data['circunscripcion']
+                    ]);
+                }                
+                $baseOepCode = 300000 + ($inst->id * 10);
                 for ($i = 1; $i <= $data['mesas']; $i++) {
-                    $currentVoters = ($i < $data['mesas']) ? 240 : $data['last_mesa_voters'];
-                    if ($data['mesas'] === 1) {
-                        $currentVoters = $data['last_mesa_voters'];
-                    }
-                    $suffix = $data['suffix'] ?? '';
-                    $oepCode = ($data['oep_inicio'] + ($i - 1)) . "-1" . $suffix;
-                    $mesa = VotingTable::updateOrCreate(
-                        ['institution_id' => $inst->id, 'number' => $i],
-                        [
+                    $currentVoters = $this->calculateVotersPerTable($i, $data['mesas'], $data['habilitados']);
+                    $oepCode = ($baseOepCode + $i) . '-' . $i;
+                    $internalCode = "INT-{$inst->id}-" . str_pad($i, 2, '0', STR_PAD_LEFT);
+                    $existingMesa = VotingTable::where('institution_id', $inst->id)
+                                                ->where('number', $i)
+                                                ->first();
+                    if ($existingMesa) {
+                        $existingMesa->update([
                             'oep_code' => $oepCode,
-                            'internal_code' => "INT-{$inst->id}-" . str_pad($i, 2, '0', STR_PAD_LEFT) . $suffix,
+                            'internal_code' => $internalCode,
                             'expected_voters' => $currentVoters,
                             'type' => 'mixta'
-                        ]
-                    );
-                    VotingTableElection::updateOrCreate(
-                        ['voting_table_id' => $mesa->id, 'election_type_id' => $election->id],
-                        ['status' => 'configurada', 'election_date' => $election->election_date]
-                    );
+                        ]);
+                        $updatedCount++;
+                    } else {
+                        VotingTable::create([
+                            'institution_id' => $inst->id,
+                            'number' => $i,
+                            'oep_code' => $oepCode,
+                            'internal_code' => $internalCode,
+                            'expected_voters' => $currentVoters,
+                            'type' => 'mixta'
+                        ]);
+                        $createdCount++;
+                    }
+                    $mesa = $existingMesa ?? VotingTable::where('institution_id', $inst->id)
+                        ->where('number', $i)
+                        ->first();
+                    if ($mesa) {
+                        VotingTableElection::updateOrCreate(
+                            [
+                                'voting_table_id' => $mesa->id, 
+                                'election_type_id' => $election->id
+                            ],
+                            [
+                                'status' => 'configurada', 
+                                'election_date' => $election->election_date ?? now()
+                            ]
+                        );
+                    }
+                    $totalMesasCreadas++;
                 }
+                $processedRecintos++;
             }
+            
             DB::commit();
-            $this->command->info("✅ Éxito: 52 recintos cargados con ciudadanos calculados desde actas reales.");
+            
+            $this->command->info("✅ Éxito: Se procesaron {$processedRecintos} recintos de Quillacollo");
+            $this->command->info("   - {$createdCount} mesas nuevas creadas");
+            $this->command->info("   - {$updatedCount} mesas existentes actualizadas");
+            $this->command->info("   - Total de mesas: {$totalMesasCreadas}");
+            
+            // Verify totals from Excel
+            $totalHabilitados = array_sum(array_column($this->recintos, 'habilitados'));
+            $totalMesas = array_sum(array_column($this->recintos, 'mesas'));
+            $this->command->info("   - Total habilitados según Excel: {$totalHabilitados}");
+            $this->command->info("   - Total mesas según Excel: {$totalMesas}");
+            
         } catch (\Exception $e) {
             DB::rollBack();
             $this->command->error("❌ Error: " . $e->getMessage());
+            $this->command->error("Archivo: " . $e->getFile() . " Línea: " . $e->getLine());
+        }
+    }
+    
+    /**
+     * Calculate voters per table based on total habilitados and number of tables
+     */
+    private function calculateVotersPerTable($tableNumber, $totalTables, $totalHabilitados): int
+    {
+        // Standard distribution: most tables have ~240 voters, last table has remainder
+        if ($totalTables <= 1) {
+            return $totalHabilitados;
+        }
+        
+        $standardPerTable = 240;
+        $totalStandard = $standardPerTable * ($totalTables - 1);
+        
+        if ($tableNumber < $totalTables) {
+            return $standardPerTable;
+        } else {
+            return $totalHabilitados - $totalStandard;
         }
     }
 }

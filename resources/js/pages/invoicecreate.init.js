@@ -1,10 +1,3 @@
-/*
-Template Name: Velzon - Admin & Dashboard Template
-Author: Themesbrand
-Website: https://Themesbrand.com/
-Contact: Themesbrand@gmail.com
-File: Invoice create init Js File
-*/
 
 var paymentSign = "$";
 Array.from(document.getElementsByClassName("product-line-price")).forEach(function (item) {

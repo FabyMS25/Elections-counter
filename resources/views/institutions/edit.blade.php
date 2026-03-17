@@ -50,6 +50,6 @@
 @endsection
 
 @section('script')
-<script src="{{ URL::asset('build/libs/choices.js/public/assets/scripts/choices.min.js') }}"></script>
+{{-- <script src="{{ URL::asset('build/libs/choices.js/public/assets/scripts/choices.min.js') }}"></script> --}}
 @include('institutions.scripts.institution-js')
 @endsection
