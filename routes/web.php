@@ -23,18 +23,19 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
     // ── USUARIOS ──────────────────────────────────────────────────────────────
     Route::prefix('users')->name('users.')->group(function () {
-        Route::get('/',                   [UserController::class, 'index'])->name('index');
-        Route::get('/create',             [UserController::class, 'create'])->name('create');
-        Route::post('/',                  [UserController::class, 'store'])->name('store');
-        Route::get('/check-email',        [UserController::class, 'checkEmail'])->name('check-email');
-        Route::get('/{user}',             [UserController::class, 'show'])->name('show');
-        Route::get('/{user}/edit',        [UserController::class, 'edit'])->name('edit');
-        Route::put('/{user}',             [UserController::class, 'update'])->name('update');
-        Route::delete('/{user}',          [UserController::class, 'destroy'])->name('destroy');
-        Route::post('/{user}/activate',   [UserController::class, 'activate'])->name('activate');
-        Route::get('/{user}/delegaciones',                          [UserController::class, 'delegacionesForm'])->name('delegaciones.form');
-        Route::post('/{user}/delegaciones',                         [UserController::class, 'addDelegacion'])->name('delegaciones.add');
-        Route::delete('/{user}/delegaciones/{assignment}',          [UserController::class, 'removeDelegacion'])->name('delegaciones.remove');
+        Route::get('/',                [UserController::class, 'index'])->name('index');
+        Route::get('/delegates',       [UserController::class, 'index'])->name('delegates');
+        Route::get('/create',          [UserController::class, 'create'])->name('create');
+        Route::post('/',               [UserController::class, 'store'])->name('store');
+        Route::get('/check-email',     [UserController::class, 'checkEmail'])->name('check-email');
+        Route::get('/{user}',          [UserController::class, 'show'])->name('show');
+        Route::get('/{user}/edit',     [UserController::class, 'edit'])->name('edit');
+        Route::put('/{user}',          [UserController::class, 'update'])->name('update');
+        Route::delete('/{user}',       [UserController::class, 'destroy'])->name('destroy');
+        Route::post('/{user}/activate',[UserController::class, 'activate'])->name('activate');
+        Route::get('/{user}/delegaciones',  [UserController::class, 'delegacionesForm'])->name('delegaciones.form');
+        Route::post('/{user}/delegaciones', [UserController::class, 'addDelegacion'])->name('delegaciones.add');
+        Route::delete('/{user}/delegaciones/{assignment}',[UserController::class, 'removeDelegacion'])->name('delegaciones.remove');
     });
 
     // ── INSTITUCIONES (RECINTOS) ──────────────────────────────────────────────
@@ -141,14 +142,14 @@ Route::middleware(['auth', 'verified'])->group(function () {
 });
 
 // ── API ───────────────────────────────────────────────────────────────────────
-Route::prefix('api')->middleware('auth')->group(function () {
-    Route::get('/provinces/{department}',           [HomeController::class, 'getProvinces'])->name('api.provinces');
-    Route::get('/municipalities/{province}',         [HomeController::class, 'getMunicipalities'])->name('api.municipalities');
-    Route::get('/institutions/{institution}/tables', [VotingTableController::class, 'getByInstitution']);
-    Route::get('/elections/{election}/candidates',   [CandidateController::class, 'getByElection']);
-    Route::get('/tables/{table}/votes',              [VotingTableVoteController::class, 'getTableVotes']);
-    Route::get('/tables/{table}/observations',       [ObservationController::class, 'getByTable']);
-    Route::post('/tables/{table}/validate',          [VotingTableVoteController::class, 'validateTable']);
-});
+// Route::prefix('api')->middleware('auth')->group(function () {
+//     Route::get('/provinces/{department}',           [HomeController::class, 'getProvinces'])->name('api.provinces');
+//     Route::get('/municipalities/{province}',         [HomeController::class, 'getMunicipalities'])->name('api.municipalities');
+//     Route::get('/institutions/{institution}/tables', [VotingTableController::class, 'getByInstitution']);
+//     Route::get('/elections/{election}/candidates',   [CandidateController::class, 'getByElection']);
+//     Route::get('/tables/{table}/votes',              [VotingTableVoteController::class, 'getTableVotes']);
+//     Route::get('/tables/{table}/observations',       [ObservationController::class, 'getByTable']);
+//     Route::post('/tables/{table}/validate',          [VotingTableVoteController::class, 'validateTable']);
+// });
 
 Route::get('{any}', [HomeController::class, 'index'])->name('index')->where('any', '.*');

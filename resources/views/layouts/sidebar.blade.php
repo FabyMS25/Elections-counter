@@ -121,12 +121,14 @@
                                 </a>
                             </li>
                             @endcan
-                            @can('assign_roles')
+                            @can('view_delegates')
                             <li class="nav-item">
-                                <a href="{{ route('users.index') }}?role=delegado_recinto"
-                                   class="nav-link">
-                                    <i class="ri-shield-user-line"></i>
-                                    Delegados
+                                <a href="{{ route('users.delegates') }}" class="nav-link {{ request()->routeIs('users.delegates') ? 'active' : '' }}">
+                                    <i class="ri-shield-user-line nav-icon"></i>
+                                    <span class="nav-name">Delegados</span>
+                                    @if($delegatesCount ?? 0 > 0)
+                                        <span class="badge bg-success ms-auto">{{ $delegatesCount }}</span>
+                                    @endif
                                 </a>
                             </li>
                             @endcan

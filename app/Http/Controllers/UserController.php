@@ -83,15 +83,24 @@ class UserController extends Controller
     public function index(Request $request)
     {
         $this->requirePermission('view_users');
-
-        $query = User::with(['roles', 'assignments']);
-
+        $query = User::with(['roles', 'assignments' => function($q) {
+            $q->with(['institution', 'votingTable']);
+        }]);
+        $isDelegatesView = $request->routeIs('users.delegates') || $request->has('delegates_view');
+        if ($isDelegatesView) {
+            $query->whereHas('assignments', function($q) {
+                $q->where('status', 'activo');
+            });
+            if (!$request->filled('status')) {
+                $query->where('is_active', true);
+            }
+        }
         if ($request->filled('search')) {
             $s = $request->search;
             $query->where(fn($q) => $q
-                ->where('name',      'ilike', "%{$s}%")
+                ->where('name', 'ilike', "%{$s}%")
                 ->orWhere('last_name', 'ilike', "%{$s}%")
-                ->orWhere('email',   'ilike', "%{$s}%")
+                ->orWhere('email', 'ilike', "%{$s}%")
                 ->orWhere('id_card', 'ilike', "%{$s}%")
             );
         }
@@ -107,25 +116,44 @@ class UserController extends Controller
                 ->where('status', 'activo')
             );
         }
-
-        $sort  = in_array($request->get('sort'), ['name', 'email', 'created_at', 'last_login_at', 'is_active'])
-            ? $request->get('sort') : 'created_at';
+        if ($request->filled('institution_id')) {
+            $query->whereHas('assignments', fn($q) => $q
+                ->where('institution_id', $request->institution_id)
+                ->where('status', 'activo')
+            );
+        }
+        $sort = in_array($request->get('sort'), ['name', 'email', 'created_at', 'last_login_at', 'is_active'])
+            ? $request->get('sort') : 'name';
         $order = $request->get('order') === 'asc' ? 'asc' : 'desc';
         $query->orderBy($sort, $order);
-
         $users = $query->paginate(20)->withQueryString();
-
         $stats = [
-            'total'     => User::count(),
-            'active'    => User::where('is_active', true)->count(),
-            'inactive'  => User::where('is_active', false)->count(),
+            'total' => User::count(),
+            'active' => User::where('is_active', true)->count(),
+            'inactive' => User::where('is_active', false)->count(),
             'delegates' => UserAssignment::where('status', 'activo')->distinct('user_id')->count('user_id'),
         ];
-
+        if ($isDelegatesView) {
+            $stats['active_assignments'] = UserAssignment::where('status', 'activo')->count();
+            $stats['recintos'] = UserAssignment::where('status', 'activo')
+                ->whereNull('voting_table_id')
+                ->distinct('institution_id')
+                ->count('institution_id');
+            $stats['mesas'] = UserAssignment::where('status', 'activo')
+                ->whereNotNull('voting_table_id')
+                ->count();
+        }
         $roles = Role::orderBy('display_name')->get();
         $delegateTypes = UserAssignment::getDelegateTypes();
-
-        return view('users.index', compact('users', 'stats', 'roles', 'delegateTypes'));
+        $institutions = Institution::where('status', 'activo')->get(['id', 'name']);
+        return view('users.index', compact(
+            'users',
+            'stats',
+            'roles',
+            'delegateTypes',
+            'institutions',
+            'isDelegatesView'
+        ));
     }
 
     public function create()

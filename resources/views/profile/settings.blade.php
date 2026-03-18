@@ -140,10 +140,10 @@
                             <i class="ri-camera-line"></i>
                         </label>
                     </form>
-                </div>                
+                </div>
                 <div class="btn-group w-100" role="group">
                     @php
-                        $currentGender = old('gender', 
+                        $currentGender = old('gender',
                             ($user->avatar && str_contains($user->avatar, '-w.')) ? 'w' : 'm'
                         );
                     @endphp
@@ -151,7 +151,7 @@
                            {{ $currentGender === 'm' ? 'checked' : '' }}>
                     <label class="btn btn-outline-secondary" for="genderM">
                         <i class="ri-men-line"></i> Masculino
-                    </label>                    
+                    </label>
                     <input type="radio" class="btn-check" name="gender" id="genderW" value="w" autocomplete="off"
                            {{ $currentGender === 'w' ? 'checked' : '' }}>
                     <label class="btn btn-outline-secondary" for="genderW">
@@ -170,9 +170,9 @@
                             ['file' => 'avatar-op-w.png', 'name' => 'Operadora', 'gender' => 'w', 'tier' => 'op'],
                         ];
                         $currentAvatarData = collect($avatars)->firstWhere('file', $currentAvatar) ?? $avatars[4];
-                    @endphp                    
+                    @endphp
                     <button type="button" class="avatar-dropdown-btn" id="avatarDropdownBtn">
-                        <img src="{{ URL::asset('build/images/users/'.$currentAvatar) }}" 
+                        <img src="{{ URL::asset('build/images/users/'.$currentAvatar) }}"
                              class="selected-avatar-preview" id="selectedAvatarPreview">
                         <span class="flex-grow-1 text-start" id="selectedAvatarName">
                             {{ $currentAvatarData['name'] }}
@@ -186,7 +186,7 @@
                                  data-gender="{{ $avatar['gender'] }}"
                                  data-name="{{ $avatar['name'] }}"
                                  onclick="selectAvatar('{{ $avatar['file'] }}', '{{ $avatar['gender'] }}', '{{ $avatar['name'] }}')">
-                                <img src="{{ URL::asset('build/images/users/'.$avatar['file']) }}" 
+                                <img src="{{ URL::asset('build/images/users/'.$avatar['file']) }}"
                                      alt="{{ $avatar['name'] }}">
                                 <div class="avatar-info">
                                     <div class="avatar-name">{{ $avatar['name'] }}</div>
@@ -234,7 +234,6 @@
                     <div class="info-v">{{ $user->id_card ?? 'No registrado' }}</div>
                 </div>
                 @php
-                    // Determinar el rol principal para mostrar
                     $mainRole = $user->roles->first();
                     $roleTier = 'op';
                     $roleName = 'Operador';
@@ -342,9 +341,9 @@
                             <div class="row g-2">
                                 <div class="col-12">
                                     <label class="form-label">Contraseña Actual <span class="text-danger">*</span></label>
-                                    <input type="password" 
+                                    <input type="password"
                                         class="form-control @error('current_password') is-invalid @enderror"
-                                        name="current_password" 
+                                        name="current_password"
                                         value="{{ old('current_password') }}"
                                         required>
                                     @error('current_password')
@@ -356,9 +355,9 @@
                                 </div>
                                 <div class="col-md-6">
                                     <label class="form-label">Nueva Contraseña <span class="text-danger">*</span></label>
-                                    <input type="password" 
+                                    <input type="password"
                                         class="form-control @error('password') is-invalid @enderror"
-                                        name="password" 
+                                        name="password"
                                         value="{{ old('password') }}"
                                         required minlength="8">
                                     @error('password')
@@ -367,9 +366,9 @@
                                 </div>
                                 <div class="col-md-6">
                                     <label class="form-label">Confirmar Contraseña <span class="text-danger">*</span></label>
-                                    <input type="password" 
+                                    <input type="password"
                                         class="form-control @error('password_confirmation') is-invalid @enderror"
-                                        name="password_confirmation" 
+                                        name="password_confirmation"
                                         value="{{ old('password_confirmation') }}"
                                         required>
                                     @error('password_confirmation')
@@ -410,13 +409,13 @@ document.addEventListener('DOMContentLoaded', function() {
     // Dropdown functionality
     const dropdownBtn = document.getElementById('avatarDropdownBtn');
     const dropdownMenu = document.getElementById('avatarDropdownMenu');
-    
+
     if (dropdownBtn && dropdownMenu) {
         dropdownBtn.addEventListener('click', function(e) {
             e.stopPropagation();
             dropdownMenu.classList.toggle('show');
         });
-        
+
         // Close dropdown when clicking outside
         document.addEventListener('click', function(e) {
             if (!dropdownBtn.contains(e.target) && !dropdownMenu.contains(e.target)) {
@@ -424,29 +423,29 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         });
     }
-    
+
     // Función para seleccionar avatar predefinido
     window.selectAvatar = function(avatarFile, gender, avatarName) {
         // Actualizar radio button de género
         const genderRadio = document.querySelector(`input[name="gender"][value="${gender}"]`);
         if (genderRadio) genderRadio.checked = true;
-        
+
         // Actualizar vista previa grande
         document.getElementById('avatar-preview').src = '{{ URL::asset("build/images/users") }}/' + avatarFile;
-        
+
         // Actualizar botón del dropdown
         document.getElementById('selectedAvatarPreview').src = '{{ URL::asset("build/images/users") }}/' + avatarFile;
         document.getElementById('selectedAvatarName').textContent = avatarName;
-        
+
         // Actualizar selección visual en dropdown
         document.querySelectorAll('.avatar-option').forEach(opt => {
             opt.classList.remove('selected');
         });
         event.currentTarget.classList.add('selected');
-        
+
         // Cerrar dropdown
         dropdownMenu.classList.remove('show');
-        
+
         // Enviar formulario
         document.getElementById('selected-avatar-input').value = avatarFile;
         document.getElementById('avatar-select-form').submit();
@@ -480,7 +479,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     this.value = '';
                     return;
                 }
-                
+
                 // Mostrar preview
                 const reader = new FileReader();
                 reader.onload = function(e) {
@@ -507,7 +506,7 @@ document.addEventListener('DOMContentLoaded', function() {
     // Validación de contraseñas en tiempo real
     const password = document.querySelector('input[name="password"]');
     const confirmPassword = document.querySelector('input[name="password_confirmation"]');
-    
+
     if (password && confirmPassword) {
         confirmPassword.addEventListener('keyup', function() {
             if (password.value !== this.value) {
@@ -533,7 +532,7 @@ document.addEventListener('DOMContentLoaded', function() {
             });
         });
     });
-    
+
     // Trigger initial filter
     const checkedGender = document.querySelector('input[name="gender"]:checked');
     if (checkedGender) {
