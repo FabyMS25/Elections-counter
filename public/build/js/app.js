@@ -1,12 +1,3 @@
-/*
-Template Name: Velzon - Admin & Dashboard Template
-Author: Themesbrand
-Version: 4.3.0
-Website: https://themesbrand.com/
-Contact: Themesbrand@gmail.com
-File: Main Js File
-*/
-
 (function () {
     ("use strict");
 
@@ -845,7 +836,7 @@ File: Main Js File
         window.addEventListener("resize", windowResizeHover);
         windowResizeHover();
 
-        Waves.init();
+        // Waves.init();
 
         document.addEventListener("scroll", function () {
             windowScroll();

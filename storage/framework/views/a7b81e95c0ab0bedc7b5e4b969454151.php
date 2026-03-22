@@ -1,0 +1,48 @@
+<!doctype html >
+<html lang="<?php echo e(str_replace('_', '-', app()->getLocale())); ?>"
+    data-layout="vertical" data-topbar="dark"
+    data-sidebar="dark" data-sidebar-size="sm-hover" data-sidebar-image="none"
+    data-preloader="disable">
+<head>
+    <meta charset="utf-8" />
+    <title><?php echo $__env->yieldContent('title'); ?></title>
+    <meta name="csrf-token" content="<?php echo e(csrf_token()); ?>">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta content="Control Elections" name="description" />
+    <meta content="" name="author" />
+    <link rel="shortcut icon" href="<?php echo e(URL::asset('build/images/logo_elections.png')); ?>">
+    <?php echo $__env->make('layouts.head-css', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?>
+</head>
+<body>
+    <div id="layout-wrapper">
+        <?php echo $__env->make('layouts.topbar', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?>
+        <?php echo $__env->make('layouts.sidebar', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?>
+        <div class="main-content">
+            <div class="page-content">
+                <div class="container-fluid">
+                    <?php echo $__env->yieldContent('content'); ?>
+                </div>
+            </div>
+            
+            <?php echo $__env->make('layouts.footer', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?>
+        </div>
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/feather-icons/dist/feather.min.js"></script>
+    <script>
+        feather.replace();
+    </script>
+    <?php echo $__env->make('layouts.vendor-scripts', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?>
+    <script src="<?php echo e(URL::asset('build/js/app.js')); ?>"></script>
+    <script src="<?php echo e(URL::asset('build/libs/swiper/swiper-bundle.min.js')); ?>"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script>
+        window.Swal = Swal;
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/choices.js/public/assets/scripts/choices.min.js"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/choices.js/public/assets/styles/choices.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+    
+</body>
+</html>
+<?php /**PATH D:\_Mine\sistema_electoral\resources\views/layouts/master.blade.php ENDPATH**/ ?>

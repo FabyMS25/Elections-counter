@@ -55,40 +55,22 @@
                     </a>
                 </li>
                 @endcan
+                @can('view_mesas')
+                <li class="nav-item">
+                    <a href="{{ route('voting-tables.index') }}"
+                       class="nav-link {{ request()->routeIs('voting-tables.*') ? 'active' : '' }}">
+                        <i class="ri-table-line"></i>
+                        <span>Mesas de Votación</span>
+                    </a>
+                </li>
+                @endcan
                 @can('view_recintos')
                 <li class="nav-item">
-                    <a class="nav-link menu-link {{ request()->routeIs('institutions.*') || request()->routeIs('voting-tables.*') ? 'active' : '' }}"
-                       href="#sidebarRecintos"
-                       data-bs-toggle="collapse"
-                       role="button"
-                       aria-expanded="{{ request()->routeIs('institutions.*') || request()->routeIs('voting-tables.*') ? 'true' : 'false' }}"
-                       aria-controls="sidebarRecintos">
-                        <i class="ri-building-line"></i>
-                        <span>Recintos y Mesas</span>
+                    <a href="{{ route('institutions.index') }}"
+                       class="nav-link {{ request()->routeIs('institutions.*') ? 'active' : '' }}">
+                        <i class="ri-building-2-line"></i>
+                        <span>Recintos</span>
                     </a>
-                    <div class="collapse menu-dropdown {{ request()->routeIs('institutions.*') || request()->routeIs('voting-tables.*') ? 'show' : '' }}"
-                         id="sidebarRecintos">
-                        <ul class="nav nav-sm flex-column">
-                            @can('view_recintos')
-                            <li class="nav-item">
-                                <a href="{{ route('institutions.index') }}"
-                                   class="nav-link {{ request()->routeIs('institutions.*') ? 'active' : '' }}">
-                                    <i class="ri-building-2-line"></i>
-                                    Recintos
-                                </a>
-                            </li>
-                            @endcan
-                            @can('view_mesas')
-                            <li class="nav-item">
-                                <a href="{{ route('voting-tables.index') }}"
-                                   class="nav-link {{ request()->routeIs('voting-tables.*') ? 'active' : '' }}">
-                                    <i class="ri-table-line"></i>
-                                    Mesas de Votación
-                                </a>
-                            </li>
-                            @endcan
-                        </ul>
-                    </div>
                 </li>
                 @endcan
                 @can('view_users')

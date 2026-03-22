@@ -1,31 +1,30 @@
 @extends('layouts.master-without-nav')
-{{-- @extends('layouts.minimal') --}}
 @section('title', 'Centro de Monitoreo')
-{{-- @section('css')
-    <link href="{{ URL::asset('build/libs/swiper/swiper-bundle.min.css') }}" rel="stylesheet" type="text/css" />
-@endsection --}}
 
 @section('content')
     <div class="layout-wrapper">
         <nav class="navbar navbar-expand-lg bg-dark" id="navbar">
-                <div class="container">
-                    <a class="navbar-brand" href="index">
-                        <img src="{{ URL::asset('build/images/logo_elections_large.png') }}" class="card-logo card-logo-dark" alt="logo dark"
-                            height="50">
-                        <img src="{{ URL::asset('build/images/logo_elections_large.png') }}" class="card-logo card-logo-light" alt="logo light"
-                            height="50">
-                    </a>
+            <div class="container">
+                <a class="navbar-brand" href="index">
+                    <img src="{{ URL::asset('build/images/logo_elections_large.png') }}" class="card-logo card-logo-dark" alt="logo dark" height="50">
+                    <img src="{{ URL::asset('build/images/logo_elections_large.png') }}" class="card-logo card-logo-light" alt="logo light" height="50">
+                </a>
+                <div class="collapse navbar-collapse" id="navbarSupportedContent">
+                    <ul class="navbar-nav mx-auto mt-2 mt-lg-0" id="navbar-example"></ul>
+                    <div class="d-flex align-items-center">
+                        <div class="ms-1 header-item d-none d-sm-flex">
+                            <button type="button" class="btn btn-icon btn-topbar btn-ghost-secondary rounded-circle"
+                                    data-toggle="fullscreen" id="fullscreen-btn">
+                                <i class='bx bx-fullscreen fs-22'></i>
+                            </button>
+                        </div>
 
-                    <div class="collapse navbar-collapse" id="navbarSupportedContent">
-                        <ul class="navbar-nav mx-auto mt-2 mt-lg-0" id="navbar-example">
-                            <li class="nav-item">
-                                <a class="nav-link active" href="#hero">Inicio</a>
-                            </li>
-                            <li class="nav-item">
-                                <a class="nav-link" href="#reviews">Reviews</a>
-                            </li>
-                        </ul>
-                        <div class="">
+                        <div class="ms-1 header-item d-none d-sm-flex">
+                            <button type="button" class="btn btn-icon btn-topbar btn-ghost-secondary rounded-circle light-dark-mode">
+                                <i class='bx bx-moon fs-22'></i>
+                            </button>
+                        </div>
+                        <div class="ms-2">
                             @auth
                                 <a href="/" class="btn btn-primary">Admin Dashboard</a>
                             @else
@@ -33,13 +32,13 @@
                             @endauth
                         </div>
                     </div>
-                    <button class="navbar-toggler py-0 fs-20 text-body" type="button" data-bs-toggle="collapse"
-                        data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent"
-                        aria-expanded="false" aria-label="Toggle navigation">
-                        <i class="mdi mdi-menu"></i>
-                    </button>
-
                 </div>
+                <button class="navbar-toggler py-0 fs-20 text-body" type="button" data-bs-toggle="collapse"
+                    data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent"
+                    aria-expanded="false" aria-label="Toggle navigation">
+                    <i class="mdi mdi-menu text-white"></i>
+                </button>
+            </div>
         </nav>
         <div class="vertical-overlay" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent.show"></div>
         <div class="row justify-content-center mt-2">
@@ -71,16 +70,15 @@
             @include('partials.dashboard-content')
             </div>
         </div>
-        <footer class="custom-footer bg-dark py-3 position-relative">
+        <footer class="custom-footer bg-dark py-3 border-0 mt-0" 
+        style="border-top: none !important; box-shadow: none !important; background-color: #212529 !important; position: relative; z-index: 10;">
             <div class="container">
-                <div class="row text-center text-sm-start align-items-center mt-2">
-                    <div class="footer-inner">
-                        <span>
-                            © {{ date('Y') }} Sistema de Procesamiento Electoral
-                        </span>
-                        <span>
-                            Plataforma de análisis y consolidación de datos
-                        </span>
+                <div class="row text-center text-sm-start align-items-center">
+                    <div class="col-sm-6 text-white-50">
+                        © {{ date('Y') }} Sistema de Procesamiento Electoral
+                    </div>
+                    <div class="col-sm-6 text-sm-end text-white-50">
+                        Plataforma de análisis Quillacollo 2026
                     </div>
                 </div>
             </div>
@@ -91,9 +89,34 @@
     </div>
 @endsection
 @section('script')
-    <script src="{{ URL::asset('build/libs/swiper/swiper-bundle.min.js') }}"></script>
     @yield('dashboard-scripts')
-
+    <script src="{{ URL::asset('build/libs/swiper/swiper-bundle.min.js') }}"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const modeBtn = document.querySelector('.light-dark-mode');
+            if (modeBtn) {
+                modeBtn.addEventListener('click', function() {
+                    let currentTheme = document.documentElement.getAttribute('data-bs-theme') || 'dark';
+                    let newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+                    document.documentElement.setAttribute('data-bs-theme', newTheme);
+                    document.documentElement.setAttribute('data-theme', newTheme);
+                    document.documentElement.setAttribute('data-layout-mode', newTheme);
+                    sessionStorage.setItem('data-bs-theme', newTheme);
+                    sessionStorage.setItem('data-theme', newTheme);
+                });
+            }
+            const fsBtn = document.getElementById('fullscreen-btn');
+            if (fsBtn) {
+                fsBtn.addEventListener('click', function() {
+                    if (!document.fullscreenElement) {
+                        document.documentElement.requestFullscreen();
+                    } else {
+                        document.exitFullscreen();
+                    }
+                });
+            }
+        });
+    </script>
     @auth
     @if(auth()->user()->hasPermission('manage_settings'))
     <script>
@@ -101,10 +124,8 @@
         const btn          = this;
         const url          = btn.dataset.toggleUrl;
         const originalHtml = btn.innerHTML;
-
         btn.disabled  = true;
         btn.innerHTML = '<span class="spinner-border spinner-border-sm me-1" role="status"></span> Procesando...';
-
         fetch(url, {
             method:  'POST',
             headers: {

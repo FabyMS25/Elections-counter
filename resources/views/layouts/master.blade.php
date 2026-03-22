@@ -1,5 +1,8 @@
 <!doctype html >
-<html lang="{{ str_replace('_', '-', app()->getLocale()) }}" data-layout="horizontal" data-sidebar-visibility="show" data-topbar="dark" data-sidebar="light" data-sidebar-size="lg" data-sidebar-image="none" data-preloader="disable" >
+<html lang="{{ str_replace('_', '-', app()->getLocale()) }}"
+    data-layout="vertical" data-topbar="dark"
+    data-sidebar="dark" data-sidebar-size="sm-hover" data-sidebar-image="none"
+    data-preloader="disable">
 <head>
     <meta charset="utf-8" />
     <title>@yield('title')</title>
@@ -10,7 +13,6 @@
     <link rel="shortcut icon" href="{{ URL::asset('build/images/logo_elections.png')}}">
     @include('layouts.head-css')
 </head>
-
 <body>
     <div id="layout-wrapper">
         @include('layouts.topbar')
@@ -21,6 +23,7 @@
                     @yield('content')
                 </div>
             </div>
+            {{-- @include('layouts.customizer') --}}
             @include('layouts.footer')
         </div>
     </div>
@@ -29,20 +32,17 @@
         feather.replace();
     </script>
     @include('layouts.vendor-scripts')
+    <script src="{{ URL::asset('build/js/app.js') }}"></script>
     <script src="{{ URL::asset('build/libs/swiper/swiper-bundle.min.js') }}"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script>
         window.Swal = Swal;
     </script>
-    <!-- Choices.js -->
-<script src="{{ URL::asset('build/libs/choices.js/public/assets/scripts/choices.min.js') }}"></script>
-    {{-- <script src="https://cdn.jsdelivr.net/npm/choices.js/public/assets/scripts/choices.min.js"></script>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/choices.js/public/assets/styles/choices.min.css"> --}}
-
-    <!-- Flatpickr -->
+    <script src="https://cdn.jsdelivr.net/npm/choices.js/public/assets/scripts/choices.min.js"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/choices.js/public/assets/styles/choices.min.css">
     <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
-    {{-- <script src="{{ URL::asset('build/libs/w/aves/waves.min.js') }}"></script> --}}
-    {{-- <script> Waves.init();</script> --}}
+    {{-- <script src="{{ URL::asset('build/libs/w/aves/waves.min.js') }}"></script>
+    <script> Waves.init();</script> --}}
 </body>
 </html>

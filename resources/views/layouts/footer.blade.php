@@ -1,13 +1,15 @@
-<footer class="footer">
+<footer class="footer border-top">
     <div class="container-fluid">
-        <div class="row">
+        <div class="row align-items-center">
             <div class="col-sm-6">
-                {{ date('Y') }} © @yield('title').
+                <span class="text-muted">
+                    © {{ date('Y') }} Sistema de Control Electoral
+                </span>
             </div>
-            <div class="col-sm-6">
-                <div class="text-sm-end d-none d-sm-block">
-                    Design & Develop by moralessfaby.dev@gmail.com
-                </div>
+            <div class="col-sm-6 text-sm-end d-none d-sm-block">
+                <span class="text-muted">
+                    Desarrollado por moralessfaby.dev@gmail.com
+                </span>
             </div>
         </div>
     </div>

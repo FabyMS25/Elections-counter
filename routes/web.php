@@ -16,7 +16,7 @@ Auth::routes();
 Route::get('index/{locale}', [HomeController::class, 'lang']);
 Route::get('/', [HomeController::class, 'root'])->name('root');
 Route::get('/refresh-dashboard', [HomeController::class, 'refreshDashboard'])->name('dashboard.refresh');
-
+Route::get('/institutions/{id}/tables', [HomeController::class, 'tablesByInstitution'])->name('tables.byInstitution');
 Route::middleware(['auth', 'verified'])->group(function () {
 
     Route::post('/dashboard/toggle', [HomeController::class, 'toggleDashboardVisibility'])->name('dashboard.toggle');

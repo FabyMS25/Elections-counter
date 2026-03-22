@@ -3638,14 +3638,14 @@ code {
   --vz-page-title-border: none;
 }
 :root[data-topbar=dark] {
-  --vz-header-bg: #687cfe;
-  --vz-header-item-color: rgba(255, 255, 255, 0.85);
-  --vz-header-item-bg: #6275f5;
-  --vz-header-item-sub-color: #c2d3e5;
-  --vz-topbar-user-bg: #5e72f1;
-  --vz-topbar-search-bg: rgba(255, 255, 255, 0.05);
-  --vz-topbar-search-color: #fff;
-  --vz-header-border: #687cfe;
+    --vz-header-bg: #2D345D;
+    --vz-header-item-color: rgba(255, 255, 255, .85);
+    --vz-header-item-bg: #6275f5;
+    --vz-header-item-sub-color: #c2d3e5;
+    --vz-topbar-user-bg: #2b3151;
+    --vz-topbar-search-bg: rgba(255, 255, 255, .05);
+    --vz-topbar-search-color: #fff;
+    --vz-header-border: #2D345D;
 }
 :root {
   --vz-topnav-bg: #fff;
@@ -3801,7 +3801,7 @@ code {
   --vz-topbar-search-color: #fff;
 }
 [data-bs-theme=dark][data-topbar=dark] {
-  --vz-header-bg: #687cfe;
+  --vz-header-bg: #2D345D;
   --vz-header-border: #687cfe;
   --vz-header-item-color: rgba(255, 255, 255, 0.85);
   --vz-header-item-bg: #6275f5;
@@ -11828,7 +11828,8 @@ span.flatpickr-weekday {
   background-size: cover;
 }
 .auth-one-bg .bg-overlay {
-  background: linear-gradient(to right, rgb(73.6013157895, 97.6276315789, 253.7986842105), #687cfe);
+  background: linear-gradient(to right, rgb(22, 31, 94), #687cfe);
+  /* background: linear-gradient(to right, rgb(73.6013157895, 97.6276315789, 253.7986842105), #687cfe); */
   opacity: 0.9;
 }
 
@@ -11876,7 +11877,8 @@ span.flatpickr-weekday {
 }
 
 .auth-bg-cover {
-  background: linear-gradient(-45deg, #687cfe 50%, #3cd188);
+  background: linear-gradient(-45deg, #4553b0 50%, #3cd188);
+  /* background: linear-gradient(-45deg, #687cfe 50%, #3cd188); */
 }
 .auth-bg-cover > .bg-overlay {
   background-image: url("../images/cover-pattern.png");

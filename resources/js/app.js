@@ -836,7 +836,7 @@
         window.addEventListener("resize", windowResizeHover);
         windowResizeHover();
 
-        Waves.init();
+        // Waves.init();
 
         document.addEventListener("scroll", function () {
             windowScroll();

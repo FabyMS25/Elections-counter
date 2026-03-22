@@ -9,7 +9,7 @@
     </div>
 </div>
 
-<div class="row g-3 mb-2">
+<div class="row mb-2">
     <div class="col-xl-3 col-md-6">
         <div class="card h-100 border-0 shadow-sm">
             <div class="card-body">
@@ -61,7 +61,7 @@
                         <i class="ri-inbox-line"></i>
                     </span>
                 </div>
-                <div class="mt-2 d-flex gap-3">
+                <div class="mt-2 d-flex gap-2">
                     <div>
                         <small class="text-muted d-block">En Blanco</small>
                         <span class="fw-bold text-secondary" id="kpi-blank">{{ number_format($totalBlankVotes) }}</span>
@@ -89,7 +89,7 @@
                 </p>
                 @if(count($candidateStats) > 0)
                     @php $leader = collect($candidateStats)->sortByDesc('votes')->first(); @endphp
-                    <div class="d-flex align-items-center gap-3">
+                    <div class="d-flex align-items-center gap-2">
                         @if($leader['candidate']->photo)
                             <img src="{{ asset('storage/'.$leader['candidate']->photo) }}"
                                  class="rounded-circle shadow-sm"
@@ -159,29 +159,60 @@
         </div>
     </div>
 </div>
-
-    <div class="row">
-        <div class="card">
-            <div class="card-header border-0 align-items-center d-flex">
-                <h4 class="card-title mb-0 flex-grow-1">Resultados por Candidato</h4>
-                <div>
-                    <button type="button" class="btn btn-soft-secondary btn-sm" onclick="window.location.reload()">
-                        Actualizar
-                    </button>
-                </div>
-            </div>
-            <div class="card-body">
-                <div id="candidates_chart"></div>
+<input type="hidden" id="currentSeatMode" value="{{ $currentSeatMode ?? 'all' }}">
+<div class="row">
+    <div class="card">
+        <div class="card-header border-0 align-items-center d-flex">
+            <h4 class="card-title mb-0 flex-grow-1">
+                Resultados por Candidato
+                @if(isset($activeCategoryCode))
+                    <small class="text-muted fs-6 ms-2">
+                        <i class="ri-bar-chart-line"></i> 
+                        @php
+                            $categoryName = '';
+                            foreach($typeCategories as $tc) {
+                                if($tc->electionCategory?->code == $activeCategoryCode) {
+                                    $categoryName = $tc->electionCategory->name;
+                                    break;
+                                }
+                            }
+                        @endphp
+                        {{ $categoryName ?: $activeCategoryCode }}
+                    </small>
+                @endif
+            </h4>
+            <div>
+                <button type="button" class="btn btn-soft-secondary btn-sm" onclick="window.location.reload()">
+                    Actualizar
+                </button>
             </div>
         </div>
+        <div class="card-body">
+            <div id="candidates_chart"></div>
+        </div>
     </div>
-
-<div class="row g-3 mb-2">
+</div>
+<div class="row mb-2">
     <div class="col-12">
         <div class="card border-0 shadow-sm">
             <div class="card-header border-bottom-0 pb-0 bg-transparent">
                 <div class="d-flex align-items-center justify-content-between flex-wrap gap-2">
-                    <h5 class="card-title mb-0">Resultados por Candidato</h5>
+                    <h5 class="card-title mb-0">
+                        Resultados por Candidato
+                        <small class="text-muted fs-6 ms-2">
+                            <i class="ri-bar-chart-line"></i> 
+                            @php
+                                $categoryName = '';
+                                foreach($typeCategories as $tc) {
+                                    if($tc->electionCategory?->code == $activeCategoryCode) {
+                                        $categoryName = $tc->electionCategory->name;
+                                        break;
+                                    }
+                                }
+                            @endphp
+                            {{ $categoryName ?: $activeCategoryCode }}
+                        </small>
+                    </h5>
                     <ul class="nav nav-pills nav-sm gap-1" id="categoryTabs" role="tablist">
                         @foreach($typeCategories as $tc)
                             @php $code = $tc->electionCategory?->code ?? 'UNK'; @endphp
@@ -215,7 +246,7 @@
                         @endphp
                         <div class="tab-pane fade {{ $code === $activeCategoryCode ? 'show active' : '' }}"
                              id="panel-{{ $code }}" role="tabpanel">
-                            <div class="d-flex gap-3 mb-2 flex-wrap">
+                            <div class="d-flex gap-2 mb-2 flex-wrap">
                                 <span class="badge bg-primary-subtle text-primary border border-primary-subtle px-3 py-2">
                                     <i class="ri-inbox-line me-1"></i>
                                     Ánfora: <strong>{{ number_format($catTotal) }}</strong>
@@ -243,7 +274,7 @@
                                     $color = $cand->color ?? '#3b5de7';
                                     $isLeader = $rank === 0;
                                 @endphp
-                                <div class="mb-3 {{ $isLeader ? 'p-2 rounded bg-light border' : '' }}">
+                                <div class="mb-2 {{ $isLeader ? 'p-2 rounded bg-light border' : '' }}">
                                     <div class="d-flex align-items-center gap-2 mb-1">
                                         <span class="badge rounded-pill fw-bold"
                                               style="background:{{ $color }};min-width:26px;">
@@ -301,7 +332,13 @@
         </div>
     </div>
 </div>
-    <div class="row">
+
+@include('partials.dashboard-seats')
+
+@include('partials.institution-avance-table')
+
+<div class="row mb-2">
+    <div class="col-12">
         <div class="card">
             <div class="card-header border-0 align-items-center d-flex">
                 <h4 class="card-title mb-0 flex-grow-1">Resultados por Localidad</h4>
@@ -348,7 +385,9 @@
             </div>
         </div>
     </div>
-<div class="row">
+</div>
+
+<div class="row mb-2">
     <div class="col-6">
         <div class="card card-height-100">
             <div class="card-header align-items-center d-flex">
@@ -405,100 +444,8 @@
     </div>
 </div>
 
-<div class="row">
-    <div class="col-12">
-        <div class="card">
-            <div class="card-header">
-                <h5 class="card-title mb-0">Resultados por Candidato - {{ $selectedElectionType ? $selectedElectionType->name : '' }}</h5>
-            </div>
-            <div class="card-body">
-                <div class="table-responsive">
-                    <table class="table table-hover">
-                        <thead>
-                            <tr>
-                                <th>Posición</th>
-                                <th>Candidato</th>
-                                <th>Partido</th>
-                                <th>Votos</th>
-                                <th>Porcentaje</th>
-                                <th class="text-center">Blancos</th>
-                                <th class="text-center">Nulos</th>
-                                <th>Progreso</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            @php $sortedStats = collect($candidateStats)->sortByDesc('votes')->values(); @endphp
-                            @foreach($sortedStats as $index => $stats)
-                            @php $candidate = $stats['candidate']; @endphp
-                                <tr>
-                                    <td><span class="badge bg-{{ $index == 0 ? 'success' : ($index == 1 ? 'info' : ($index == 2 ? 'warning' : 'primary')) }}">#{{ $index + 1 }}</span></td>
-                                    <td>
-                                        <div class="d-flex align-items-center">
-                                            @if($candidate->photo)
-                                                <img src="{{ asset('storage/' . $candidate->photo) }}"
-                                                     alt="{{ $candidate->name }}"
-                                                     class="rounded-circle avatar-xs me-2">
-                                            @else
-                                                <div class="avatar-xs me-2">
-                                                    <span class="avatar-title rounded-circle bg-{{ $index == 0 ? 'success' : ($index == 1 ? 'info' : ($index == 2 ? 'warning' : 'primary')) }}">
-                                                        {{ substr($candidate->name, 0, 1) }}
-                                                    </span>
-                                                </div>
-                                            @endif
-                                            <span>{{ $candidate->name }}</span>
-                                        </div>
-                                    </td>
-                                    <td>{{ $candidate->party }}</td>
-                                    <td>{{ number_format($stats['votes']) }}</td>
-                                    <td>{{ $stats['percentage'] }}%</td>
-                                    <td style="width: 150px;">
-                                        <div class="progress" style="height: 5px;">
-                                            <div class="progress-bar bg-{{ $index == 0 ? 'success' : ($index == 1 ? 'info' : ($index == 2 ? 'warning' : 'primary')) }}"
-                                                 role="progressbar"
-                                                 style="width: {{ $stats['percentage'] }}%;"
-                                                 aria-valuenow="{{ $stats['percentage'] }}"
-                                                 aria-valuemin="0"
-                                                 aria-valuemax="100"></div>
-                                        </div>
-                                    </td>
-                                </tr>
-                            @endforeach
-                            @if(isset($categoryStats[$activeCategoryCode]))
-                            @php
-                                $blankForCat = $categoryStats[$activeCategoryCode]['blankVotes'] ?? 0;
-                                $nullForCat  = $categoryStats[$activeCategoryCode]['nullVotes']  ?? 0;
-                                $totalForCat = $categoryStats[$activeCategoryCode]['totalVotes'] ?? 0;
-                            @endphp
-                            <tr class="table-light fw-semibold">
-                                <td colspan="3" class="text-end text-muted small">Votos especiales:</td>
-                                <td>
-                                    <span class="badge bg-secondary-subtle text-secondary border">
-                                        <i class="ri-subtract-line me-1"></i>Blancos: {{ number_format($blankForCat) }}
-                                    </span>
-                                </td>
-                                <td>
-                                    <span class="badge bg-danger-subtle text-danger border">
-                                        <i class="ri-close-line me-1"></i>Nulos: {{ number_format($nullForCat) }}
-                                    </span>
-                                </td>
-                                <td>
-                                    @if($totalForCat > 0)
-                                        <small class="text-muted">
-                                            {{ round((($blankForCat + $nullForCat) / $totalForCat) * 100, 1) }}% del total
-                                        </small>
-                                    @endif
-                                </td>
-                            </tr>
-                            @endif
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
-<div class="row">
-    <div class="col-md-6">
+<div class="row mb-2">
+    <div class="col-6">
         <div class="card">
             <div class="card-header">
                 <h5 class="card-title mb-0">Estado de Mesas</h5>
@@ -521,7 +468,7 @@
             </div>
         </div>
     </div>
-    <div class="col-md-6">
+    <div class="col-6">
         <div class="card">
             <div class="card-header">
                 <h5 class="card-title mb-0">Progreso General</h5>
@@ -544,98 +491,7 @@
     </div>
 </div>
 
-<div class="row g-2 mb-2">
-    <div class="col-lg-8">
-        <div class="card border-0 shadow-sm h-100">
-            <div class="card-header border-bottom-0 bg-transparent d-flex align-items-center justify-content-between">
-                <h6 class="card-title mb-0">
-                    <i class="ri-bar-chart-2-line me-1 text-primary"></i>Votos por Candidato
-                </h6>
-                <div class="d-flex gap-1">
-                    @foreach($typeCategories as $tc)
-                        @php $code = $tc->electionCategory?->code ?? 'UNK'; @endphp
-                        <button type="button"
-                                class="btn btn-xs {{ $code === $activeCategoryCode ? 'btn-primary' : 'btn-outline-secondary' }}"
-                                style="font-size:.72rem;padding:.2rem .6rem;"
-                                onclick="switchChartCategory('{{ $code }}')">
-                            {{ $code }}
-                        </button>
-                    @endforeach
-                </div>
-            </div>
-            <div class="card-body pt-0">
-                <div id="candidates_chart" style="min-height:300px;"></div>
-            </div>
-        </div>
-    </div>
-    <div class="col-lg-4">
-        <div class="card border-0 shadow-sm h-100">
-            <div class="card-header border-bottom-0 bg-transparent">
-                <h6 class="card-title mb-0">
-                    <i class="ri-pie-chart-2-line me-1 text-success"></i>Distribución
-                </h6>
-            </div>
-            <div class="card-body pt-0">
-                <div id="party_distribution_chart" style="min-height:300px;"></div>
-            </div>
-        </div>
-    </div>
-</div>
-
-<div class="row g-3 mb-2">
-    <div class="col-lg-8">
-        <div class="card border-0 shadow-sm h-100">
-            <div class="card-header border-bottom-0 bg-transparent d-flex align-items-center justify-content-between">
-                <h6 class="card-title mb-0">
-                    <i class="ri-map-pin-2-line me-1 text-warning"></i>Resultados por Localidad
-                </h6>
-                <div id="locality-filter-btns" class="d-flex gap-1 flex-wrap">
-                    <button type="button" class="btn btn-outline-secondary active"
-                            style="font-size:.72rem;padding:.2rem .6rem;"
-                            onclick="filterLocality('all')">Todos</button>
-                    @foreach($localityStats->take(6) as $ls)
-                        <button type="button" class="btn btn-outline-secondary"
-                                style="font-size:.72rem;padding:.2rem .6rem;"
-                                onclick="filterLocality('{{ $ls->id }}')">
-                            {{ $ls->name }}
-                        </button>
-                    @endforeach
-                </div>
-            </div>
-            <div class="card-body pt-0 pb-2">
-                <div id="projects-overview-chart" style="height:300px;"></div>
-            </div>
-        </div>
-    </div>
-    <div class="col-lg-4">
-        <div class="card border-0 shadow-sm h-100">
-            <div class="card-header border-bottom-0 bg-transparent">
-                <h6 class="card-title mb-0">
-                    <i class="ri-checkbox-circle-line me-1 text-info"></i>Estado de Escrutinio
-                </h6>
-            </div>
-            <div class="card-body">
-                <div id="progress-radial-chart" style="height:200px;"></div>
-                <div class="row g-0 text-center mt-2 border-top pt-3">
-                    <div class="col-4">
-                        <div class="fw-bold fs-5 text-success" id="stat-reported">{{ $reportedTables }}</div>
-                        <small class="text-muted">Escrutadas</small>
-                    </div>
-                    <div class="col-4 border-start border-end">
-                        <div class="fw-bold fs-5 text-warning" id="stat-pending">{{ $totalTables - $reportedTables }}</div>
-                        <small class="text-muted">Pendientes</small>
-                    </div>
-                    <div class="col-4">
-                        <div class="fw-bold fs-5 text-secondary" id="stat-total">{{ $totalTables }}</div>
-                        <small class="text-muted">Total</small>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
-
-<div class="row g-3 mb-2">
+<div class="row mb-2">
     <div class="col-12">
         <div class="card border-0 shadow-sm">
             <div class="card-header border-bottom-0 bg-transparent d-flex align-items-center justify-content-between">
@@ -681,627 +537,67 @@
         <small class="text-success">● Activo</small>
     </div>
 </div>
-@push('scripts')
-<script src="https://cdn.jsdelivr.net/npm/apexcharts@3.45.2/dist/apexcharts.min.js"></script>
-<script>
-document.addEventListener('DOMContentLoaded', function () {
-    const ALL_STATS     = @json($categoryStats ?? []);
-    const LOCALITY_DATA = @json($localityResults ?? []);
-    const ACTIVE_CODE   = @json($activeCategoryCode ?? '');
-    const TOTAL_TABLES  = {{ $totalTables ?? 0 }};
-    let charts        = {};
-    let activeCode    = ACTIVE_CODE;
-    let refreshTimer  = null;
-    let isRefreshing  = false;
-    function buildArrays(code) {
-        const stats  = ALL_STATS[code] ?? {};
-        const sorted = Object.values(stats.stats ?? {}).sort((a, b) => b.votes - a.votes);
-        return {
-            names:  sorted.map(s => {
-                const n = s.candidate?.name ?? 'N/A';
-                return n.length > 22 ? n.substring(0, 20) + '…' : n;
-            }),
-            colors: sorted.map(s => s.candidate?.color ?? '#3b5de7'),
-            votes:  sorted.map(s => s.votes ?? 0),
-            pcts:   sorted.map(s => s.percentage ?? 0),
-        };
-    }
 
-    // ── Init / update bar chart ────────────────────────────────────────────
-    function renderBarChart(code) {
-        const { names, colors, votes, pcts } = buildArrays(code);
-        const el = document.querySelector('#candidates_chart');
-        if (!el) return;
-
-        const opts = {
-            series: [{ name: 'Votos', data: votes }],
-            chart:  { type: 'bar', height: 300, toolbar: { show: false }, id: 'candidateBar',
-                      animations: { enabled: true, speed: 400 } },
-            plotOptions: { bar: { distributed: true, borderRadius: 5, horizontal: false,
-                columnWidth: votes.length > 8 ? '85%' : '60%' } },
-            xaxis: {
-                categories: names,
-                labels: { rotate: -40, trim: true, style: { fontSize: '11px' } },
-            },
-            yaxis: { labels: { formatter: v => v.toLocaleString() } },
-            colors,
-            dataLabels: {
-                enabled: true,
-                formatter: (val, opts2) => pcts[opts2.dataPointIndex] + '%',
-                style: { fontSize: '10px' },
-                offsetY: -4,
-            },
-            tooltip: {
-                y: { formatter: v => v.toLocaleString() + ' votos' },
-                custom({ series, seriesIndex, dataPointIndex }) {
-                    const name  = names[dataPointIndex] ?? '';
-                    const votes = (series[seriesIndex][dataPointIndex] ?? 0).toLocaleString();
-                    const pct   = pcts[dataPointIndex] ?? 0;
-                    return `<div class="px-3 py-2 small">
-                        <strong>${name}</strong><br>
-                        ${votes} votos (${pct}%)
-                    </div>`;
-                },
-            },
-            legend: { show: false },
-            grid:   { borderColor: '#f1f1f1' },
-        };
-
-        if (charts.bar) {
-            charts.bar.updateOptions({ colors, xaxis: { categories: names } }, false, false);
-            charts.bar.updateSeries([{ name: 'Votos', data: votes }]);
-        } else {
-            charts.bar = new ApexCharts(el, opts);
-            charts.bar.render();
-        }
-    }
-
-    // ── Init / update donut chart ──────────────────────────────────────────
-    function renderDonut(code) {
-        const { names, colors, votes } = buildArrays(code);
-        const el = document.querySelector('#party_distribution_chart');
-        if (!el || !votes.length) return;
-
-        const opts = {
-            series: votes,
-            labels: names,
-            colors,
-            chart: { type: 'donut', height: 300, id: 'partyDonut',
-                     animations: { enabled: true, speed: 400 } },
-            legend: { position: 'bottom', fontSize: '11px', itemMargin: { horizontal: 8 } },
-            plotOptions: {
-                pie: { donut: { size: '65%', labels: { show: true,
-                    value:  { fontSize: '16px', fontWeight: 700,
-                              formatter: v => Number(v).toLocaleString() },
-                    total:  { show: true, label: 'Total válidos',
-                              fontSize: '11px',
-                              formatter: w => w.globals.seriesTotals
-                                .reduce((a, b) => a + b, 0).toLocaleString() }
-                }}}
-            },
-            tooltip: { y: { formatter: v => v.toLocaleString() + ' votos' } },
-            dataLabels: { enabled: false },
-        };
-
-        if (charts.donut) {
-            charts.donut.updateOptions({ labels: names, colors }, false, false);
-            charts.donut.updateSeries(votes);
-        } else {
-            charts.donut = new ApexCharts(el, opts);
-            charts.donut.render();
-        }
-    }
-
-    // ── Radial progress chart ──────────────────────────────────────────────
-    function renderRadial(reported, total) {
-        const el  = document.querySelector('#progress-radial-chart');
-        if (!el) return;
-        const pct = total > 0 ? Math.round((reported / total) * 100) : 0;
-
-        const opts = {
-            series: [pct],
-            chart:  { type: 'radialBar', height: 200,
-                      animations: { enabled: true, speed: 600 } },
-            plotOptions: {
-                radialBar: {
-                    hollow: { size: '55%' },
-                    dataLabels: {
-                        name:  { show: true, fontSize: '13px', offsetY: -8, color: '#74788d',
-                                 formatter: () => 'Escrutadas' },
-                        value: { show: true, fontSize: '22px', fontWeight: 700, offsetY: 4,
-                                 formatter: v => v + '%',
-                                 color: pct >= 75 ? '#0ab39c' : pct >= 50 ? '#f7b84b' : '#f06548' },
-                    },
-                    track: { background: '#f1f1f1' },
-                }
-            },
-            colors: [pct >= 75 ? '#0ab39c' : pct >= 50 ? '#f7b84b' : '#f06548'],
-            stroke: { lineCap: 'round' },
-        };
-
-        if (charts.radial) {
-            charts.radial.updateSeries([pct]);
-            charts.radial.updateOptions({ colors: opts.colors });
-        } else {
-            charts.radial = new ApexCharts(el, opts);
-            charts.radial.render();
-        }
-    }
-
-    // ── Locality overview bar chart ────────────────────────────────────────
-    function renderLocalityChart(localityData, code) {
-        const el = document.querySelector('#projects-overview-chart');
-        if (!el) return;
-
-        const localities = Object.values(localityData);
-        if (!localities.length) return;
-
-        const localityNames = localities.map(l => l.name ?? '?');
-        const { names, colors } = buildArrays(code);
-
-        const series = names.map((name, idx) => ({
-            name,
-            data: localities.map(l => {
-                const cat = Object.values(l.categories ?? {})
-                    .find(c => (c.candidates ?? []).some(x => {
-                        const short = (x.name ?? '').length > 22 ? x.name.substring(0, 20) + '…' : x.name;
-                        return short === name || x.name === name;
-                    }));
-                if (!cat) return 0;
-                const cand = cat.candidates.find(x => {
-                    const short = (x.name ?? '').length > 22 ? x.name.substring(0, 20) + '…' : x.name;
-                    return short === name || x.name === name;
-                });
-                return cand?.votes ?? 0;
-            }),
-        }));
-
-        const opts = {
-            series,
-            chart: { type: 'bar', height: 300, stacked: false, toolbar: { show: false },
-                     animations: { enabled: true, speed: 400 } },
-            xaxis: { categories: localityNames,
-                     labels: { rotate: -35, style: { fontSize: '11px' } } },
-            yaxis: { labels: { formatter: v => v.toLocaleString() } },
-            colors,
-            plotOptions: { bar: { columnWidth: '75%', borderRadius: 3 } },
-            legend: { position: 'bottom', fontSize: '11px' },
-            tooltip: { shared: true, intersect: false,
-                       y: { formatter: v => v.toLocaleString() + ' votos' } },
-            grid: { borderColor: '#f1f1f1' },
-            dataLabels: { enabled: false },
-        };
-
-        if (charts.locality) {
-            charts.locality.updateOptions({ colors, xaxis: { categories: localityNames } }, false, false);
-            charts.locality.updateSeries(series);
-        } else {
-            charts.locality = new ApexCharts(el, opts);
-            charts.locality.render();
-        }
-    }
-
-    // ── Switch category (pills + charts) ──────────────────────────────────
-    window.switchChartCategory = function(code) {
-        activeCode = code;
-        renderBarChart(code);
-        renderDonut(code);
-        renderLocalityChart(LOCALITY_DATA, code);
-        // Sync category pill buttons in chart header
-        document.querySelectorAll('.auto-refresh-controls').forEach(() => {});
-    };
-
-    // ── Initial render ─────────────────────────────────────────────────────
-    if (Object.keys(ALL_STATS).length) {
-        renderBarChart(activeCode);
-        renderDonut(activeCode);
-        renderLocalityChart(LOCALITY_DATA, activeCode);
-    }
-    renderRadial({{ $reportedTables }}, TOTAL_TABLES);
-
-    // ── Refresh dashboard ──────────────────────────────────────────────────
-    function refreshDashboard() {
-        if (isRefreshing) return;
-        isRefreshing = true;
-
-        const electionType = document.querySelector('select[name="election_type"]')?.value ?? '';
-        const category     = document.getElementById('filter-category-input')?.value ?? '';
-        const department   = document.getElementById('dept-select')?.value ?? '';
-        const province     = document.getElementById('prov-select')?.value ?? '';
-        const municipality = document.getElementById('muni-select')?.value ?? '';
-
-        const params = new URLSearchParams({
-            election_type: electionType, category,
-            department, province, municipality,
-        });
-
-        fetch(`/refresh-dashboard?${params}`, {
-            headers: { Accept: 'application/json', 'X-Requested-With': 'XMLHttpRequest' },
-        })
-        .then(r => { if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); })
-        .then(data => {
-            if (!data.success) throw new Error(data.message ?? 'Error');
-            // Update KPI counters
-            setText('#kpi-reported', data.reportedTables);
-            setText('#kpi-total',    data.totalTables);
-            setText('#kpi-pending',  (data.totalTables ?? 0) - (data.reportedTables ?? 0));
-            setText('#kpi-votes',    Number(data.totalVotes).toLocaleString());
-            setText('#kpi-blank',    Number(data.totalBlankVotes).toLocaleString());
-            setText('#kpi-null',     Number(data.totalNullVotes).toLocaleString());
-            setText('#kpi-pct',      data.progressPercentage + '%');
-            setText('#stat-reported', data.reportedTables);
-            setText('#stat-pending',  (data.totalTables ?? 0) - (data.reportedTables ?? 0));
-            setText('#stat-total',    data.totalTables);
-
-            const bar = document.getElementById('kpi-bar');
-            if (bar) bar.style.width = data.progressPercentage + '%';
-
-            renderRadial(data.reportedTables, data.totalTables);
-        })
-        .catch(err => {
-            console.warn('Refresh error, reloading:', err.message);
-            location.reload();
-        })
-        .finally(() => { isRefreshing = false; });
-    }
-
-    function setText(sel, val) {
-        document.querySelectorAll(sel).forEach(el => { el.textContent = val ?? ''; });
-    }
-
-    function startAuto() {
-        stopAuto();
-        refreshTimer = setInterval(refreshDashboard, 120_000);
-        document.getElementById('refresh-status').innerHTML =
-            '<small class="text-success">● Activo</small>';
-    }
-    function stopAuto() {
-        clearInterval(refreshTimer);
-        refreshTimer = null;
-        document.getElementById('refresh-status').innerHTML =
-            '<small class="text-secondary">○ Pausado</small>';
-    }
-
-    // ── Locality filter ────────────────────────────────────────────────────
-    window.filterLocality = function(id) {
-        document.querySelectorAll('.locality-progress-item').forEach(el => {
-            el.style.display = (id === 'all' || el.dataset.localityId == id) ? '' : 'none';
-        });
-        document.querySelectorAll('#locality-filter-btns button').forEach(btn => {
-            btn.classList.toggle('active', btn.textContent.trim() === 'Todos' ? id === 'all' : false);
-        });
-    };
-
-    // ── CSV export ─────────────────────────────────────────────────────────
-    window.exportTableToCSV = function(tableId, filename) {
-        const table = document.getElementById(tableId);
-        if (!table) return;
-        const rows = [...table.querySelectorAll('tr')].map(row =>
-            [...row.querySelectorAll('td,th')]
-                .map(c => '"' + c.innerText.replace(/\n/g, ' ').replace(/"/g, '""') + '"')
-                .join(',')
-        );
-        const blob = new Blob([rows.join('\n')], { type: 'text/csv;charset=utf-8;' });
-        const a = Object.assign(document.createElement('a'), {
-            href: URL.createObjectURL(blob), download: filename, style: 'display:none',
-        });
-        document.body.append(a);
-        a.click();
-        a.remove();
-    };
-
-    // ── Expose API ─────────────────────────────────────────────────────────
-    window.ElectionDashboard = { refresh: refreshDashboard, startAuto, stopAuto };
-    window.refreshDashboard  = refreshDashboard;
-    window.startAutoRefresh  = startAuto;
-    window.stopAutoRefresh   = stopAuto;
-
-    startAuto();
-});
-</script>
-@endpush
-@section('dashboard-scripts')
-<script src="https://cdn.jsdelivr.net/npm/apexcharts@3.45.2/dist/apexcharts.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/jsvectormap@1.5.3/dist/js/jsvectormap.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/jsvectormap@1.5.3/dist/maps/world.js"></script>
-<script>
-document.addEventListener('DOMContentLoaded', function () {
-    let refreshTimer   = null;
-    let isRefreshing   = false;
-    let charts         = {};
-    const REFRESH_MS   = 120_000; // 2 minutes
-    const initialStats = @json($candidateStats ?? []);
-    const localityData = @json($localityResults ?? []);
-    initCharts(initialStats, localityData);
-    startAutoRefresh();
-    document.getElementById('exportLocalityTable')?.addEventListener('click', () =>
-        exportTableToCSV('locality-table', 'resultados_localidades.csv')
-    );
-    window.refreshDashboard  = refreshDashboard;
-    window.startAutoRefresh  = startAutoRefresh;
-    window.stopAutoRefresh   = stopAutoRefresh;
-    window.filterLocality    = filterLocality;
-    function refreshDashboard() {
-        if (isRefreshing) return;
-        isRefreshing = true;
-        setRefreshIcon(true);
-        const electionType = document.querySelector('select[name="election_type"]')?.value ?? '';
-        const category     = document.querySelector('#filter-category-input')?.value ?? '';
-        const department   = document.querySelector('#dept-select')?.value ?? '';
-        const province     = document.querySelector('#prov-select')?.value ?? '';
-        const municipality = document.querySelector('#muni-select')?.value ?? '';
-        const params = new URLSearchParams({ election_type: electionType, category, department, province, municipality });
-        fetch(`/refresh-dashboard?${params}`, {
-            headers: { 'Accept': 'application/json', 'X-Requested-With': 'XMLHttpRequest' }
-        })
-        .then(r => {
-            if (!r.ok) throw new Error(`HTTP ${r.status}`);
-            return r.json();
-        })
-        .then(data => {
-            if (!data.success) throw new Error(data.message ?? 'Error del servidor');
-            updateCounters(data);
-            updateCharts(data.candidateStats ?? {});
-            updateLastUpdated(data.last_updated);
-        })
-        .catch(err => {
-            console.warn('Refresh failed, reloading page:', err.message);
-            location.reload();
-        })
-        .finally(() => {
-            isRefreshing = false;
-            setRefreshIcon(false);
-        });
-    }
-
-    function startAutoRefresh() {
-        stopAutoRefresh();
-        refreshTimer = setInterval(refreshDashboard, REFRESH_MS);
-        setRefreshStatus(true);
-    }
-
-    function stopAutoRefresh() {
-        if (refreshTimer) {
-            clearInterval(refreshTimer);
-            refreshTimer = null;
-        }
-        setRefreshStatus(false);
-    }
-
-    function setRefreshStatus(active) {
-        const el = document.getElementById('refresh-status');
-        if (!el) return;
-        el.innerHTML = active
-            ? '<small class="text-success">● Activo</small>'
-            : '<small class="text-secondary">○ Pausado</small>';
-    }
-
-    function setRefreshIcon(loading) {
-        const btn = document.querySelector('.auto-refresh-controls .btn[onclick*="refreshDashboard"]');
-        if (!btn) return;
-        btn.innerHTML = loading
-            ? '<span class="spinner-border spinner-border-sm" role="status"></span>'
-            : '<i class="ri-refresh-line"></i>';
-        btn.disabled = loading;
-    }
-
-    function updateLastUpdated(ts) {
-        const el = document.querySelector('.card-header p.text-muted');
-        if (el && ts) el.textContent = 'Última actualización: ' + ts;
-    }
-    function updateCounters(data) {
-        setCounter('.total-votes-counter',    data.totalVotes);
-        setCounter('.reported-tables-counter', data.reportedTables);
-        setCounter('.total-tables-counter',   data.totalTables);
-        setCounter('.progress-counter',       data.progressPercentage);
-        setCounter('.blank-votes-counter',     data.totalBlankVotes);
-        setCounter('.null-votes-counter',      data.totalNullVotes);
-        document.querySelectorAll('.general-progress-bar').forEach(bar => {
-            bar.style.width = data.progressPercentage + '%';
-            bar.textContent = data.progressPercentage + '%';
-            bar.setAttribute('aria-valuenow', data.progressPercentage);
-        });
-        const pending = (data.totalTables ?? 0) - (data.reportedTables ?? 0);
-        setText('.total-tables-count',    data.totalTables);
-        setText('.reported-tables-count', data.reportedTables);
-        setText('.pending-tables-count',  pending);
-        setText('.progress-text',
-            `${data.reportedTables} de ${data.totalTables} mesas reportadas`
-        );
-        const headerBar = document.querySelector('.progress-bar.bg-info[role="progressbar"]');
-        if (headerBar) {
-            headerBar.style.width = data.progressPercentage + '%';
-        }
-    }
-
-    function setCounter(selector, value) {
-        document.querySelectorAll(selector).forEach(el => {
-            el.textContent = Number(value ?? 0).toLocaleString('es-BO');
-        });
-    }
-
-    function setText(selector, value) {
-        document.querySelectorAll(selector).forEach(el => {
-            el.textContent = value ?? '';
-        });
-    }
-    function buildChartArrays(candidateStats) {
-        const sorted = Object.values(candidateStats).sort((a, b) => b.votes - a.votes);
-        return {
-            names:  sorted.map(s => {
-                const n = s.candidate?.name ?? 'Sin nombre';
-                return n.length > 20 ? n.substring(0, 18) + '…' : n;
-            }),
-            colors: sorted.map(s => s.candidate?.color ?? '#3b5de7'),
-            votes:  sorted.map(s => s.votes ?? 0),
-        };
-    }
-
-    function initCharts(candidateStats, localityResults) {
-        if (!Object.keys(candidateStats).length) return;
-        const { names, colors, votes } = buildChartArrays(candidateStats);
-        const barEl = document.querySelector('#candidates_chart');
-        if (barEl) {
-            charts.bar = new ApexCharts(barEl, {
-                series: [{ name: 'Votos', data: votes }],
-                chart:  { type: 'bar', height: 350, toolbar: { show: true }, id: 'candidateBar' },
-                plotOptions: { bar: { distributed: true, borderRadius: 4 } },
-                xaxis: {
-                    categories: names,
-                    labels: { rotate: -45, trim: true, style: { fontSize: '11px' } }
-                },
-                colors,
-                tooltip: { y: { formatter: v => v.toLocaleString() + ' votos' } },
-                legend: { show: false },
-            });
-            charts.bar.render();
-        }
-        const donutEl = document.querySelector('#party_distribution_chart');
-        if (donutEl && votes.length) {
-            charts.donut = new ApexCharts(donutEl, {
-                series:  votes,
-                labels:  names,
-                colors,
-                chart:   { type: 'donut', height: 300, id: 'partyDonut' },
-                legend:  { position: 'bottom', fontSize: '11px' },
-                plotOptions: {
-                    pie: { donut: { size: '60%', labels: { show: true,
-                        total: { show: true, label: 'Total',
-                            formatter: w => w.globals.seriesTotals.reduce((a, b) => a + b, 0).toLocaleString()
-                        }
-                    }}}
-                },
-                tooltip: { y: { formatter: v => v.toLocaleString() + ' votos' } },
-            });
-            charts.donut.render();
-        }
-        const localityEl = document.querySelector('#projects-overview-chart');
-        const localities  = Object.values(localityResults).map(l => l.name);
-        if (localityEl && localities.length && names.length) {
-            const series = names.map((name) => ({
-                name,
-                type: 'bar',
-                data: Object.values(localityResults).map(l => {
-                    let votes = 0;
-                    Object.values(l.categories ?? {}).forEach(cat => {
-                        const found = (cat.candidates ?? []).find(c => {
-                            const short = (c.name ?? '').length > 20
-                                ? c.name.substring(0, 18) + '…' : c.name;
-                            return short === name || c.name === name;
-                        });
-                        if (found) votes = found.votes;
-                    });
-                    return votes;
-                }),
-            }));
-            charts.locality = new ApexCharts(localityEl, {
-                series,
-                chart:   { type: 'bar', height: 350, stacked: false, toolbar: { show: true } },
-                xaxis:   { categories: localities, labels: { rotate: -45, style: { fontSize: '11px' } } },
-                colors,
-                legend:  { position: 'bottom', horizontalAlign: 'center' },
-                tooltip: { shared: true, intersect: false },
-                plotOptions: { bar: { columnWidth: '70%' } },
-            });
-            charts.locality.render();
-        }
-        initMap(localityResults);
-    }
-
-    function updateCharts(candidateStats) {
-        if (!Object.keys(candidateStats).length) return;
-        const { names, colors, votes } = buildChartArrays(candidateStats);
-        if (charts.bar) {
-            charts.bar.updateOptions({ colors }, false, false);
-            charts.bar.updateSeries([{ name: 'Votos', data: votes }]);
-        }
-        if (charts.donut) {
-            charts.donut.updateOptions({ labels: names, colors }, false, false);
-            charts.donut.updateSeries(votes);
-        }
-    }
-
-    function initMap(localityResults) {
-        const mapEl = document.getElementById('votes-by-locations');
-        if (!mapEl || !Object.keys(localityResults).length) return;
-        if (typeof jsVectorMap === 'undefined') return;
-        const markers = Object.values(localityResults).map(l => ({
-            name:   `${l.name} (${l.total_votes ?? 0} votos)`,
-            coords: [l.latitude ?? -17.4, l.longitude ?? -66.2],
-            votes:  l.total_votes ?? 0,
-            categories: l.categories ?? {},
-        }));
-        mapEl.innerHTML = '';
-        charts.map = new jsVectorMap({
-            map:         'world',
-            selector:    '#votes-by-locations',
-            zoomOnScroll: true,
-            zoomButtons:  true,
-            markers,
-            markerStyle: {
-                initial:  { fill: '#0ab39c' },
-                hover:    { fill: '#f06548' },
-                selected: { fill: '#f06548' },
-            },
-            onMarkerClick(event, index) { showMarkerPopup(markers[index]); },
-        });
-    }
-
-    function showMarkerPopup(marker) {
-        document.querySelector('.custom-map-popup')?.remove();
-        let rows = '';
-        Object.entries(marker.categories).forEach(([code, cat]) => {
-            rows += `<li class="list-group-item list-group-item-secondary small fw-bold">${cat.label ?? code}</li>`;
-            (cat.candidates ?? []).forEach(c => {
-                rows += `
-                    <li class="list-group-item d-flex justify-content-between align-items-center py-1">
-                        <span class="small">${c.name} <span class="text-muted">(${c.party})</span></span>
-                        <span class="badge bg-primary rounded-pill">${(c.votes ?? 0).toLocaleString()} · ${c.percentage ?? 0}%</span>
-                    </li>`;
-            });
-        });
-        if (!rows) rows = '<li class="list-group-item small text-muted">Sin datos</li>';
-
-        const popup = document.createElement('div');
-        popup.className = 'custom-map-popup position-fixed top-50 start-50 translate-middle bg-white rounded shadow-lg';
-        popup.style.cssText = 'z-index:10000;width:340px;max-width:92vw;';
-        popup.innerHTML = `
-            <div class="d-flex justify-content-between align-items-center p-3 border-bottom">
-                <h6 class="mb-0 fw-bold">${marker.name}</h6>
-                <button type="button" class="btn-close btn-close-sm"></button>
+<div id="institutionTablesModal" class="modal fade" tabindex="-1" style="display: none;">
+    <div class="modal-dialog modal-md modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header bg-primary text-white py-2">
+                <h6 class="modal-title">
+                    <i class="ri-building-line me-1"></i>
+                    <span id="modalInstitutionName">Mesas por Recinto</span>
+                </h6>
+                <div class="d-flex gap-1">
+                    <button type="button" class="btn btn-sm btn-light py-0 px-2" onclick="exportModalToImage()" title="Exportar Imagen">
+                        <i class="ri-image-line"></i>
+                    </button>
+                    <button type="button" class="btn btn-sm btn-light py-0 px-2" onclick="printModalContent()" title="Imprimir">
+                        <i class="ri-printer-line"></i>
+                    </button>
+                    <button type="button" class="btn-close btn-close-white" onclick="closeInstitutionModal()"></button>
+                </div>
             </div>
-            <div class="p-2" style="max-height:60vh;overflow-y:auto;">
-                <ul class="list-group list-group-flush">${rows}</ul>
-            </div>`;
-        popup.querySelector('.btn-close').addEventListener('click', () => popup.remove());
-        document.body.appendChild(popup);
-    }
-    function filterLocality(localityId) {
-        document.querySelectorAll('.locality-progress-item').forEach(item => {
-            item.style.display = (localityId === 'all' || item.dataset.localityId == localityId)
-                ? '' : 'none';
-        });
-    }
+            <div class="modal-body p-0" id="modalTablesContent">
+                <div class="text-center p-4">
+                    <div class="spinner-border text-primary" role="status">
+                        <span class="visually-hidden">Cargando...</span>
+                    </div>
+                    <p class="mt-2 text-muted small">Cargando mesas...</p>
+                </div>
+            </div>
+            <div class="modal-footer py-2">
+                <button type="button" class="btn btn-sm btn-secondary" onclick="closeInstitutionModal()">Cerrar</button>
+                <button type="button" class="btn btn-sm btn-primary" onclick="exportModalToImage()">
+                    <i class="ri-image-line"></i> Guardar Imagen
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
 
-    function exportTableToCSV(tableId, filename) {
-        const table = document.getElementById(tableId);
-        if (!table) return;
-        const rows = [...table.querySelectorAll('tr')].map(row =>
-            [...row.querySelectorAll('td,th')]
-                .map(cell => '"' + cell.innerText.replace(/\n/g, ' ').replace(/"/g, '""') + '"')
-                .join(',')
-        );
-        const blob = new Blob([rows.join('\n')], { type: 'text/csv;charset=utf-8;' });
-        const link = Object.assign(document.createElement('a'), {
-            href:     URL.createObjectURL(blob),
-            download: filename,
-            style:    'display:none',
-        });
-        document.body.append(link);
-        link.click();
-        link.remove();
-    }
+<div id="seatExportModal" class="modal fade" tabindex="-1" style="display: none;">
+    <div class="modal-dialog modal-sm modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header bg-success text-white py-2">
+                <h6 class="modal-title">
+                    <i class="ri-group-line me-1"></i>Exportar Concejales
+                </h6>
+                <button type="button" class="btn-close btn-close-white" onclick="closeSeatExportModal()"></button>
+            </div>
+            <div class="modal-body">
+                <div class="d-grid gap-2">
+                    <button class="btn btn-outline-success btn-sm" onclick="exportSeatsToCSV(); closeSeatExportModal();">
+                        <i class="ri-file-csv-line me-1"></i> Exportar CSV
+                    </button>
+                    <button class="btn btn-outline-info btn-sm" onclick="exportSeatsToImage(); closeSeatExportModal();">
+                        <i class="ri-image-line me-1"></i> Exportar Imagen (PNG)
+                    </button>
+                    <button class="btn btn-outline-primary btn-sm" onclick="printSeatsTable(); closeSeatExportModal();">
+                        <i class="ri-printer-line me-1"></i> Imprimir
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
 
-});
-</script>
-@endsection
+@include('partials.dashboard-scripts')
