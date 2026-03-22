@@ -4,8 +4,7 @@ return [
 
     'paths' => ['refresh-dashboard', 'api/*', 'sanctum/csrf-cookie'],
 
-    'allowed_methods' => ['GET', 'POST'],
-
+    'allowed_methods' => ['*'],
 
     'allowed_origins' => [
         'https://liquid-prefers-rendered-tiny.trycloudflare.com',
