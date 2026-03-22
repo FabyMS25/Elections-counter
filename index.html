@@ -1,0 +1,628 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Resultados Electorales · Quillacollo 2026</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=IBM+Plex+Mono:wght@400;500;600&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/apexcharts@3.45.2/dist/apexcharts.min.js"></script>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --bg:       #080c14;
+    --surface:  #0f1623;
+    --card:     #141c2e;
+    --border:   #1e2d4a;
+    --gold:     #f5a623;
+    --blue:     #3b82f6;
+    --green:    #22c55e;
+    --red:      #ef4444;
+    --muted:    #4a6080;
+    --text:     #c8d8f0;
+    --bright:   #e8f2ff;
+    --mono:     'IBM Plex Mono', monospace;
+    --sans:     'DM Sans', sans-serif;
+    --display:  'Syne', sans-serif;
+  }
+  html, body {
+    background: var(--bg); color: var(--text);
+    font-family: var(--sans); font-size: 15px;
+    min-height: 100vh; overflow-x: hidden;
+  }
+  body::before {
+    content: ''; position: fixed; inset: 0; z-index: 0;
+    background-image:
+      linear-gradient(rgba(59,130,246,.03) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(59,130,246,.03) 1px, transparent 1px);
+    background-size: 40px 40px; pointer-events: none;
+  }
+  header {
+    position: relative; z-index: 10;
+    padding: 20px 40px;
+    display: flex; align-items: center; justify-content: space-between;
+    border-bottom: 1px solid var(--border);
+    background: linear-gradient(180deg, rgba(59,130,246,.07) 0%, transparent 100%);
+  }
+  .logo-area { display: flex; align-items: center; gap: 14px; }
+  .logo-mark {
+    width: 42px; height: 42px; border-radius: 8px;
+    background: linear-gradient(135deg, var(--gold), #c47b0a);
+    display: flex; align-items: center; justify-content: center;
+    font-family: var(--display); font-weight: 800; font-size: 18px; color: #000; flex-shrink: 0;
+  }
+  .logo-text h1 { font-family: var(--display); font-size: 17px; font-weight: 700; color: var(--bright); letter-spacing: .02em; line-height: 1.2; }
+  .logo-text p  { font-size: 11px; color: var(--muted); letter-spacing: .08em; text-transform: uppercase; font-family: var(--mono); }
+  .header-right { display: flex; align-items: center; gap: 20px; }
+  .live-badge {
+    display: flex; align-items: center; gap: 6px;
+    padding: 5px 12px; border-radius: 20px;
+    border: 1px solid rgba(34,197,94,.3); background: rgba(34,197,94,.07);
+    font-family: var(--mono); font-size: 11px; color: var(--green); letter-spacing: .06em;
+  }
+  .live-dot {
+    width: 7px; height: 7px; border-radius: 50%; background: var(--green);
+    animation: pulse-dot 1.4s ease-in-out infinite;
+  }
+  @keyframes pulse-dot { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:.4;transform:scale(.7)} }
+  .refresh-info { font-family: var(--mono); font-size: 11px; color: var(--muted); text-align: right; line-height: 1.6; }
+  .refresh-info span { display: block; }
+  .refresh-info .countdown { color: var(--gold); }
+  main {
+    position: relative; z-index: 1;
+    max-width: 1400px; margin: 0 auto;
+    padding: 28px 32px 60px;
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr 1fr;
+    gap: 16px;
+  }
+  .kpi-cards { grid-column: 1/-1; display: grid; grid-template-columns: repeat(4,1fr); gap: 14px; }
+  .kpi {
+    background: var(--card); border: 1px solid var(--border); border-radius: 12px;
+    padding: 20px 22px; position: relative; overflow: hidden; transition: border-color .3s;
+  }
+  .kpi::after { content:''; position:absolute; inset:0; background:linear-gradient(135deg,rgba(255,255,255,.02),transparent 60%); pointer-events:none; }
+  .kpi:hover { border-color: rgba(59,130,246,.4); }
+  .kpi.gold::before {
+    content:''; position:absolute; right:-20px; top:-20px; width:80px; height:80px; border-radius:50%;
+    background:radial-gradient(circle, rgba(245,166,35,.15), transparent 70%); pointer-events:none;
+  }
+  .kpi-label { font-family:var(--mono); font-size:10px; letter-spacing:.1em; color:var(--muted); text-transform:uppercase; margin-bottom:10px; }
+  .kpi-value { font-family:var(--display); font-size:2.2rem; font-weight:800; color:var(--bright); line-height:1; margin-bottom:6px; transition:color .4s; }
+  .kpi-sub { font-size:12px; color:var(--muted); }
+  .kpi-accent { color:var(--gold); }
+  .kpi-accent-green { color:var(--green); }
+  .kpi-progress { margin-top:10px; height:3px; background:var(--border); border-radius:3px; overflow:hidden; }
+  .kpi-progress-bar { height:100%; border-radius:3px; background:linear-gradient(90deg,var(--blue),var(--gold)); transition:width .8s cubic-bezier(.4,0,.2,1); }
+  .progress-card {
+    grid-column: 1/-1;
+    background:var(--card); border:1px solid var(--border); border-radius:12px;
+    padding:18px 24px; display:flex; align-items:center; gap:24px;
+  }
+  .progress-label { font-family:var(--mono); font-size:10px; letter-spacing:.1em; color:var(--muted); text-transform:uppercase; white-space:nowrap; }
+  .progress-pct { font-family:var(--display); font-size:1.6rem; font-weight:800; color:var(--green); min-width:70px; white-space:nowrap; }
+  .progress-bar-wrap { flex:1; height:10px; background:var(--border); border-radius:10px; overflow:hidden; }
+  .progress-bar-fill { height:100%; border-radius:10px; background:linear-gradient(90deg,#1d4ed8,var(--green)); transition:width 1s cubic-bezier(.4,0,.2,1); }
+  .progress-stats { display:flex; gap:20px; flex-shrink:0; }
+  .ps-item { text-align:center; }
+  .ps-val { font-family:var(--mono); font-size:14px; font-weight:600; color:var(--bright); display:block; }
+  .ps-lab { font-size:10px; color:var(--muted); letter-spacing:.06em; }
+  .chart-card {
+    background:var(--card); border:1px solid var(--border); border-radius:12px;
+    overflow:hidden; display:flex; flex-direction:column;
+  }
+  .chart-header {
+    padding:16px 20px 10px; border-bottom:1px solid var(--border);
+    display:flex; align-items:center; justify-content:space-between;
+  }
+  .chart-title { font-family:var(--display); font-size:14px; font-weight:700; color:var(--bright); letter-spacing:.01em; }
+  .chart-sub { font-size:11px; color:var(--muted); margin-top:2px; }
+  .pill {
+    font-family:var(--mono); font-size:10px; letter-spacing:.06em;
+    padding:3px 9px; border-radius:20px;
+    background:rgba(59,130,246,.12); color:var(--blue); border:1px solid rgba(59,130,246,.2);
+  }
+  .chart-body { padding:10px 10px 0; flex:1; }
+  .candidate-list { grid-column:span 2; background:var(--card); border:1px solid var(--border); border-radius:12px; overflow:hidden; display:flex; flex-direction:column; }
+  .cand-scroll { overflow-y:auto; max-height:340px; flex:1; }
+  .cand-row {
+    display:flex; align-items:center; gap:12px; padding:10px 18px;
+    border-bottom:1px solid rgba(30,45,74,.6); transition:background .2s;
+  }
+  .cand-row:hover { background:rgba(59,130,246,.05); }
+  .cand-row:last-child { border-bottom:none; }
+  .cand-rank { font-family:var(--mono); font-size:11px; font-weight:600; color:var(--muted); min-width:22px; text-align:center; }
+  .cand-rank.gold { color:var(--gold); }
+  .cand-rank.silver { color:#94a3b8; }
+  .cand-avatar {
+    width:34px; height:34px; border-radius:50%; flex-shrink:0;
+    display:flex; align-items:center; justify-content:center;
+    font-family:var(--display); font-size:13px; font-weight:700; color:#fff; overflow:hidden;
+  }
+  .cand-avatar img { width:100%; height:100%; object-fit:cover; }
+  .cand-info { flex:1; min-width:0; }
+  .cand-name { font-size:13px; font-weight:500; color:var(--bright); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .cand-party { font-size:11px; color:var(--muted); }
+  .cand-bar-wrap { flex:1; }
+  .cand-bar-bg { height:6px; background:var(--border); border-radius:6px; overflow:hidden; }
+  .cand-bar-fill { height:100%; border-radius:6px; transition:width .8s cubic-bezier(.4,0,.2,1); }
+  .cand-votes { text-align:right; min-width:80px; flex-shrink:0; }
+  .cand-votes .v { font-family:var(--mono); font-size:13px; color:var(--bright); }
+  .cand-votes .p { font-family:var(--mono); font-size:11px; color:var(--muted); }
+  .cat-tab {
+    padding:5px 14px; border-radius:6px;
+    font-family:var(--mono); font-size:11px; letter-spacing:.04em;
+    cursor:pointer; border:1px solid var(--border);
+    color:var(--muted); transition:all .2s; background:transparent;
+  }
+  .cat-tab.active { color:var(--bright); background:var(--surface); border-color:var(--blue); }
+  .status-strip {
+    position:fixed; bottom:0; left:0; right:0; z-index:100;
+    background:var(--surface); border-top:1px solid var(--border);
+    padding:6px 32px; display:flex; align-items:center; justify-content:space-between;
+    font-family:var(--mono); font-size:11px;
+  }
+  .status-ok  { color:var(--green); }
+  .status-err { color:var(--red); }
+  .status-mid { color:var(--muted); }
+
+  /* ── ERROR OVERLAY ── */
+  .error-overlay {
+    display:none; position:fixed; inset:0; z-index:200;
+    background:rgba(8,12,20,.95);
+    align-items:center; justify-content:center; flex-direction:column; gap:14px;
+    font-family:var(--mono); text-align:center; padding:24px;
+  }
+  .error-overlay.show { display:flex; }
+  .error-icon { font-size:3rem; }
+  .error-title { font-size:1.3rem; font-weight:700; color:var(--bright); }
+  .error-msg { color:var(--muted); font-size:13px; max-width:480px; line-height:1.7; }
+  .error-steps {
+    background:var(--card); border:1px solid var(--border); border-radius:10px;
+    padding:16px 20px; text-align:left; max-width:520px; width:100%;
+    font-size:12px; color:var(--text); line-height:2;
+  }
+  .error-steps code {
+    background:var(--surface); padding:1px 6px; border-radius:4px;
+    color:var(--gold); font-family:var(--mono);
+  }
+  .retry-btn {
+    margin-top:8px; padding:9px 24px; border-radius:8px;
+    background:var(--blue); color:#fff; border:none;
+    font-family:var(--mono); font-size:12px; cursor:pointer; transition:opacity .2s;
+  }
+  .retry-btn:hover { opacity:.8; }
+
+  @keyframes shimmer { 0%{background-position:-800px 0} 100%{background-position:800px 0} }
+  .shimmer {
+    background:linear-gradient(90deg,var(--card) 25%,var(--border) 50%,var(--card) 75%);
+    background-size:800px 100%; animation:shimmer 1.4s infinite; border-radius:6px;
+  }
+  .shimmer-line { height:14px; margin-bottom:8px; }
+
+  @media(max-width:900px) {
+    main { grid-template-columns:1fr 1fr; padding:16px; }
+    .kpi-cards { grid-template-columns:1fr 1fr; }
+    .candidate-list { grid-column:1/-1; }
+    header { padding:14px 16px; }
+  }
+  @media(max-width:550px) {
+    .kpi-cards { grid-template-columns:1fr; }
+    main { grid-template-columns:1fr; }
+    .progress-card { flex-direction:column; align-items:flex-start; }
+  }
+</style>
+</head>
+<body>
+
+<script>
+/* ══════════════════════════════════════════════════════════════════
+   ██████  CONFIG  — edit ONLY this block
+   ══════════════════════════════════════════════════════════════════ */
+const CONFIG = {
+
+  /* URL of your Laravel server — NO trailing slash
+     Local dev:    'http://127.0.0.1:8000'
+     Production:   'https://tu-sistema.com'             */
+  API_BASE_URL: 'https://liquid-prefers-rendered-tiny.trycloudflare.com',
+
+  /* Seconds between automatic refreshes */
+  REFRESH_SECS: 120,
+
+  /* Default category tab to show (ALC = Alcalde, CON = Concejal, etc.)
+     Leave empty '' to auto-pick whatever the server returns first     */
+  CATEGORY: 'ALC',
+
+  /* Leave these empty to use the dashboard defaults from your seeder  */
+  ELECTION_TYPE: '',
+  DEPARTMENT:    '',
+  PROVINCE:      '',
+  MUNICIPALITY:  '',
+};
+/* ══════════════════════════════════════════════════════════════════ */
+</script>
+
+<header>
+  <div class="logo-area">
+    <div class="logo-mark">Q</div>
+    <div class="logo-text">
+      <h1>Panel Electoral · Quillacollo</h1>
+      <p>Sistema de procesamiento de resultados · 2026</p>
+    </div>
+  </div>
+  <div class="header-right">
+    <div class="refresh-info">
+      <span id="last-updated">Conectando…</span>
+      <span class="countdown">Actualizando en <strong id="countdown">—</strong>s</span>
+    </div>
+    <div class="live-badge"><div class="live-dot"></div>EN VIVO</div>
+  </div>
+</header>
+
+<main>
+  <!-- KPI CARDS -->
+  <div class="kpi-cards">
+    <div class="kpi gold">
+      <div class="kpi-label">Mesas Escrutadas</div>
+      <div class="kpi-value" id="k-reported"><div class="shimmer shimmer-line" style="width:70px;height:36px;"></div></div>
+      <div class="kpi-sub">de <span id="k-total">—</span> habilitadas</div>
+      <div class="kpi-progress"><div class="kpi-progress-bar" id="k-bar" style="width:0%"></div></div>
+    </div>
+    <div class="kpi">
+      <div class="kpi-label">Papeletas en Ánfora</div>
+      <div class="kpi-value kpi-accent" id="k-votes"><div class="shimmer shimmer-line" style="width:80px;height:36px;"></div></div>
+      <div class="kpi-sub">votos totales registrados</div>
+    </div>
+    <div class="kpi">
+      <div class="kpi-label">Avance General</div>
+      <div class="kpi-value kpi-accent-green" id="k-pct"><div class="shimmer shimmer-line" style="width:60px;height:36px;"></div></div>
+      <div class="kpi-sub">del escrutinio completado</div>
+    </div>
+    <div class="kpi">
+      <div class="kpi-label">Mesas Pendientes</div>
+      <div class="kpi-value" id="k-pending"><div class="shimmer shimmer-line" style="width:60px;height:36px;"></div></div>
+      <div class="kpi-sub">Blancos: <span id="k-blank">—</span> &nbsp;·&nbsp; Nulos: <span id="k-null">—</span></div>
+    </div>
+  </div>
+
+  <!-- PROGRESS BAR -->
+  <div class="progress-card">
+    <div class="progress-label">Progreso<br>escrutinio</div>
+    <div class="progress-pct" id="p-pct">0%</div>
+    <div class="progress-bar-wrap"><div class="progress-bar-fill" id="p-bar" style="width:0%"></div></div>
+    <div class="progress-stats">
+      <div class="ps-item"><span class="ps-val" id="p-reported">—</span><span class="ps-lab">Computadas</span></div>
+      <div class="ps-item"><span class="ps-val" id="p-pending">—</span><span class="ps-lab">Pendientes</span></div>
+      <div class="ps-item"><span class="ps-val" id="p-total">—</span><span class="ps-lab">Habilitadas</span></div>
+    </div>
+  </div>
+
+  <!-- CANDIDATE LIST -->
+  <div class="candidate-list" style="grid-column:span 2;">
+    <div class="chart-header">
+      <div>
+        <div class="chart-title">Resultados por Candidato</div>
+        <div class="chart-sub">Votos acumulados por partido</div>
+      </div>
+      <div style="display:flex;gap:6px;" id="cat-tabs-container"></div>
+    </div>
+    <div class="cand-scroll" id="candidate-list-body">
+      <div style="padding:24px 18px;">
+        <div class="shimmer shimmer-line" style="width:100%;"></div>
+        <div class="shimmer shimmer-line" style="width:90%;"></div>
+        <div class="shimmer shimmer-line" style="width:95%;"></div>
+        <div class="shimmer shimmer-line" style="width:80%;"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- DONUT CHART -->
+  <div class="chart-card" style="grid-column:span 2;">
+    <div class="chart-header">
+      <div>
+        <div class="chart-title">Distribución por Partido</div>
+        <div class="chart-sub">Proporción de votos válidos</div>
+      </div>
+      <span class="pill" id="donut-cat-label">ALC</span>
+    </div>
+    <div class="chart-body"><div id="donut-chart" style="min-height:280px;"></div></div>
+  </div>
+
+  <!-- BAR CHART -->
+  <div class="chart-card" style="grid-column:1/-1;">
+    <div class="chart-header">
+      <div>
+        <div class="chart-title">Comparativa de Votos</div>
+        <div class="chart-sub">Votos por candidato / partido</div>
+      </div>
+      <span class="pill" id="bar-cat-label">ALC</span>
+    </div>
+    <div class="chart-body"><div id="bar-chart" style="min-height:280px;"></div></div>
+  </div>
+</main>
+
+<div class="status-strip">
+  <span id="status-left" class="status-mid">Iniciando…</span>
+  <span class="status-mid">Sistema Electoral · Quillacollo 2026</span>
+</div>
+
+<!-- ERROR OVERLAY -->
+<div class="error-overlay" id="error-overlay">
+  <div class="error-icon">🔌</div>
+  <div class="error-title" id="err-title">Sin conexión con el servidor</div>
+  <div class="error-msg" id="err-msg"></div>
+  <div class="error-steps" id="err-steps"></div>
+  <button class="retry-btn" onclick="load()">Reintentar ahora</button>
+</div>
+
+<script>
+(function () {
+  'use strict';
+
+  let charts    = {};
+  let allStats  = {};
+  let activeCode = CONFIG.CATEGORY;
+  let countdown  = CONFIG.REFRESH_SECS;
+  let timer = null, cdTimer = null;
+  let firstLoad = true;
+
+  function $(id) { return document.getElementById(id); }
+  function set(id, val) { const el = $(id); if (el) el.textContent = val ?? '—'; }
+  function n(v) { return Number(v).toLocaleString('es-BO'); }
+
+  function statusOk(msg)  { const el = $('status-left'); if(el){ el.className='status-ok';  el.textContent='● '+msg; } }
+  function statusErr(msg) { const el = $('status-left'); if(el){ el.className='status-err'; el.textContent='✖ '+msg; } }
+
+  /* ── COUNTDOWN ─────────────────────────────────────── */
+  function startCountdown() {
+    if (cdTimer) clearInterval(cdTimer);
+    countdown = CONFIG.REFRESH_SECS;
+    set('countdown', countdown);
+    cdTimer = setInterval(() => { countdown--; set('countdown', countdown < 0 ? 0 : countdown); }, 1000);
+  }
+
+  /* ── ARRAYS FROM STATS ─────────────────────────────── */
+  function arrays(code) {
+    const raw = Object.values((allStats[code] ?? {}).stats ?? {}).sort((a,b) => b.votes - a.votes);
+    return {
+      names:  raw.map(s => s.candidate?.party ?? s.candidate?.name ?? '?'),
+      full:   raw.map(s => s.candidate?.name  ?? '?'),
+      colors: raw.map(s => s.candidate?.color ?? '#3b82f6'),
+      votes:  raw.map(s => s.votes      ?? 0),
+      pcts:   raw.map(s => s.percentage ?? 0),
+      photos: raw.map(s => s.candidate?.photo ?? null),
+    };
+  }
+
+  /* ── CANDIDATE LIST ────────────────────────────────── */
+  function renderList(code) {
+    const body = $('candidate-list-body');
+    if (!body) return;
+    const { names, full, colors, votes, pcts, photos } = arrays(code);
+    if (!votes.length) {
+      body.innerHTML = '<div style="padding:32px;text-align:center;color:var(--muted);font-size:13px;">Sin datos disponibles aún</div>';
+      return;
+    }
+    const maxV = Math.max(...votes, 1);
+    body.innerHTML = votes.map((v, i) => {
+      const rankClass = i===0?'gold':i===1?'silver':'';
+      const medal     = i===0?'🥇':i===1?'🥈':i===2?'🥉':(i+1);
+      const initials  = (full[i]||names[i]||'?').charAt(0).toUpperCase();
+      const photoHtml = photos[i]
+        ? `<img src="${CONFIG.API_BASE_URL}/storage/${photos[i]}" alt="" onerror="this.style.display='none'">`
+        : initials;
+      return `<div class="cand-row">
+        <div class="cand-rank ${rankClass}">${medal}</div>
+        <div class="cand-avatar" style="background:${colors[i]};">${photoHtml}</div>
+        <div class="cand-info">
+          <div class="cand-name">${full[i]}</div>
+          <div class="cand-party">${names[i]}</div>
+        </div>
+        <div class="cand-bar-wrap">
+          <div class="cand-bar-bg">
+            <div class="cand-bar-fill" style="width:${Math.round((v/maxV)*100)}%;background:${colors[i]};"></div>
+          </div>
+        </div>
+        <div class="cand-votes">
+          <div class="v">${n(v)}</div>
+          <div class="p">${pcts[i]}%</div>
+        </div>
+      </div>`;
+    }).join('');
+  }
+
+  /* ── CATEGORY TABS ─────────────────────────────────── */
+  function renderTabs() {
+    const c = $('cat-tabs-container');
+    if (!c) return;
+    c.innerHTML = Object.keys(allStats).map(code =>
+      `<button class="cat-tab ${code===activeCode?'active':''}" onclick="window._switchCat('${code}')">${code}</button>`
+    ).join('');
+  }
+
+  window._switchCat = function(code) {
+    activeCode = code;
+    renderTabs(); renderList(code); renderDonut(code); renderBar(code);
+    set('donut-cat-label', code); set('bar-cat-label', code);
+  };
+
+  /* ── DONUT ─────────────────────────────────────────── */
+  function renderDonut(code) {
+    const el = $('donut-chart');
+    if (!el) return;
+    const { names, colors, votes, pcts } = arrays(code);
+    if (!votes.length || votes.every(v=>v===0)) return;
+    const opts = {
+      series: votes, labels: names, colors,
+      chart: { type:'donut', height:290, background:'transparent', animations:{enabled:true,speed:500}, toolbar:{show:false} },
+      theme: { mode:'dark' },
+      plotOptions: { pie: { donut: { size:'58%', labels: { show:true,
+        total: { show:true, label:'Total', fontSize:'11px', color:'#4a6080',
+          formatter: w => n(w.globals.seriesTotals.reduce((a,b)=>a+b,0)) },
+        value: { fontSize:'18px', fontWeight:700, color:'#e8f2ff', formatter: v => n(Number(v)) },
+      }}}},
+      legend: { position:'bottom', fontSize:'11px', fontFamily:"'IBM Plex Mono',monospace", labels:{colors:'#4a6080'} },
+      tooltip: { custom: ({seriesIndex:i}) =>
+        `<div style="padding:8px 12px;background:#141c2e;border:1px solid #1e2d4a;border-radius:6px;font-family:'IBM Plex Mono',monospace;font-size:11px;color:#c8d8f0;">
+          <div style="color:${colors[i]};font-weight:600;margin-bottom:4px;">${names[i]}</div>
+          <div>${n(votes[i])} votos · ${pcts[i]}%</div></div>` },
+      dataLabels: { enabled:false },
+    };
+    if (charts.donut) { charts.donut.updateOptions({colors,labels:names}); charts.donut.updateSeries(votes); }
+    else { charts.donut = new ApexCharts(el, opts); charts.donut.render(); }
+  }
+
+  /* ── BAR ───────────────────────────────────────────── */
+  function renderBar(code) {
+    const el = $('bar-chart');
+    if (!el) return;
+    const { names, colors, votes, pcts, full } = arrays(code);
+    if (!votes.length) return;
+    const opts = {
+      series: [{ name:'Votos', data:votes }],
+      chart: { type:'bar', height:290, background:'transparent', toolbar:{show:false}, animations:{enabled:true,speed:500} },
+      theme: { mode:'dark' },
+      plotOptions: { bar: { distributed:true, borderRadius:5, columnWidth:votes.length>10?'75%':'55%' } },
+      xaxis: { categories:names, labels:{ rotate:-35, style:{fontSize:'11px',fontFamily:"'IBM Plex Mono',monospace",colors:Array(names.length).fill('#4a6080')} }, axisBorder:{color:'#1e2d4a'}, axisTicks:{color:'#1e2d4a'} },
+      yaxis: { labels:{ formatter:v=>n(v), style:{fontFamily:"'IBM Plex Mono',monospace",colors:['#4a6080']} } },
+      grid: { borderColor:'#1e2d4a', strokeDashArray:4 },
+      colors,
+      dataLabels: { enabled:true, formatter:(v,o)=>pcts[o.dataPointIndex]+'%', style:{fontSize:'10px',fontFamily:"'IBM Plex Mono',monospace",colors:['#e8f2ff']}, background:{enabled:false}, offsetY:-8 },
+      tooltip: { custom: ({dataPointIndex:i}) =>
+        `<div style="padding:8px 12px;background:#141c2e;border:1px solid #1e2d4a;border-radius:6px;font-family:'IBM Plex Mono',monospace;font-size:11px;color:#c8d8f0;">
+          <div style="color:${colors[i]};font-weight:600;margin-bottom:4px;">${names[i]}</div>
+          <div style="margin-bottom:2px;">${full[i]}</div>
+          <div>${n(votes[i])} votos · ${pcts[i]}%</div></div>` },
+      legend: { show:false },
+    };
+    if (charts.bar) { charts.bar.updateOptions({colors,xaxis:{categories:names}}); charts.bar.updateSeries([{name:'Votos',data:votes}]); }
+    else { charts.bar = new ApexCharts(el, opts); charts.bar.render(); }
+  }
+
+  /* ── KPI UPDATE ────────────────────────────────────── */
+  function updateKPIs(d) {
+    const pending = (d.totalTables??0) - (d.reportedTables??0);
+    const pct     = d.progressPercentage ?? 0;
+    set('k-reported', n(d.reportedTables)); set('k-total',   n(d.totalTables));
+    set('k-votes',    n(d.totalVotes));
+    set('k-pct',      pct+'%');            set('k-pending', n(pending));
+    set('k-blank',    n(d.totalBlankVotes)); set('k-null', n(d.totalNullVotes));
+    const kBar = $('k-bar'); if(kBar) kBar.style.width = pct+'%';
+    set('p-pct', pct+'%'); set('p-reported', n(d.reportedTables));
+    set('p-pending', n(pending)); set('p-total', n(d.totalTables));
+    const pBar = $('p-bar'); if(pBar) pBar.style.width = pct+'%';
+    set('last-updated', 'Actualizado: ' + (d.last_updated ?? '—'));
+  }
+
+  /* ── SHOW SPECIFIC ERROR WITH INSTRUCTIONS ─────────── */
+  function showError(type, detail) {
+    const overlay = $('error-overlay');
+    const title   = $('err-title');
+    const msg     = $('err-msg');
+    const steps   = $('err-steps');
+
+    if (type === 'cors') {
+      title.textContent = 'Error de CORS';
+      msg.textContent   = 'El servidor bloqueó la solicitud porque este dominio no está en la lista de orígenes permitidos.';
+      steps.innerHTML   = `
+        <b>Pasos para solucionar en Laravel:</b><br>
+        1. Abre <code>config/cors.php</code><br>
+        2. Agrega este dominio a <code>allowed_origins</code>:<br>
+        &nbsp;&nbsp;<code>'${location.origin}'</code><br>
+        3. Agrega <code>'refresh-dashboard'</code> a <code>paths</code><br>
+        4. Ejecuta: <code>php artisan config:clear</code>`;
+    } else if (type === 'auth') {
+      title.textContent = 'Dashboard privado (401/403)';
+      msg.textContent   = 'El servidor rechazó la solicitud porque el dashboard está deshabilitado.';
+      steps.innerHTML   = `
+        <b>Activa el dashboard público:</b><br>
+        Opción A — desde tinker:<br>
+        &nbsp;&nbsp;<code>php artisan tinker</code><br>
+        &nbsp;&nbsp;<code>Dashboard::first()->update(['is_public' => true]);</code><br><br>
+        Opción B — inicia sesión en el sistema y pulsa <b>"Habilitar Dashboard"</b>`;
+    } else if (type === 'network') {
+      title.textContent = 'No se pudo conectar';
+      msg.textContent   = `No hay respuesta del servidor en ${CONFIG.API_BASE_URL}`;
+      steps.innerHTML   = `
+        <b>Verifica:</b><br>
+        1. Que Laravel esté corriendo: <code>php artisan serve</code><br>
+        2. Que <code>API_BASE_URL</code> en este archivo sea correcta<br>
+        &nbsp;&nbsp;Valor actual: <code>${CONFIG.API_BASE_URL}</code><br>
+        3. Que no haya firewall bloqueando la conexión`;
+    } else {
+      title.textContent = 'Error inesperado';
+      msg.textContent   = detail ?? 'Ocurrió un error desconocido.';
+      steps.innerHTML   = `Revisa la consola del navegador (F12) para más detalles.`;
+    }
+
+    overlay.classList.add('show');
+  }
+
+  /* ── FETCH ─────────────────────────────────────────── */
+  async function load() {
+    $('error-overlay').classList.remove('show');
+    const params = new URLSearchParams({
+      election_type: CONFIG.ELECTION_TYPE,
+      category:      activeCode,
+      department:    CONFIG.DEPARTMENT,
+      province:      CONFIG.PROVINCE,
+      municipality:  CONFIG.MUNICIPALITY,
+    });
+    const url = CONFIG.API_BASE_URL + '/refresh-dashboard?' + params;
+
+    try {
+      const res = await fetch(url, {
+        headers: { Accept: 'application/json', 'X-Requested-With': 'XMLHttpRequest' },
+      });
+
+      if (res.status === 401 || res.status === 403) { showError('auth'); return; }
+      if (!res.ok) throw new Error('HTTP ' + res.status);
+
+      const data = await res.json();
+      if (!data.success) throw new Error(data.message ?? 'Error del servidor');
+
+      updateKPIs(data);
+
+      if (data.categoryStats && Object.keys(data.categoryStats).length) {
+        allStats = data.categoryStats;
+        if (!allStats[activeCode]) activeCode = Object.keys(allStats)[0];
+        renderTabs(); renderList(activeCode); renderDonut(activeCode); renderBar(activeCode);
+        set('donut-cat-label', activeCode); set('bar-cat-label', activeCode);
+      }
+
+      firstLoad = false;
+      statusOk('Conectado · ' + (data.last_updated ?? ''));
+      $('error-overlay').classList.remove('show');
+
+    } catch (err) {
+      statusErr('Error: ' + err.message);
+      // Detect CORS: TypeError with no HTTP status = blocked by browser
+      if (err instanceof TypeError && err.message.toLowerCase().includes('fetch')) {
+        showError('cors');
+      } else if (err.message.includes('NetworkError') || err.message === 'Failed to fetch') {
+        showError('network');
+      } else if (firstLoad) {
+        showError('network', err.message);
+      } else {
+        // Silent fail on background refresh — show toast instead
+        const toast = document.createElement('div');
+        toast.style.cssText = 'position:fixed;bottom:40px;right:20px;z-index:9999;background:#7f1d1d;color:#fca5a5;padding:8px 16px;border-radius:8px;font-size:12px;font-family:monospace;border:1px solid #b91c1c;';
+        toast.textContent = '⚠ Sin conexión — reintentando en ' + CONFIG.REFRESH_SECS + 's';
+        document.body.appendChild(toast);
+        setTimeout(() => toast.remove(), 4000);
+      }
+    }
+  }
+
+  /* ── AUTO REFRESH ──────────────────────────────────── */
+  function scheduleRefresh() {
+    if (timer) clearInterval(timer);
+    timer = setInterval(() => { load(); startCountdown(); }, CONFIG.REFRESH_SECS * 1000);
+    startCountdown();
+  }
+
+  document.addEventListener('DOMContentLoaded', () => { load(); scheduleRefresh(); });
+})();
+</script>
+</body>
+</html>
