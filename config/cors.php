@@ -8,6 +8,7 @@ return [
 
 
     'allowed_origins' => [
+        'https://liquid-prefers-rendered-tiny.trycloudflare.com',
         'https://elections-control.neocities.org',
         'http://localhost', 
         'http://127.0.0.1',
