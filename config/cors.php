@@ -7,7 +7,6 @@ return [
     'allowed_methods' => ['*'],
 
     'allowed_origins' => [
-        'allowed_origins' => [
         'https://brothers-display-concern-building.trycloudflare.com',
         'https://elections-control.netlify.app',
         'https://elections-control.neocities.org',
